@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyB9AaVL8LaXYMiPEC2HFt39-otc1PzYXT0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>527380473232</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.xgenious.gocar</string>
+	<key>PROJECT_ID</key>
+	<string>firstapp-9dc95</string>
+	<key>STORAGE_BUCKET</key>
+	<string>firstapp-9dc95.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:527380473232:ios:fc3c8159a09233806fff15</string>
+	<key>DATABASE_URL</key>
+	<string>https://firstapp-9dc95-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

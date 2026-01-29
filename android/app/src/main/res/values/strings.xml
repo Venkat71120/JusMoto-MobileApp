@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">Prohandy</string>
+    <string name="facebook_app_id">589311797111547</string>
+    <string name="fb_login_protocol_scheme">fb589311797111547</string>
+    <string name="facebook_client_token">109a1c9b62c18d1f5ac2e3f0ca38ee83</string>
+</resources>

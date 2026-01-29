@@ -1,0 +1,286 @@
+import 'dart:math';
+
+import 'package:car_service/customizations/colors.dart';
+import 'package:car_service/services/dynamics/dynamics_service.dart';
+import 'package:car_service/services/theme_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
+
+import '/services/app_string_service.dart';
+import '../../models/color_model.dart';
+
+extension ContextExtension on BuildContext {
+  MediaQueryData get mediaQuery => MediaQuery.of(this);
+}
+
+extension MediaQueryExtension on BuildContext {
+  double get height => mediaQuery.size.height;
+  double get width => mediaQuery.size.width;
+  double get paddingTop => mediaQuery.padding.top;
+  double get viewPaddingTop => mediaQuery.viewPadding.top;
+  double get viewPaddingBottom => mediaQuery.viewInsets.bottom;
+
+  double get lowValue => height * 0.01;
+  double get normalValue => height * 0.02;
+  double get mediumValue => height * 0.04;
+  double get highValue => height * 0.1;
+}
+
+extension ThemeExtension on BuildContext {
+  ThemeData get theme => Theme.of(this);
+  TextTheme get textTheme => theme.textTheme;
+  ColorScheme get colors => theme.colorScheme;
+  ColorModel get color =>
+      Provider.of<ThemeService>(this, listen: false).selectedTheme;
+  ThemeData get cTheme {
+    return Provider.of<ThemeService>(this, listen: false).darkTheme
+        ? ThemeData.dark()
+        : ThemeData.light();
+  }
+
+  DynamicsService get dProvider =>
+      Provider.of<DynamicsService>(this, listen: false);
+}
+
+extension PaddingExtensionAll on BuildContext {
+  EdgeInsets get paddingLow => EdgeInsets.all(lowValue);
+  EdgeInsets get paddingNormal => EdgeInsets.all(normalValue);
+  EdgeInsets get paddingMedium => EdgeInsets.all(mediumValue);
+  EdgeInsets get paddingHigh => EdgeInsets.all(highValue);
+}
+
+extension PaddingExtensionSymetric on BuildContext {
+  EdgeInsets get paddingLowVertical => EdgeInsets.symmetric(vertical: lowValue);
+  EdgeInsets get paddingNormalVertical =>
+      EdgeInsets.symmetric(vertical: normalValue);
+  EdgeInsets get paddingMediumVertical =>
+      EdgeInsets.symmetric(vertical: mediumValue);
+  EdgeInsets get paddingHighVertical =>
+      EdgeInsets.symmetric(vertical: highValue);
+
+  EdgeInsets get paddingLowHorizontal =>
+      EdgeInsets.symmetric(horizontal: lowValue);
+  EdgeInsets get paddingNormalHorizontal =>
+      EdgeInsets.symmetric(horizontal: normalValue);
+  EdgeInsets get paddingMediumHorizontal =>
+      EdgeInsets.symmetric(horizontal: mediumValue);
+  EdgeInsets get paddingHighHorizontal =>
+      EdgeInsets.symmetric(horizontal: highValue);
+}
+
+extension PageExtension on BuildContext {
+  Color get randomColor => Colors.primaries[Random().nextInt(17)];
+}
+
+extension DurationExtension on BuildContext {
+  Duration get lowDuration => const Duration(milliseconds: 500);
+  Duration get normalDuration => const Duration(seconds: 1);
+}
+
+extension TextThemeExtension on BuildContext {
+  TextTheme get textTheme =>
+      Theme.of(this).textTheme.apply(fontFamily: 'Inter Tight');
+
+  TextStyle? get bodySmall => textTheme.bodySmall?.copyWith(
+    color: color.secondaryContrastColor,
+    fontSize: 12,
+  );
+  TextStyle? get bodyMedium => textTheme.bodyMedium?.copyWith(
+    color: color.secondaryContrastColor,
+    fontSize: 14,
+  );
+  TextStyle? get bodyLarge => textTheme.bodyLarge?.copyWith(
+    color: color.secondaryContrastColor,
+    fontSize: 16,
+  );
+  TextStyle? get titleSmall => textTheme.titleSmall?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 14,
+  );
+  TextStyle? get titleMedium => textTheme.titleMedium?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 16,
+  );
+  TextStyle? get titleLarge => textTheme.titleLarge?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 18,
+  );
+  TextStyle? get labelSmall => textTheme.labelSmall?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 12,
+  );
+  TextStyle? get labelMedium => textTheme.labelMedium?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 14,
+  );
+  TextStyle? get labelLarge => textTheme.labelLarge?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 16,
+  );
+  TextStyle? get headlineSmall => textTheme.headlineSmall?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 16,
+  );
+  TextStyle? get headlineMedium => textTheme.headlineMedium?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 18,
+  );
+  TextStyle? get headlineLarge => textTheme.headlineLarge?.copyWith(
+    color: color.primaryContrastColor,
+    fontSize: 20,
+  );
+}
+
+extension LocalizationExtension on BuildContext {
+  AppStringService get asProvider =>
+      Provider.of<AppStringService>(this, listen: false);
+}
+
+extension TurnTextBoldExtension on TextStyle {
+  TextStyle get bold => copyWith(fontWeight: FontWeight.bold);
+  TextStyle get bold6 => copyWith(fontWeight: FontWeight.w600);
+  TextStyle get bold5 => copyWith(fontWeight: FontWeight.w500);
+}
+
+extension NavigationExtension on BuildContext {
+  toNamed(String routeName, {then, arguments = const []}) {
+    Navigator.of(this).pushNamed(routeName, arguments: arguments).then((value) {
+      then ??= () {};
+      then();
+    });
+  }
+
+  toPopeNamed(String routeName, {then}) {
+    Navigator.of(this).popAndPushNamed(routeName).then((value) {
+      then ??= () {};
+      then();
+    });
+  }
+
+  animateToPage(Widget page, {then}) {
+    Navigator.of(this)
+        .push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => page,
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              final tween = Tween(begin: begin, end: end);
+              final curvedAnimation = CurvedAnimation(
+                parent: animation,
+                curve: curve,
+              );
+
+              return SlideTransition(
+                position: tween.animate(curvedAnimation),
+                child: child,
+              );
+            },
+            reverseTransitionDuration: 300.milliseconds,
+            transitionDuration: 300.milliseconds,
+          ),
+        )
+        .then((value) {
+          if (then != null) {
+            then(value);
+          }
+        });
+  }
+
+  toPage(Widget page, {then}) {
+    Navigator.of(this).push(MaterialPageRoute(builder: (context) => page)).then(
+      (value) {
+        if (then != null) {
+          then(value);
+        }
+      },
+    );
+  }
+
+  toPopPage(Widget page) {
+    Navigator.of(this).push(MaterialPageRoute(builder: (context) => page));
+  }
+
+  toUntilPage(Widget page) {
+    Navigator.of(this).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => page),
+      (route) => false,
+    );
+  }
+
+  paru(Widget page) {
+    Navigator.pushAndRemoveUntil(
+      this,
+      MaterialPageRoute(builder: (context) => page),
+      (route) => false,
+    );
+  }
+
+  get popTrue => Navigator.pop(this, true);
+  get popFalse => Navigator.pop(this, false);
+  get pop {
+    Navigator.of(this).pop();
+    return null;
+  }
+
+  get animatePop {
+    Navigator.of(this).pop();
+    return null;
+  }
+}
+
+extension ShowSnackBar on BuildContext {
+  snackBar(
+    String content, {
+    String? buttonText,
+    void Function()? onTap,
+    Color? backgroundColor,
+    Duration? duration,
+  }) {
+    ScaffoldMessenger.of(this).removeCurrentSnackBar();
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        margin: const EdgeInsets.all(5),
+        backgroundColor: backgroundColor ?? primaryColor,
+        duration: duration ?? const Duration(seconds: 2),
+        content: Row(
+          children: [
+            Text(content, overflow: TextOverflow.ellipsis, style: titleSmall),
+            const Spacer(),
+            if (buttonText != null)
+              GestureDetector(
+                onTap: onTap,
+                child: Text(
+                  buttonText,
+                  style: titleSmall?.copyWith(color: color.accentContrastColor),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+extension ModalRouteExtension on BuildContext {
+  get arguments {
+    return ModalRoute.of(this)?.settings.arguments;
+  }
+}
+
+extension FocusExtension on BuildContext {
+  bool get unFocus {
+    FocusScope.of(this).unfocus();
+    return true;
+  }
+}

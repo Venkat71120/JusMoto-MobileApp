@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "527380473232",
+    "firebase_url": "https://firstapp-9dc95-default-rtdb.firebaseio.com",
+    "project_id": "firstapp-9dc95",
+    "storage_bucket": "firstapp-9dc95.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527380473232:android:a13e294ecf28705b6fff15",
+        "android_client_info": {
+          "package_name": "com.example.clean_architecture_digital_marketplace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHb77420sCbMSr4tzh0Y8lCLD4BZgbD5w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527380473232:android:9fd3be3ad5c4d31f6fff15",
+        "android_client_info": {
+          "package_name": "com.example.shopsmart_users"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHb77420sCbMSr4tzh0Y8lCLD4BZgbD5w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527380473232:android:543d21e329e8e81a6fff15",
+        "android_client_info": {
+          "package_name": "com.xgenious.car_service"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHb77420sCbMSr4tzh0Y8lCLD4BZgbD5w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,40 @@
+import 'dart:convert';
+
+import 'package:car_service/helper/app_urls.dart';
+import 'package:flutter/material.dart';
+
+import '../../data/network/network_api_services.dart';
+import '../../helper/constant_helper.dart';
+import '../../helper/local_keys.g.dart';
+import '../../models/slider_model.dart';
+
+class HomeSliderService with ChangeNotifier {
+  List<HomeSliderModel>? sliderList;
+
+  initLocal() {
+    final localData = sPref?.getString("sliders");
+    final tempData = SliderListModel.fromJson(jsonDecode(localData ?? "{}"));
+    if ((tempData.sliders ?? []).isNotEmpty) {
+      sliderList = tempData.sliders;
+      fetchHomeSlider();
+    }
+  }
+
+  fetchHomeSlider() async {
+    var url = AppUrls.homeSliderListUrl;
+
+    final responseData =
+        await NetworkApiServices().getApi(url, LocalKeys.sliders);
+    try {
+      if (responseData != null) {
+        final tempData = SliderListModel.fromJson(responseData);
+
+        sliderList = tempData.sliders ?? [];
+        sPref?.setString("sliders", jsonEncode(responseData));
+      }
+    } finally {
+      sliderList ??= [];
+      notifyListeners();
+    }
+  }
+}

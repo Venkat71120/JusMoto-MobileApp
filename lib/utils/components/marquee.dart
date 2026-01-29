@@ -1,0 +1,69 @@
+import 'package:car_service/helper/extension/context_extension.dart';
+import 'package:flutter/material.dart';
+
+enum DirectionMarguee { oneDirection, TwoDirection }
+
+/// Marquee Text
+class Marquee extends StatelessWidget {
+  final Widget child;
+  final Axis direction;
+  final Duration animationDuration, backDuration, pauseDuration;
+  final DirectionMarguee directionMarguee;
+
+  Marquee({
+    required this.child,
+    this.direction = Axis.horizontal,
+    this.animationDuration = const Duration(milliseconds: 5000),
+    this.backDuration = const Duration(milliseconds: 5000),
+    this.pauseDuration = const Duration(milliseconds: 2000),
+    this.directionMarguee = DirectionMarguee.TwoDirection,
+    super.key,
+  });
+
+  final ScrollController scrollController = ScrollController();
+
+  scroll() async {
+    while (true) {
+      if (scrollController.hasClients) {
+        await Future.delayed(pauseDuration);
+        if (scrollController.hasClients) {
+          await scrollController.animateTo(
+              scrollController.position.maxScrollExtent,
+              duration: animationDuration,
+              curve: Curves.easeIn);
+        }
+        await Future.delayed(pauseDuration);
+        if (scrollController.hasClients) {
+          switch (directionMarguee) {
+            case DirectionMarguee.oneDirection:
+              scrollController.jumpTo(
+                0.0,
+              );
+              break;
+            case DirectionMarguee.TwoDirection:
+              await scrollController.animateTo(0.0,
+                  duration: backDuration, curve: Curves.easeOut);
+              break;
+          }
+        }
+      } else {
+        await Future.delayed(pauseDuration);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    scroll();
+    return Directionality(
+      textDirection: context.dProvider.textDirectionRight
+          ? TextDirection.rtl
+          : TextDirection.ltr,
+      child: SingleChildScrollView(
+        scrollDirection: direction,
+        controller: scrollController,
+        child: child,
+      ),
+    );
+  }
+}
