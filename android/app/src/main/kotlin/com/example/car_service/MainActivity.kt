@@ -1,4 +1,4 @@
-package com.xgenious.car_service
+package com.jusMoto.jusMoto
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity

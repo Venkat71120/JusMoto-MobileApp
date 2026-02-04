@@ -1,7 +1,7 @@
 String siteLink = 'https://car-service.bytesed.com';
 
-String appLabel = 'GoCar';
-String storeLabel = "GoCar";
+String appLabel = 'JusMoto';
+String storeLabel = "JusMoto";
 String appVersion = '1.0';
 String mapApiKey = 'google_map_key';
 

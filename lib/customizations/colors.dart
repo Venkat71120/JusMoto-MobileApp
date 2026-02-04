@@ -1,13 +1,13 @@
 import 'package:car_service/models/color_model.dart';
 import 'package:flutter/material.dart';
 
-const Color primaryColor = Color(0xFFB92325);
+const Color primaryColor = Color(0xFFFF3B3B);
 Color get mutedPrimaryColor => primaryColor.withOpacity(.1);
 
 //Light theme colors
 final ColorModel lightColors = ColorModel(
   backgroundColor: const Color(0xFFF7F7F7),
-  primaryContrastColor: const Color(0xFF0F172A),
+  primaryContrastColor: const Color(0xFF1F1F1F),
   secondaryContrastColor: const Color(0xFF475569),
   tertiaryContrastColo: const Color(0xFF64748B),
   accentContrastColor: const Color(0xFFFFFFFF),

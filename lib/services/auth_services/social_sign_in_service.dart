@@ -44,34 +44,70 @@ class SignInService with ChangeNotifier {
     }
   }
 
-  trySocialSignIn({
-    required String type,
-    required String fName,
-    required String lName,
-    required String email,
-    required String id,
-  }) async {
-    final url = AppUrls.socialSignInUrl;
+ trySocialSignIn({
+  required String type,
+  required String fName,
+  required String lName,
+  required String email,
+  required String id,
+}) async {
+  print('📡 Sending social sign-in request to backend');
+  print('  - URL: ${AppUrls.socialSignInUrl}');
+  print('  - Type: $type');
+  print('  - Email: $email');
+  print('  - First Name: $fName');
+  print('  - Last Name: $lName');
+  print('  - ID: $id');
+  
+  final url = AppUrls.socialSignInUrl;
 
-    final data = {
-      'email': email,
-      'source': type,
-      'firstname': fName,
-      'lastname': lName,
-      'is_go_fb_ap_id': id
-    };
+  final data = {
+    'email': email,
+    'source': type,
+    'firstname': fName,
+    'lastname': lName,
+    "user_type": "1",
+    'is_go_fb_ap_id': id
+  };
 
-    final headers = {
-      'Accept': 'application/json',
-      'secretKey': socialSignInKey
-    };
+  final headers = {
+    'Accept': 'application/json',
+    'secretKey': socialSignInKey
+  };
 
-    final responseData = await NetworkApiServices()
-        .postApi(data, url, LocalKeys.signInWithGoogle, headers: headers);
+  print('📦 Request data: $data');
+  print('📋 Request headers: ${headers.keys.toList()}');
 
-    if (responseData != null) {
-      setToken(responseData["token"]);
+  final responseData = await NetworkApiServices()
+      .postApi(data, url, LocalKeys.signInWithGoogle, headers: headers);
+
+  print('📥 Response received: $responseData');
+
+  if (responseData != null) {
+    if (responseData.containsKey("token")) {
+      // ✅ CRITICAL FIX: Save to instance variable FIRST
+      token = responseData["token"] ?? "";
+      
+      print('✅ Token saved to instance variable: ${token.substring(0, 20)}...');
+      
+      // ✅ THEN save to SharedPreferences
+      setToken(token);
+      
+      print('✅ Token saved to SharedPreferences');
+      
       return true;
+    } else if (responseData.containsKey("message")) {
+      print('⚠️ Server message: ${responseData["message"]}');
+      responseData["message"]?.toString().showToast();
+      return false;
+    } else {
+      print('⚠️ Unexpected response structure: $responseData');
+      return false;
     }
+  } else {
+    print('❌ Response is null');
+    return false;
   }
 }
+  }
+

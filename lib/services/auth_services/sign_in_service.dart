@@ -15,6 +15,7 @@ class SignInService with ChangeNotifier {
   var email = "";
   var userId = "";
   String? firstName;
+  
   Future trySignIn(
       {required String emailUsername, required String password}) async {
     final data = {
@@ -51,6 +52,14 @@ class SignInService with ChangeNotifier {
     required String email,
     required String id,
   }) async {
+    print('📡 Sending social sign-in request to backend');
+    print('  - URL: ${AppUrls.socialSignInUrl}');
+    print('  - Type: $type');
+    print('  - Email: $email');
+    print('  - First Name: $fName');
+    print('  - Last Name: $lName');
+    print('  - ID: $id');
+    
     final url = AppUrls.socialSignInUrl;
 
     final data = {
@@ -58,7 +67,7 @@ class SignInService with ChangeNotifier {
       'source': type,
       'firstname': fName,
       'lastname': lName,
-      "user_type": "1",
+      "user_type": "1",  // ⚠️ IMPORTANT: This was missing in your second version!
       'is_go_fb_ap_id': id
     };
 
@@ -67,12 +76,30 @@ class SignInService with ChangeNotifier {
       'secretKey': socialSignInKey
     };
 
+    print('📦 Request data: $data');
+    print('📋 Request headers: ${headers.keys.toList()}');
+
     final responseData = await NetworkApiServices()
         .postApi(data, url, LocalKeys.signInWithGoogle, headers: headers);
 
+    print('📥 Response received: $responseData');
+
     if (responseData != null) {
-      setToken(responseData["token"]);
-      return true;
+      if (responseData.containsKey("token")) {
+        print('✓ Token received: ${responseData["token"]?.toString().substring(0, 20)}...');
+        setToken(responseData["token"]);
+        return true;
+      } else if (responseData.containsKey("message")) {
+        print('⚠️ Server message: ${responseData["message"]}');
+        responseData["message"]?.toString().showToast();
+        return false;
+      } else {
+        print('⚠️ Unexpected response structure: $responseData');
+        return false;
+      }
+    } else {
+      print('❌ Response is null');
+      return false;
     }
   }
 }

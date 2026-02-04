@@ -282,7 +282,7 @@ abstract class LocalKeys {
   static const String _signUp = "Sign up";
   static const String _otpSignIn = "Sign In with OTP";
   static const String _signInFailed = "Sign In Failed";
-  static const String _signInWithGoogle = "Sing in with Google";
+  static const String _signInWithGoogle = "Sign in with Google";
   static const String _signInWithFacebook = "Sign in with Facebook";
   static const String _signInWithApple = "Sign in with Apple";
   static const String _or = "Or";

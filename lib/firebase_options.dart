@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -47,33 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAdp1rIJ74Lrrh859GzmEqHjvyS-7Vnky8',
-    appId: '1:527380473232:web:b398a47410bd14106fff15',
-    messagingSenderId: '527380473232',
-    projectId: 'firstapp-9dc95',
-    authDomain: 'firstapp-9dc95.firebaseapp.com',
-    databaseURL: 'https://firstapp-9dc95-default-rtdb.firebaseio.com',
-    storageBucket: 'firstapp-9dc95.appspot.com',
-    measurementId: 'G-WM595NJK9N',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB9AaVL8LaXYMiPEC2HFt39-otc1PzYXT0',
-    appId: '1:527380473232:ios:fc3c8159a09233806fff15',
-    messagingSenderId: '527380473232',
-    projectId: 'firstapp-9dc95',
-    databaseURL: 'https://firstapp-9dc95-default-rtdb.firebaseio.com',
-    storageBucket: 'firstapp-9dc95.appspot.com',
-    iosBundleId: 'com.xgenious.gocar',
+    apiKey: 'AIzaSyDYMuu0kwONipsywsd3iJ9kwZhoYtTlN6s',
+    appId: '1:423970134410:web:cb31cdc5329c9ed98d5073',
+    messagingSenderId: '423970134410',
+    projectId: 'jusmoto-app',
+    authDomain: 'jusmoto-app.firebaseapp.com',
+    storageBucket: 'jusmoto-app.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBHb77420sCbMSr4tzh0Y8lCLD4BZgbD5w',
-    appId: '1:527380473232:android:543d21e329e8e81a6fff15',
-    messagingSenderId: '527380473232',
-    projectId: 'firstapp-9dc95',
-    databaseURL: 'https://firstapp-9dc95-default-rtdb.firebaseio.com',
-    storageBucket: 'firstapp-9dc95.appspot.com',
+    apiKey: 'AIzaSyCSGwnhnpmQ28wdjFjeTwoeWtILma6VXgE',
+    appId: '1:423970134410:android:677d681316ee20e48d5073',
+    messagingSenderId: '423970134410',
+    projectId: 'jusmoto-app',
+    storageBucket: 'jusmoto-app.firebasestorage.app',
   );
 
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyACp-UYJR_YpoFtESvCb-XUyQ584_R_T5w',
+    appId: '1:423970134410:ios:0f82da1e1aedf0ea8d5073',
+    messagingSenderId: '423970134410',
+    projectId: 'jusmoto-app',
+    storageBucket: 'jusmoto-app.firebasestorage.app',
+    iosClientId: '423970134410-5v9nq9hv31kfei7nhqb79bgoledf6f5c.apps.googleusercontent.com',
+    iosBundleId: 'com.xgenious.gocar',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyACp-UYJR_YpoFtESvCb-XUyQ584_R_T5w',
+    appId: '1:423970134410:ios:0754a978731b75dc8d5073',
+    messagingSenderId: '423970134410',
+    projectId: 'jusmoto-app',
+    storageBucket: 'jusmoto-app.firebasestorage.app',
+    iosClientId: '423970134410-0fq8rcmt3j6i88usa9jkvppbqgvbg87n.apps.googleusercontent.com',
+    iosBundleId: 'com.example.carService',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDYMuu0kwONipsywsd3iJ9kwZhoYtTlN6s',
+    appId: '1:423970134410:web:1c8d063cb3f731398d5073',
+    messagingSenderId: '423970134410',
+    projectId: 'jusmoto-app',
+    authDomain: 'jusmoto-app.firebaseapp.com',
+    storageBucket: 'jusmoto-app.firebasestorage.app',
+  );
 }

@@ -43,14 +43,39 @@ class AddEditAddressViewModel {
   dynamic addressId;
 
   AddEditAddressViewModel._init();
+  
   static AddEditAddressViewModel? _instance;
+  
   static AddEditAddressViewModel get instance {
     _instance ??= AddEditAddressViewModel._init();
     return _instance!;
   }
 
-  AddEditAddressViewModel._dispose();
+  // Proper instance disposal method
+  void _disposeResources() {
+    titlePassController.dispose();
+    addressController.dispose();
+    phoneController.dispose();
+    emergencyPhoneController.dispose();
+    zipCodeController.dispose();
+    
+    selectedState.dispose();
+    selectedCity.dispose();
+    selectedArea.dispose();
+    selectedFromMap.dispose();
+    disableScroll.dispose();
+    isLoading.dispose();
+    phone.dispose();
+    emergencyPhone.dispose();
+    selectedType.dispose();
+    
+    scrollController.dispose();
+    controller?.dispose();
+  }
+
+  // Static dispose getter to cleanup singleton instance
   static bool get dispose {
+    _instance?._disposeResources();
     _instance = null;
     return true;
   }
@@ -98,7 +123,7 @@ class AddEditAddressViewModel {
     );
   }
 
-  initAddress(Address address) {
+  void initAddress(Address address) {
     titlePassController.text = address.title ?? "";
     addressController.text = address.address ?? "";
     zipCodeController.text = address.postCode ?? "";

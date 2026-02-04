@@ -72,22 +72,30 @@ class MapChooseBlock extends StatelessWidget {
                         zoom: 16.0,
                       ),
                       zoomControlsEnabled: false,
-                      onMapCreated: (controller) {
-                        this.controller = controller;
-                        if (currentLoc.value != null) {
-                          debugPrint(
-                              "Current location is ----------------- ${currentLoc.value}"
-                                  .toString());
-                          controller
-                              .animateCamera(CameraUpdate.newCameraPosition(
-                            CameraPosition(
-                              target: LatLng(currentLoc.value!.latitude,
-                                  currentLoc.value!.longitude),
-                              zoom: 16,
-                            ),
-                          ));
-                        }
-                      },
+                     onMapCreated: (controller) {
+  this.controller = controller;
+  if (currentLoc.value != null) {
+    debugPrint("Current location is ----------------- ${currentLoc.value}");
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: LatLng(
+          currentLoc.value!.latitude,
+          currentLoc.value!.longitude
+        ),
+        zoom: 16,
+      ),
+    ));
+    
+    // Fetch address for current location
+    gl.fetchGEOLocations(
+      lat: currentLoc.value!.latitude,
+      lng: currentLoc.value!.longitude,
+    ).then((_) {
+      final aea = AddEditAddressViewModel.instance;
+      aea.addressController.text = gl.geoLoc?.description ?? "";
+    });
+  }
+},
                       style: gl.dark,
                       buildingsEnabled: false,
                       mapToolbarEnabled: true,
@@ -151,12 +159,41 @@ class MapChooseBlock extends StatelessWidget {
         }));
   }
 
-  _getCurrentLoc(GoogleLocationSearch gl, {bool isDark = false}) async {
-    final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
-    await geolocatorPlatform.requestPermission();
-    currentLoc.value = await geolocatorPlatform.getCurrentPosition();
-    if (isDark && gl.dark == null) {
-      await gl.setDark();
+ _getCurrentLoc(GoogleLocationSearch gl, {bool isDark = false}) async {
+  final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
+  
+  // Check permission status first
+  LocationPermission permission = await geolocatorPlatform.checkPermission();
+  
+  if (permission == LocationPermission.denied) {
+    permission = await geolocatorPlatform.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Handle denied permission
+      debugPrint('Location permissions are denied');
+      return;
     }
   }
+  
+  if (permission == LocationPermission.deniedForever) {
+    // Handle permanently denied permission
+    debugPrint('Location permissions are permanently denied');
+    return;
+  }
+  
+  currentLoc.value = await geolocatorPlatform.getCurrentPosition();
+  
+  // Fetch address for current location
+  if (currentLoc.value != null) {
+    await gl.fetchGEOLocations(
+      lat: currentLoc.value!.latitude,
+      lng: currentLoc.value!.longitude,
+    );
+    final aea = AddEditAddressViewModel.instance;
+    aea.addressController.text = gl.geoLoc?.description ?? "";
+  }
+  
+  if (isDark && gl.dark == null) {
+    await gl.setDark();
+  }
+}
 }

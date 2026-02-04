@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class IntroService with ChangeNotifier {
   final introData = [
     {
-      "title": "Welcome to GoCar",
+      "title": "Welcome to JusMoto",
       "description":
           "Book expert handymen for any task—repairs, shifting, plumbing, and laundry. Experience reliable service and peace of mind.",
       "image": "assets/images/intro_1.png",
