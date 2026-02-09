@@ -25,13 +25,13 @@ class SocialSignIn extends StatelessWidget {
           },
         ),
         EmptySpaceHelper.emptyHeight(16),
-        SocialSignInButton(
-          title: LocalKeys.signInWithFacebook,
-          image: "facebook",
-          onTap: () async {
-            await ssi.trySocialSignIn(context, type: "facebook");
-          },
-        ),
+        // SocialSignInButton(
+        //   title: LocalKeys.signInWithFacebook,
+        //   image: "facebook",
+        //   onTap: () async {
+        //     await ssi.trySocialSignIn(context, type: "facebook");
+        //   },
+        // ),
         if (Platform.isIOS) ...[
           EmptySpaceHelper.emptyHeight(16),
           SocialSignInButton(

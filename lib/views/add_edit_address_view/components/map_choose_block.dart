@@ -23,6 +23,23 @@ class MapChooseBlock extends StatelessWidget {
   GoogleMapController? controller;
   ValueNotifier<Position?> currentLoc = ValueNotifier(null);
 
+  // Helper method to populate fields from geoLoc
+  void _populateAddressFields(GoogleLocationSearch gl) {
+    final aea = AddEditAddressViewModel.instance;
+    
+    // Populate address field
+    if (gl.geoLoc?.description != null && gl.geoLoc!.description!.isNotEmpty) {
+      aea.addressController.text = gl.geoLoc!.description!;
+      debugPrint("✅ Address field populated: ${gl.geoLoc!.description}");
+    }
+    
+    // Populate zip code field
+    if (gl.geoLoc?.postCode != null && gl.geoLoc!.postCode!.isNotEmpty) {
+      aea.zipCodeController.text = gl.geoLoc!.postCode!;
+      debugPrint("✅ Zip code field populated: ${gl.geoLoc!.postCode}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Timer? timer;
@@ -72,30 +89,29 @@ class MapChooseBlock extends StatelessWidget {
                         zoom: 16.0,
                       ),
                       zoomControlsEnabled: false,
-                     onMapCreated: (controller) {
-  this.controller = controller;
-  if (currentLoc.value != null) {
-    debugPrint("Current location is ----------------- ${currentLoc.value}");
-    controller.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(
-        target: LatLng(
-          currentLoc.value!.latitude,
-          currentLoc.value!.longitude
-        ),
-        zoom: 16,
-      ),
-    ));
-    
-    // Fetch address for current location
-    gl.fetchGEOLocations(
-      lat: currentLoc.value!.latitude,
-      lng: currentLoc.value!.longitude,
-    ).then((_) {
-      final aea = AddEditAddressViewModel.instance;
-      aea.addressController.text = gl.geoLoc?.description ?? "";
-    });
-  }
-},
+                      onMapCreated: (controller) {
+                        this.controller = controller;
+                        if (currentLoc.value != null) {
+                          debugPrint("Current location is ----------------- ${currentLoc.value}");
+                          controller.animateCamera(CameraUpdate.newCameraPosition(
+                            CameraPosition(
+                              target: LatLng(
+                                currentLoc.value!.latitude,
+                                currentLoc.value!.longitude
+                              ),
+                              zoom: 16,
+                            ),
+                          ));
+                          
+                          // Fetch address for current location and populate fields
+                          gl.fetchGEOLocations(
+                            lat: currentLoc.value!.latitude,
+                            lng: currentLoc.value!.longitude,
+                          ).then((_) {
+                            _populateAddressFields(gl);
+                          });
+                        }
+                      },
                       style: gl.dark,
                       buildingsEnabled: false,
                       mapToolbarEnabled: true,
@@ -119,9 +135,9 @@ class MapChooseBlock extends StatelessWidget {
                               lat: details.target.latitude,
                               lng: details.target.longitude,
                             );
-                            final aea = AddEditAddressViewModel.instance;
-                            aea.addressController.text =
-                                gl.geoLoc?.description ?? "";
+                            
+                            // Populate both address and zip code fields
+                            _populateAddressFields(gl);
                           },
                         );
                       },
@@ -159,41 +175,42 @@ class MapChooseBlock extends StatelessWidget {
         }));
   }
 
- _getCurrentLoc(GoogleLocationSearch gl, {bool isDark = false}) async {
-  final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
-  
-  // Check permission status first
-  LocationPermission permission = await geolocatorPlatform.checkPermission();
-  
-  if (permission == LocationPermission.denied) {
-    permission = await geolocatorPlatform.requestPermission();
+  _getCurrentLoc(GoogleLocationSearch gl, {bool isDark = false}) async {
+    final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
+    
+    // Check permission status first
+    LocationPermission permission = await geolocatorPlatform.checkPermission();
+    
     if (permission == LocationPermission.denied) {
-      // Handle denied permission
-      debugPrint('Location permissions are denied');
+      permission = await geolocatorPlatform.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Handle denied permission
+        debugPrint('Location permissions are denied');
+        return;
+      }
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      // Handle permanently denied permission
+      debugPrint('Location permissions are permanently denied');
       return;
     }
+    
+    currentLoc.value = await geolocatorPlatform.getCurrentPosition();
+    
+    // Fetch address for current location and populate fields
+    if (currentLoc.value != null) {
+      await gl.fetchGEOLocations(
+        lat: currentLoc.value!.latitude,
+        lng: currentLoc.value!.longitude,
+      );
+      
+      // Populate both address and zip code fields
+      _populateAddressFields(gl);
+    }
+    
+    if (isDark && gl.dark == null) {
+      await gl.setDark();
+    }
   }
-  
-  if (permission == LocationPermission.deniedForever) {
-    // Handle permanently denied permission
-    debugPrint('Location permissions are permanently denied');
-    return;
-  }
-  
-  currentLoc.value = await geolocatorPlatform.getCurrentPosition();
-  
-  // Fetch address for current location
-  if (currentLoc.value != null) {
-    await gl.fetchGEOLocations(
-      lat: currentLoc.value!.latitude,
-      lng: currentLoc.value!.longitude,
-    );
-    final aea = AddEditAddressViewModel.instance;
-    aea.addressController.text = gl.geoLoc?.description ?? "";
-  }
-  
-  if (isDark && gl.dark == null) {
-    await gl.setDark();
-  }
-}
 }

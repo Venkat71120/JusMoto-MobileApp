@@ -18,7 +18,7 @@ class DynamicsService with ChangeNotifier {
 
   bool currencyRight = false;
   bool textDirectionRight = false;
-  String currencySymbol = "\$";
+  String currencySymbol = "\₹";
   String currencyCode = "USD";
   get noConnection => _noConnection;
   Locale _appLocal = const Locale("en", "GB");

@@ -23,15 +23,20 @@ class HomeSlider extends StatelessWidget {
         return CustomFutureWidget(
           function: hs.sliderList == null ? hs.fetchHomeSlider() : null,
           shimmer: const SliderSkeleton(),
-          child:
-              (hs.sliderList ?? []).isEmpty
-                  ? const SizedBox()
-                  : Container(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: ((context.width - 24) / 328) * 128,
+        child: (hs.sliderList ?? []).isEmpty
+    ? const SizedBox()
+    : Container(
+        padding: const EdgeInsets.only(top: 16),
+        child: Column(
+          children: [
+            // Add this debug print
+            Builder(builder: (context) {
+              print("Slider count: ${hs.sliderList!.length}");
+              print("Calculated height: ${((context.width - 24) / 328) * 128}");
+              return SizedBox();
+            }),
+            SizedBox(
+              height: ((context.width - 24) / 328) * 128,
                           child: Swiper(
                             itemCount: hs.sliderList!.length,
                             autoplay: true,

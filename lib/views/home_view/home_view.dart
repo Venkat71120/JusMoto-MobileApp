@@ -8,6 +8,7 @@ import 'package:car_service/services/home_services/unread_count_service.dart';
 import 'package:car_service/services/theme_service.dart';
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
 import 'package:car_service/view_models/home_view_model/home_view_model.dart';
+import 'package:car_service/views/home_view/components/HomeRecentOrders.dart' show HomeRecentOrders;
 import 'package:car_service/views/home_view/components/home_popular_products.dart';
 import 'package:car_service/views/home_view/components/home_popular_services.dart';
 import 'package:car_service/views/home_view/components/home_slider.dart';
@@ -31,7 +32,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final hm = HomeViewModel.instance;
     UnreadCountService.instance.fetchUnreadCounts();
-    LandingOfferService.instance.fetchPrimaryOfferContent(context);
+    // LandingOfferService.instance.fetchPrimaryOfferContent(context);
     return CustomRefreshIndicator(
       onRefresh: () async {
         Provider.of<HomeSliderService>(
@@ -86,11 +87,14 @@ class HomeView extends StatelessWidget {
                           background: HomeViewHeader(),
                         ),
                       ),
+                      
                       SliverList(
                         delegate: SliverChildListDelegate([
                           const HomeCategories(),
+                          const HomeRecentOrders(),
+                           const HomeSlider(),
                           const HomeFeaturedServices(),
-                          const HomeSlider(),
+                         
                           HomePopularServices(),
                           // ConstrainedBox(
                           //   constraints: BoxConstraints(

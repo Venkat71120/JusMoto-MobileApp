@@ -22,6 +22,7 @@ class ChooseLocationView extends StatelessWidget {
   ChooseLocationView({super.key});
   GoogleMapController? controller;
   ValueNotifier<Position?> currentLoc = ValueNotifier(null);
+  ValueNotifier<LatLng?> currentCameraPosition = ValueNotifier(null);
   String? dark;
 
   @override
@@ -54,50 +55,69 @@ class ChooseLocationView extends StatelessWidget {
                   Expanded(
                     child: Stack(
                       children: [
-                        GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(
-                                gl.geoLoc?.lat ??
-                                    currentLoc.value?.latitude ??
-                                    23.75617346773963,
-                                gl.geoLoc?.lng ??
-                                    currentLoc.value?.longitude ??
-                                    90.441897487471404),
-                            zoom: 16.0,
-                          ),
-                          zoomControlsEnabled: false,
-                          onMapCreated: (controller) {
-                            this.controller = controller;
-                          },
-                          style: dark,
-                          buildingsEnabled: false,
-                          mapToolbarEnabled: true,
-                          indoorViewEnabled: false,
-                          liteModeEnabled: false,
-                          rotateGesturesEnabled: false,
-                          myLocationButtonEnabled: true,
-                          myLocationEnabled: true,
-                          onCameraMove: (details) {
-                            timer?.cancel();
-                            timer = Timer(
-                              1.seconds,
-                              () {
-                                gl.fetchGEOLocations(
-                                  lat: details.target.latitude,
-                                  lng: details.target.longitude,
+                        ValueListenableBuilder<Position?>(
+                          valueListenable: currentLoc,
+                          builder: (context, position, child) {
+                            return GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(
+                                    gl.geoLoc?.lat ??
+                                        position?.latitude ??
+                                        23.75617346773963,
+                                    gl.geoLoc?.lng ??
+                                        position?.longitude ??
+                                        90.441897487471404),
+                                zoom: 16.0,
+                              ),
+                              zoomControlsEnabled: false,
+                              onMapCreated: (controller) {
+                                this.controller = controller;
+                                // Move camera to current location after map is created
+                                if (position != null) {
+                                  controller.animateCamera(
+                                    CameraUpdate.newCameraPosition(
+                                      CameraPosition(
+                                        target: LatLng(
+                                          position.latitude,
+                                          position.longitude,
+                                        ),
+                                        zoom: 16.0,
+                                      ),
+                                    ),
+                                  );
+                                  // Fetch address for current location
+                                  gl.fetchGEOLocations(
+                                    lat: position.latitude,
+                                    lng: position.longitude,
+                                  );
+                                }
+                              },
+                              style: dark,
+                              buildingsEnabled: false,
+                              mapToolbarEnabled: true,
+                              indoorViewEnabled: false,
+                              liteModeEnabled: false,
+                              rotateGesturesEnabled: false,
+                              myLocationButtonEnabled: true,
+                              myLocationEnabled: true,
+                              onCameraMove: (details) {
+                                // Store current camera position
+                                currentCameraPosition.value = details.target;
+                                
+                                timer?.cancel();
+                                timer = Timer(
+                                  1.seconds,
+                                  () {
+                                    gl.fetchGEOLocations(
+                                      lat: details.target.latitude,
+                                      lng: details.target.longitude,
+                                    );
+                                  },
                                 );
                               },
+                              mapType: MapType.normal,
                             );
-                            aea.controller
-                                ?.animateCamera(CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target:
-                                    LatLng(gl.geoLoc!.lat!, gl.geoLoc!.lng!),
-                                zoom: 16,
-                              ),
-                            ));
                           },
-                          mapType: MapType.normal,
                         ),
                         Align(
                           alignment: Alignment.center,

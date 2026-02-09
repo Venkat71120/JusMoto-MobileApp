@@ -58,9 +58,16 @@ class ChooseLocationButtons extends StatelessWidget {
               ),
               12.toHeight,
               CustomButton(
-                  onPressed: () {
+                  onPressed: gl.geoLoc == null ? null : () {
                     final aea = AddEditAddressViewModel.instance;
+                    
+                    // Set the address text
                     aea.addressController.text = gl.geoLoc?.description ?? "";
+                    
+                    // Mark that address was selected from map
+                    aea.selectedFromMap.value = true;
+                    
+                    // Return the location data with coordinates
                     Navigator.pop(context, [gl.geoLoc]);
                   },
                   btText: LocalKeys.useThisLocation),

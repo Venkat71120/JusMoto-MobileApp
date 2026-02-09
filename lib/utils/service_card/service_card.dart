@@ -41,7 +41,7 @@ class ServiceCard extends StatelessWidget {
       },
       child: SquircleContainer(
         width: 188,
-        height: 252,
+        height: 254,
         padding: const EdgeInsets.all(8),
         radius: 12,
         color: context.color.accentContrastColor,

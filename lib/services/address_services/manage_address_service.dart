@@ -13,8 +13,11 @@ class ManageAddressService {
   tryAddingAddress(BuildContext context) async {
     var url = AppUrls.addAddressUrl;
     final aea = AddEditAddressViewModel.instance;
-    final glProvider =
-        Provider.of<GoogleLocationSearch>(context, listen: false);
+   final glProvider = Provider.of<GoogleLocationSearch>(context, listen: false);
+if (glProvider.geoLoc?.postCode != null) {
+  AddEditAddressViewModel.instance.zipCodeController.text = 
+      glProvider.geoLoc!.postCode!;
+}
 
     final data = {
       'state_id': aea.selectedState.value?.id?.toString() ?? "",
@@ -47,8 +50,8 @@ class ManageAddressService {
         Provider.of<GoogleLocationSearch>(context, listen: false);
     final data = {
       'state_id': aea.selectedState.value?.id?.toString() ?? "",
-      'city_id': aea.selectedState.value?.id?.toString() ?? "",
-      'area_id': aea.selectedState.value?.id?.toString() ?? "",
+   'city_id': aea.selectedCity.value?.id?.toString() ?? "", // Fixed: was using selectedState
+      'area_id': aea.selectedArea.value?.id?.toString() ?? "", // Fixed: was using selectedState
       'phone': aea.phoneController.text,
       'emergency_phone': aea.emergencyPhoneController.text,
       'post_code': aea.zipCodeController.text,

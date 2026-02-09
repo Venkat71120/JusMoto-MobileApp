@@ -78,16 +78,16 @@ class BookingPaymentChooseView extends StatelessWidget {
                       ),
                       16.toHeight,
                       // Wallet Payment Option
-                      WalletPaymentSelector(
-                        key: sbm.walletSelectorKey,
-                        useWalletNotifier: sbm.useWallet,
-                        onWalletSelected: () {
-                          // Deselect other gateway when wallet is selected
-                          if (sbm.useWallet.value) {
-                            sbm.selectedGateway.value = null;
-                          }
-                        },
-                      ),
+                      // WalletPaymentSelector(
+                      //   key: sbm.walletSelectorKey,
+                      //   useWalletNotifier: sbm.useWallet,
+                      //   onWalletSelected: () {
+                      //     // Deselect other gateway when wallet is selected
+                      //     if (sbm.useWallet.value) {
+                      //       sbm.selectedGateway.value = null;
+                      //     }
+                      //   },
+                      // ),
                       16.toHeight,
                       SquircleContainer(
                         padding: 12.paddingAll,

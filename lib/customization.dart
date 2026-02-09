@@ -1,9 +1,9 @@
-String siteLink = 'https://car-service.bytesed.com';
+String siteLink = 'https://jusmoto.blackitechs.in';
 
 String appLabel = 'JusMoto';
 String storeLabel = "JusMoto";
 String appVersion = '1.0';
-String mapApiKey = 'google_map_key';
+String mapApiKey = 'AIzaSyBkuEdaVPDKWbC4jl9DgKK2aiQ8sUN9JJY';
 
 String socialSignInKey =
     '\$2y\$10\$GlEhJtlTAqv2rvQd2llgPeGGV8RT2Yap844OSazHfHlbU.0bvVTPm';

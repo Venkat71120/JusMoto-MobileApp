@@ -63,15 +63,15 @@ class MenuTiles extends StatelessWidget {
                   },
                   haveDivider: true,
                 ),
-                MenuTile(
-                  title: LocalKeys.wallet,
-                  svg: SvgAssets.creditCard,
-                  onPress: () {
-                    WalletViewModel.dispose;
-                    context.toPage(const WalletView());
-                  },
-                  haveDivider: true,
-                ),
+                // MenuTile(
+                //   title: LocalKeys.wallet,
+                //   svg: SvgAssets.creditCard,
+                //   onPress: () {
+                //     WalletViewModel.dispose;
+                //     context.toPage(const WalletView());
+                //   },
+                //   haveDivider: true,
+                // ),
                 MenuTile(
                   title: LocalKeys.notifications,
                   svg: SvgAssets.notificationBell,

@@ -24,13 +24,13 @@ class SocialSignUp extends StatelessWidget {
             await ssi.trySocialSignIn(context);
           },
         ),
-        SocialSignInButton(
-          title: LocalKeys.signUpWithFacebook,
-          image: "facebook",
-          onTap: () async {
-            await ssi.trySocialSignIn(context, type: "facebook");
-          },
-        ),
+        // SocialSignInButton(
+        //   title: LocalKeys.signUpWithFacebook,
+        //   image: "facebook",
+        //   onTap: () async {
+        //     await ssi.trySocialSignIn(context, type: "facebook");
+        //   },
+        // ),
         if (Platform.isIOS)
           SocialSignInButton(
             title: LocalKeys.signUpWithApple,

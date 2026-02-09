@@ -74,54 +74,83 @@ class GoogleLocationSearch with ChangeNotifier {
       debugPrint("same lat lng is not ignoring fetching".toString());
       locations = [];
       setIsLoading(true);
+      
+      // Remove the space after $lat to fix URL formatting
       debugPrint(
-          'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat, $lng&key=$mapApiKey'
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapApiKey'
               .toString());
       var headers = {'Accept': 'application/json'};
       var request = http.Request(
           'GET',
           Uri.parse(
-              'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat, $lng&key=$mapApiKey'));
+              'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapApiKey'));
 
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
 
       var responseString = await response.stream.bytesToString();
+      
       if (response.statusCode == 200) {
         var responseData = jsonDecode(responseString);
         debugPrint(responseData.toString());
+        
+        // CHECK IF RESULTS ARE EMPTY - THIS IS THE CRITICAL FIX
+        if (responseData['results'] == null || 
+            (responseData['results'] as List).isEmpty) {
+          debugPrint("⚠️ No geocoding results found. Status: ${responseData['status']}");
+          if (responseData['status'] == 'REQUEST_DENIED') {
+            debugPrint("⚠️ API KEY ERROR: ${responseData['error_message']}");
+            debugPrint("⚠️ Please enable Geocoding API in Google Cloud Console");
+          }
+          return;
+        }
+        
         bool breakLoop = false;
         var postCode;
         var city;
-        for (var i = 0; i < responseData['results'].length; i++) {
-          var element = responseData["results"][i];
-          element["address_components"].forEach((e) {
-            if (e["types"].contains("postal_code")) {
-              breakLoop = true;
-              postCode = e["long_name"];
-            }
-            if (e["types"].contains("sublocality")) {
-              breakLoop = true;
-              city = e["long_name"];
-            }
-          });
-          if (breakLoop) break;
-        }
+        
+       // In fetchGEOLocations method, replace the postal code extraction loop:
+for (var i = 0; i < responseData['results'].length; i++) {
+  var element = responseData["results"][i];
+  for (var component in element["address_components"]) {
+    List<dynamic> types = component["types"];
+    
+    // Extract postal code
+    if (types.contains("postal_code")) {
+      postCode = component["long_name"];
+      debugPrint("✅ Postal code found: $postCode");
+    }
+    
+    // Extract city/sublocality
+    if (types.contains("sublocality") || 
+        types.contains("sublocality_level_1") || 
+        types.contains("locality")) {
+      city = component["long_name"];
+      debugPrint("✅ City found: $city");
+    }
+  }
+  
+  // Break if we found postal code
+  if (postCode != null) break;
+}
+        
         geoLoc = Prediction(
-          description: formatAddress(responseData["results"]?[0] ?? {}),
-          placeId: responseData["results"]?[0]?['place_id'],
+          description: formatAddress(responseData["results"][0] ?? {}),
+          placeId: responseData["results"][0]?['place_id'],
           postCode: postCode,
           city: city,
           lat: lat,
           lng: lng,
         );
 
-        debugPrint((geoLoc?.lat).toString());
-        debugPrint((geoLoc?.lng).toString());
+        debugPrint("✅ Address found: ${geoLoc?.description}");
+        debugPrint("✅ Coordinates: (${geoLoc?.lat}, ${geoLoc?.lng})");
       } else {
-        print(response.reasonPhrase);
+        debugPrint("❌ HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
+    } catch (e) {
+      debugPrint("❌ Error in fetchGEOLocations: $e");
     } finally {
       setIsLoading(false);
     }
@@ -143,8 +172,16 @@ class GoogleLocationSearch with ChangeNotifier {
           'https://maps.googleapis.com/maps/api/place/details/json?place_id=$id&key=$mapApiKey'
               .toString());
       if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        
+        // Check for API errors
+        if (responseBody['status'] == 'REQUEST_DENIED') {
+          debugPrint("⚠️ API KEY ERROR: ${responseBody['error_message']}");
+          return null;
+        }
+        
         GooglePlaceDetailsModel responseData =
-            GooglePlaceDetailsModel.fromJson(jsonDecode(response.body));
+            GooglePlaceDetailsModel.fromJson(responseBody);
         setIsLoading(false);
         geoLoc = Prediction(
           description: responseData.result?.formattedAddress,
@@ -156,13 +193,11 @@ class GoogleLocationSearch with ChangeNotifier {
       } else {
         print(response.reasonPhrase);
       }
+    } catch (e) {
+      debugPrint("❌ Error in fetchPlaceDetails: $e");
     } finally {
       setIsLoading(false);
     }
-    error(e) {
-      debugPrint(e.toString());
-    }
-
     return null;
   }
 

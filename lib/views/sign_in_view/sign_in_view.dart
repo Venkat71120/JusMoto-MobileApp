@@ -30,13 +30,13 @@ class SignInView extends StatelessWidget {
             children: [
               const EmailSignIn(),
               12.toHeight,
-              SocialSignInButton(
-                  title: LocalKeys.otpSignIn,
-                  image: null,
-                  onTap: () {
-                    SignInWithOtpViewModel.dispose;
-                    context.toPage(const SignInWithOtpView());
-                  }),
+              // SocialSignInButton(
+              //     title: LocalKeys.otpSignIn,
+              //     image: null,
+              //     onTap: () {
+              //       SignInWithOtpViewModel.dispose;
+              //       context.toPage(const SignInWithOtpView());
+              //     }),
               24.toHeight,
               const CreateAccount(),
               24.toHeight,

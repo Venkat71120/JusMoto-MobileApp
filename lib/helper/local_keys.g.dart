@@ -505,7 +505,7 @@ abstract class LocalKeys {
   static const String _visitOutlet = "Visit Outlet";
   static const String _pickupAndDelivery = "Pickup & Delivery";
   static const String _serviceBookingAddressSchedule = "Address and Schedule";
-  static const String _choseFromMap = "Choos From Map";
+  static const String _choseFromMap = "Choose From Map";
   static const String _selectOutlet = "Select outlet";
   static const String _outlet = "Outlet";
   static const String _viewOutletsInMap = "View Outlets in Map";
@@ -561,6 +561,8 @@ abstract class LocalKeys {
   static const String _paymentMethod = "Payment Method";
   static const String _referenceType = "Reference Type";
   static const String _insufficientWalletBalance = "Insufficient wallet balance";
+  static const String _recentOrders = "Recent Orders";
+  
 //variable ends here
 
 //getter starts here
@@ -1111,8 +1113,11 @@ abstract class LocalKeys {
   static String get pullUp => _pullUp.tr();
   static String get translatingText => _translatingText.tr();
   static String get cancel => _cancel.tr();
+  static String get recentOrders => _recentOrders.tr();
+  
 
   static final stringsMap = {
+    _recentOrders: _recentOrders,
     _state: _state,
     _city: _city,
     _selectAState: _selectAState,

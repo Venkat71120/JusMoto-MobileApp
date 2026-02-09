@@ -34,36 +34,37 @@ class SplashView extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              Consumer<DynamicsService>(builder: (context, lProvider, child) {
-                return Positioned(
-                  bottom: context.width / 2.5,
-                  child: lProvider.noConnection
-                      ? TextButton(
-                          onPressed: () {
-                            lProvider.setNoConnection(false);
-                            SplashViewModel().initiateStartingSequence(context);
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: primaryColor,
-                            backgroundColor: context.color.accentContrastColor,
-                            padding: const EdgeInsets.symmetric(horizontal: 40),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            surfaceTintColor: Colors.transparent,
-                            splashFactory: NoSplash.splashFactory,
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            LocalKeys.retry,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(color: primaryColor),
-                          ),
-                        )
-                      : SizedBox(),
-                );
-              }),
+              // Commented out the retry button/popup for now
+              // Consumer<DynamicsService>(builder: (context, lProvider, child) {
+              //   return Positioned(
+              //     bottom: context.width / 2.5,
+              //     child: lProvider.noConnection
+              //         ? TextButton(
+              //             onPressed: () {
+              //               lProvider.setNoConnection(false);
+              //               SplashViewModel().initiateStartingSequence(context);
+              //             },
+              //             style: TextButton.styleFrom(
+              //               foregroundColor: primaryColor,
+              //               backgroundColor: context.color.accentContrastColor,
+              //               padding: const EdgeInsets.symmetric(horizontal: 40),
+              //               shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(12)),
+              //               surfaceTintColor: Colors.transparent,
+              //               splashFactory: NoSplash.splashFactory,
+              //               elevation: 0,
+              //             ),
+              //             child: Text(
+              //               LocalKeys.retry,
+              //               style: Theme.of(context)
+              //                   .textTheme
+              //                   .titleSmall!
+              //                   .copyWith(color: primaryColor),
+              //             ),
+              //           )
+              //         : SizedBox(),
+              //   );
+              // }),
             ],
           ),
         ),
