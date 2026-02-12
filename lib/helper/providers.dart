@@ -14,6 +14,8 @@ import '../services/auth_services/email_otp_service.dart';
 import '../services/auth_services/phone_manage_service.dart';
 import '../services/auth_services/sign_in_service.dart';
 import '../services/auth_services/sign_up_service.dart';
+// ✅ ADD THIS IMPORT
+import '../services/auth_services/FranchiseLoginService.dart';
 import '../services/booking_services/booking_addons_service.dart';
 import '../services/booking_services/booking_schedule_service.dart';
 import '../services/booking_services/hire_provider_from_offer_service.dart';
@@ -69,6 +71,8 @@ class Providers {
     ChangeNotifierProvider(create: (context) => ChatListService()),
     ChangeNotifierProvider(create: (context) => SignInService()),
     ChangeNotifierProvider(create: (context) => SignUpService()),
+    // ✅ ADD THIS LINE
+    ChangeNotifierProvider(create: (context) => FranchiseLoginService()),
     ChangeNotifierProvider(create: (context) => RatingAndReviewsService()),
     ChangeNotifierProvider(create: (context) => ProfileInfoService()),
     ChangeNotifierProvider(create: (context) => AddressListService()),

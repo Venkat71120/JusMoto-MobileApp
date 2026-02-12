@@ -30,29 +30,33 @@ class FieldWithLabel extends StatelessWidget {
   final double? bottomSpace;
   final Widget? prefixIcon;
   final void Function(PointerDownEvent)? onTapOutside;
-  const FieldWithLabel(
-      {super.key,
-      required this.label,
-      required this.hintText,
-      this.initialValue,
-      this.onChanged,
-      this.onFieldSubmitted,
-      this.validator,
-      this.keyboardType,
-      this.textInputAction,
-      this.svgPrefix,
-      this.autovalidateMode,
-      this.isRequired,
-      this.errorNotifier,
-      this.errorText,
-      this.successText,
-      this.prefixIcon,
-      this.autofillHints,
-      this.bottomSpace,
-      this.maxLines,
-      this.minLines,
-      this.controller,
-      this.onTapOutside});
+  final TextCapitalization textCapitalization; // Add this parameter
+  
+  const FieldWithLabel({
+    super.key,
+    required this.label,
+    required this.hintText,
+    this.initialValue,
+    this.onChanged,
+    this.onFieldSubmitted,
+    this.validator,
+    this.keyboardType,
+    this.textInputAction,
+    this.svgPrefix,
+    this.autovalidateMode,
+    this.isRequired,
+    this.errorNotifier,
+    this.errorText,
+    this.successText,
+    this.prefixIcon,
+    this.autofillHints,
+    this.bottomSpace,
+    this.maxLines,
+    this.minLines,
+    this.controller,
+    this.onTapOutside,
+    this.textCapitalization = TextCapitalization.none, // Add with default value
+  });
 
   setInitialValue(value) {
     if (value == null || value.isEmpty) {
@@ -81,6 +85,7 @@ class FieldWithLabel extends StatelessWidget {
           autofillHints: autofillHints,
           minLines: minLines,
           maxLines: maxLines,
+          textCapitalization: textCapitalization, // Add this line
           style: context.titleSmall,
           decoration: InputDecoration(
               hintText: hintText,

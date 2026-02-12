@@ -41,6 +41,10 @@ class AppUrls {
   static String get otpSignInUrl => "$baseEndPoint/login-otp/verification";
   static String get emailSignUpUrl => '$baseEndPoint/register';
   static String get socialSignInUrl => '$baseEndPoint/social/login';
+  
+  // ✅ NEW: Franchise login endpoint
+  static String get franchiseLoginUrl => '$baseEndPoint/admin/login';
+  
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';
   static String get orderCancelUrl =>

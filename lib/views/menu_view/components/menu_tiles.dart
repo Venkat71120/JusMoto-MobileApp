@@ -87,6 +87,14 @@ class MenuTiles extends StatelessWidget {
                     context.toPage(const AddressListView());
                   },
                 ),
+
+                //  MenuTile(
+                //   title: LocalKeys.addresses,
+                //   svg: SvgAssets.addressHome,
+                //   onPress: () {
+                //     context.toPage(const ChatListView());
+                //   },
+                // ),
               ],
             ],
           ),

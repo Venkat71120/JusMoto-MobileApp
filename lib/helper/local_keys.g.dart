@@ -224,7 +224,7 @@ abstract class LocalKeys {
   static const String _reviews = "Reviews";
   static const String _faq = "FAQ";
   static const String _ourOffers = "Our Offers";
-  static const String _whatIsNotIncluded = "What’s not included:";
+  static const String _whatIsNotIncluded = "What's not included:";
   static const String _safetyAndSecurity = "Safety and Security";
   static const String _cancellationPolicy = "Cancellation Policy";
   static const String _bookService = "Book Service";
@@ -540,7 +540,7 @@ abstract class LocalKeys {
   static const String _productCategories = "Product Categories";
   static const String _favorites = "Favorites";
   static const String _assignedStaff = "Assigned staff";
-  static const String _featured = "Featured";
+  static const String _featured = "Featured Services";
   static const String _products = "Products";
   static const String _searchType = "Search Type";
   static const String _wallet = "Wallet";
@@ -562,6 +562,32 @@ abstract class LocalKeys {
   static const String _referenceType = "Reference Type";
   static const String _insufficientWalletBalance = "Insufficient wallet balance";
   static const String _recentOrders = "Recent Orders";
+  
+  // ✅ FRANCHISE LOGIN CONSTANTS
+  static const String _franchiseLogin = 'Franchise Login';
+  static const String _franchiseLoginTitle = 'Franchise Access';
+  static const String _franchiseLoginSubtitle = 'Sign in with your franchise credentials';
+  static const String _franchiseCode = 'Franchise Code';
+  static const String _enterFranchiseCode = 'Enter franchise code';
+  static const String _franchiseCodeRequired = 'Franchise code is required';
+  static const String _invalidFranchiseCredentials = 'Invalid franchise credentials';
+  static const String _franchiseLoginInfo = 'Contact your franchise manager if you need assistance with your credentials.';
+  static const String _franchiseDashboard = 'Franchise Dashboard';
+  static const String _franchiseInformation = 'Franchise Information';
+  static const String _franchiseUser = 'Franchise User';
+  static const String _welcome = 'Welcome';
+  static const String _name = 'Name';
+  static const String _notProvided = 'Not Provided';
+  static const String _quickStats = 'Quick Stats';
+  static const String _viewDashboard = 'View Dashboard';
+  static const String _logout = 'Logout';
+  static const String _confirmLogout = 'Confirm Logout';
+  static const String _logoutConfirmationMessage = 'Are you sure you want to logout?';
+  static const String _emailValidateText = 'Email is required';
+  static const String _invalidEmail = 'Please enter a valid email';
+  static const String _passwordRequired = 'Password is required';
+  static const String _usernameRequired = 'Username is required';
+  static const String _userInformation = 'User Information';
   
 //variable ends here
 
@@ -1115,6 +1141,32 @@ abstract class LocalKeys {
   static String get cancel => _cancel.tr();
   static String get recentOrders => _recentOrders.tr();
   
+  // ✅ FRANCHISE LOGIN GETTERS
+  static String get franchiseLogin => _franchiseLogin.tr();
+  static String get franchiseLoginTitle => _franchiseLoginTitle.tr();
+  static String get franchiseLoginSubtitle => _franchiseLoginSubtitle.tr();
+  static String get franchiseCode => _franchiseCode.tr();
+  static String get enterFranchiseCode => _enterFranchiseCode.tr();
+  static String get franchiseCodeRequired => _franchiseCodeRequired.tr();
+  static String get invalidFranchiseCredentials => _invalidFranchiseCredentials.tr();
+  static String get franchiseLoginInfo => _franchiseLoginInfo.tr();
+  static String get franchiseDashboard => _franchiseDashboard.tr();
+  static String get franchiseInformation => _franchiseInformation.tr();
+  static String get franchiseUser => _franchiseUser.tr();
+  static String get welcome => _welcome.tr();
+  static String get name => _name.tr();
+  static String get notProvided => _notProvided.tr();
+  static String get quickStats => _quickStats.tr();
+  static String get viewDashboard => _viewDashboard.tr();
+  static String get logout => _logout.tr();
+  static String get confirmLogout => _confirmLogout.tr();
+  static String get logoutConfirmationMessage => _logoutConfirmationMessage.tr();
+  static String get emailValidateText => _emailValidateText.tr();
+  static String get invalidEmail => _invalidEmail.tr();
+  static String get passwordRequired => _passwordRequired.tr();
+  static String get usernameRequired => _usernameRequired.tr();
+  static String get userInformation => _userInformation.tr();
+  
 
   static final stringsMap = {
     _recentOrders: _recentOrders,
@@ -1462,5 +1514,31 @@ abstract class LocalKeys {
    _paymentMethod: "",
    _referenceType: "",
    _insufficientWalletBalance: "",
+   
+   // ✅ FRANCHISE LOGIN MAP ENTRIES
+   _franchiseLogin: _franchiseLogin,
+   _franchiseLoginTitle: _franchiseLoginTitle,
+   _franchiseLoginSubtitle: _franchiseLoginSubtitle,
+   _franchiseCode: _franchiseCode,
+   _enterFranchiseCode: _enterFranchiseCode,
+   _franchiseCodeRequired: _franchiseCodeRequired,
+   _invalidFranchiseCredentials: _invalidFranchiseCredentials,
+   _franchiseLoginInfo: _franchiseLoginInfo,
+   _franchiseDashboard: _franchiseDashboard,
+   _franchiseInformation: _franchiseInformation,
+   _franchiseUser: _franchiseUser,
+   _welcome: _welcome,
+   _name: _name,
+   _notProvided: _notProvided,
+   _quickStats: _quickStats,
+   _viewDashboard: _viewDashboard,
+   _logout: _logout,
+   _confirmLogout: _confirmLogout,
+   _logoutConfirmationMessage: _logoutConfirmationMessage,
+   _emailValidateText: _emailValidateText,
+   _invalidEmail: _invalidEmail,
+   _passwordRequired: _passwordRequired,
+     _usernameRequired: _usernameRequired,
+   _userInformation: _userInformation,
   };
 }

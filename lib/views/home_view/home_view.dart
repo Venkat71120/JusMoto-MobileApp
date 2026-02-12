@@ -95,14 +95,14 @@ class HomeView extends StatelessWidget {
                            const HomeSlider(),
                           const HomeFeaturedServices(),
                          
-                          HomePopularServices(),
+                          // HomePopularServices(),
                           // ConstrainedBox(
                           //   constraints: BoxConstraints(
                           //     maxHeight: context.height * .4,
                           //   ),
                           //   child: HomePresentationVideo(),
                           // ),
-                          const HomeProductCategories(),
+                          // const HomeProductCategories(),
                           HomePopularProducts(),
                         ]),
                       ),
