@@ -588,6 +588,7 @@ abstract class LocalKeys {
   static const String _passwordRequired = 'Password is required';
   static const String _usernameRequired = 'Username is required';
   static const String _userInformation = 'User Information';
+  static const String _notAFranchiseUser = 'Access denied. Not a franchise user.';
   
 //variable ends here
 
@@ -1166,7 +1167,7 @@ abstract class LocalKeys {
   static String get passwordRequired => _passwordRequired.tr();
   static String get usernameRequired => _usernameRequired.tr();
   static String get userInformation => _userInformation.tr();
-  
+  static String get notAFranchiseUser => _notAFranchiseUser.tr();
 
   static final stringsMap = {
     _recentOrders: _recentOrders,
@@ -1540,5 +1541,6 @@ abstract class LocalKeys {
    _passwordRequired: _passwordRequired,
      _usernameRequired: _usernameRequired,
    _userInformation: _userInformation,
+   _notAFranchiseUser: _notAFranchiseUser,
   };
 }

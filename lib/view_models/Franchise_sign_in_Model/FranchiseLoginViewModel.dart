@@ -1,8 +1,9 @@
 import 'package:car_service/customization.dart';
-import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
-import 'package:car_service/views/Franchise_dashboard/FranchiseDashboardView.dart';
+import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
+import 'package:car_service/views/Franchise_landing_nav_view/FranchiseLandingView.dart';
+// import 'package:car_service/views/Franchise_dashboard/franchise_landing_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ import '../../helper/local_keys.g.dart';
 import '../../services/chat_services/chat_credential_service.dart';
 import '../../services/profile_services/profile_info_service.dart';
 import '../../services/push_notification_service.dart';
+// import '../../view_models/franchise_landing_view_model/franchise_landing_view_model.dart';
 
 class FranchiseLoginViewModel {
   final TextEditingController usernameController = TextEditingController();
@@ -78,20 +80,21 @@ class FranchiseLoginViewModel {
 
   franchiseSignIn(BuildContext context) async {
     debugPrint('🔐 Starting franchise sign-in process');
-    
-    final isValid = formKey.currentState?.validate();
 
+    final isValid = formKey.currentState?.validate();
     if (isValid == false) {
       debugPrint('❌ Form validation failed');
       return;
     }
 
     loading.value = true;
-    
+
     try {
-      final flProvider = Provider.of<FranchiseLoginService>(context, listen: false);
-      final piProvider = Provider.of<ProfileInfoService>(context, listen: false);
-      
+      final flProvider =
+          Provider.of<FranchiseLoginService>(context, listen: false);
+      final piProvider =
+          Provider.of<ProfileInfoService>(context, listen: false);
+
       final result = await flProvider.tryFranchiseLogin(
         username: usernameController.text.trim(),
         password: passwordController.text,
@@ -99,43 +102,32 @@ class FranchiseLoginViewModel {
 
       if (result == true) {
         debugPrint('✅ Franchise login successful');
-        
-        // Save credentials if remember me is checked
+
         await setUserInfo(
           username: usernameController.text,
           pass: passwordController.text,
         );
 
-        // Fetch additional data
         Provider.of<ChatCredentialService>(context, listen: false)
             .fetchCredentials();
-        
+
         signInSuccess = true;
-        
+
         await PushNotificationService().updateDeviceToken(forceUpdate: true);
         await piProvider.fetchProfileInfo();
-        
+
         loading.value = false;
-        
-        // Navigate to franchise dashboard
+
+        // ✅ Navigate to FranchiseLandingView — clears entire back stack
         if (context.mounted) {
-          debugPrint('📍 Navigating to franchise dashboard');
-          await Navigator.pushReplacement(
+          debugPrint('📍 Navigating to FranchiseLandingView');
+          FranchiseLandingViewModel.instance.currentIndex.value = 0;
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (context) => FranchiseDashboardView(
-                name: flProvider.name,
-                username: flProvider.username,
-                email: flProvider.email,
-                phone: flProvider.phone,
-                role: flProvider.role,
-                franchiseCode: flProvider.franchiseCode,
-                franchiseLocation: flProvider.franchiseLocation,
-                outletLocationId: flProvider.outletLocationId,
-                userId: flProvider.userId,
-                token: flProvider.token,
-              ),
+              builder: (_) => const FranchiseLandingView(),
             ),
+            (route) => false, // removes ALL previous routes
           );
         }
       } else if (result == false) {

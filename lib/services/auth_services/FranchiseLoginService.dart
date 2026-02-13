@@ -44,10 +44,23 @@ class FranchiseLoginService with ChangeNotifier {
 
       debugPrint('📥 Franchise login response: $responseData');
 
-      if (responseData != null && responseData.containsKey("token")) {
-        debugPrint('✅ Franchise login successful');
-        
-        token = responseData["token"] ?? "";
+     if (responseData != null && responseData.containsKey("token")) {
+
+  // ✅ Block sign-in if is_franchise is not 1
+  final isFranchiseValue = responseData["user"]["is_franchise"];
+  final int franchiseFlag = isFranchiseValue is bool
+      ? (isFranchiseValue == true ? 1 : 0)
+      : (isFranchiseValue ?? 0);
+
+  if (franchiseFlag != 1) {
+    debugPrint('🚫 Login blocked — not a franchise user (is_franchise = $franchiseFlag)');
+    LocalKeys.notAFranchiseUser.showToast();
+    return false;
+  }
+
+  debugPrint('✅ Franchise login successful');
+
+  token = responseData["token"] ?? "";
         this.username = responseData["user"]["username"] ?? "";
         this.email = responseData["user"]["email"] ?? "";
         this.phone = responseData["user"]["phone"] ?? "";
@@ -58,7 +71,7 @@ class FranchiseLoginService with ChangeNotifier {
         franchiseCode = responseData["user"]["franchise_code"] ?? "";
         franchiseLocation = responseData["user"]["franchise_location"] ?? "";
         outletLocationId = responseData["user"]["outlet_location_id"]?.toString() ?? "";
-        isFranchise = responseData["user"]["is_franchise"] ?? true;
+       isFranchise = true;
         
         // Save token
         setToken(token);
