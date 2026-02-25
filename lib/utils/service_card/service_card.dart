@@ -22,6 +22,14 @@ class ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ FIX: If a car variant is selected, use its price; otherwise fall back
+    // to the service's own price. Old API always had serviceCar set; new API
+    // only sets it when a variant is selected, so we must not default to 0.
+    final displayPrice =
+        service.serviceCar?.price ?? service.price;
+    final displayDiscountPrice =
+        service.serviceCar?.discountPrice ?? service.discountPrice;
+
     return GestureDetector(
       onTap: () {
         final sdm = ServiceDetailsViewModel.instance;
@@ -53,6 +61,7 @@ class ServiceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ServiceCardImage(
+                  // ✅ FIX: Same pattern for image — fall back to service image
                   imageUrl: service.serviceCar?.image ?? service.image,
                   service: service,
                   duration: service.duration,
@@ -77,8 +86,9 @@ class ServiceCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: ServiceCardPrice(
-                    price: service.serviceCar?.price ?? 0,
-                    discountPrice: service.serviceCar?.discountPrice ?? 0,
+                    // ✅ FIXED: Use resolved prices instead of serviceCar directly
+                    price: displayPrice,
+                    discountPrice: displayDiscountPrice,
                   ),
                 ),
                 Consumer<CartService>(
@@ -94,9 +104,7 @@ class ServiceCard extends StatelessWidget {
                         (isAdded && service.type.toString() == "0");
                     return GestureDetector(
                       onTap: () {
-                        if (preventMultiCart) {
-                          return;
-                        }
+                        if (preventMultiCart) return;
                         if (isAdded) {
                           cartService.updateToCart(
                             service.id.toString(),
@@ -113,15 +121,13 @@ class ServiceCard extends StatelessWidget {
                       },
                       child: SquircleContainer(
                         radius: 8,
-                        color:
-                            preventMultiCart
-                                ? context.color.accentContrastColor
-                                : context.color.primaryContrastColor,
-                        borderColor:
-                            preventMultiCart
-                                ? context.color.primaryBorderColor
-                                : null,
-                        padding: EdgeInsets.symmetric(
+                        color: preventMultiCart
+                            ? context.color.accentContrastColor
+                            : context.color.primaryContrastColor,
+                        borderColor: preventMultiCart
+                            ? context.color.primaryBorderColor
+                            : null,
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 3,
                         ),
@@ -129,10 +135,9 @@ class ServiceCard extends StatelessWidget {
                           children: [
                             SvgAssets.cart.toSVGSized(
                               20,
-                              color:
-                                  preventMultiCart
-                                      ? context.color.primaryContrastColor
-                                      : context.color.accentContrastColor,
+                              color: preventMultiCart
+                                  ? context.color.primaryContrastColor
+                                  : context.color.accentContrastColor,
                             ),
                             4.toWidth,
                             Text(
@@ -140,10 +145,9 @@ class ServiceCard extends StatelessWidget {
                                   ? LocalKeys.added
                                   : LocalKeys.add,
                               style: context.titleSmall?.bold.copyWith(
-                                color:
-                                    preventMultiCart
-                                        ? context.color.primaryContrastColor
-                                        : context.color.accentContrastColor,
+                                color: preventMultiCart
+                                    ? context.color.primaryContrastColor
+                                    : context.color.accentContrastColor,
                               ),
                             ),
                           ],

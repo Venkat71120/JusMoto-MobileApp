@@ -7,6 +7,8 @@ import '../../helper/constant_helper.dart';
 import '../../helper/extension/string_extension.dart';
 import '../../helper/local_keys.g.dart';
 
+/// Signs in regular users via email/password or social providers.
+/// Backend wraps all responses in: { success, message, data: { user, token } }
 class SignInService with ChangeNotifier {
   bool emailVerified = true;
   bool verifyEnabled = true;
@@ -15,90 +17,88 @@ class SignInService with ChangeNotifier {
   var email = "";
   var userId = "";
   String? firstName;
-  
-  Future trySignIn(
-      {required String emailUsername, required String password}) async {
+
+  Future trySignIn({
+    required String emailUsername,
+    required String password,
+  }) async {
     final data = {
-      'email': emailUsername,
+      'email': emailUsername,   // backend accepts email OR username in this field
       'password': password,
-      "user_type": "1",
+      // NOTE: backend /auth/login does NOT require user_type — removed
     };
+
     final responseData = await NetworkApiServices().postApi(
       data,
       AppUrls.signInUrl,
       LocalKeys.signIn,
     );
 
-    if (responseData != null && responseData.containsKey("token")) {
-      LocalKeys.signedInSuccessfully.showToast();
-      token = responseData["token"] ?? "";
-      verifyEnabled = responseData["verify_enabled"].toString().parseToBool;
-      emailVerified =
-          responseData["user"]["email_verified"].toString().parseToBool;
-      emailToken = responseData["user"]["email_verify_token"]?.toString() ?? "";
-      email = responseData["user"]["email"] ?? "";
-      firstName = responseData["user"]["first_name"];
-      userId = responseData["user"]["id"]?.toString() ?? "";
+    // Backend response shape: { success, message, data: { user: {...}, token: "..." } }
+    if (responseData != null && responseData['data'] != null) {
+      final dataObj = responseData['data'];
+      final user = dataObj['user'];
+
+      token = dataObj['token'] ?? "";
+      email = user['email'] ?? "";
+      firstName = user['first_name'];
+      userId = user['id']?.toString() ?? "";
+
+      // These fields may not exist on the new backend — default to verified/disabled
+      verifyEnabled = (responseData['verify_enabled'] ?? false).toString().parseToBool;
+      emailVerified = (user['email_verified'] ?? 1).toString().parseToBool;
+      emailToken = user['email_verify_token']?.toString() ?? "";
+
       return emailVerified || !verifyEnabled;
     } else if (responseData != null && responseData.containsKey("message")) {
       responseData["message"]?.toString().showToast();
     }
+
+    return null;
   }
 
-  trySocialSignIn({
-    required String type,
+  /// Social login — Google, Facebook, Apple.
+  /// Backend expects: provider, email, firstName, lastName, socialId, (optional) image
+  Future trySocialSignIn({
+    required String type,      // "google" | "facebook" | "apple"
     required String fName,
     required String lName,
     required String email,
     required String id,
+    String? image,
   }) async {
-    print('📡 Sending social sign-in request to backend');
-    print('  - URL: ${AppUrls.socialSignInUrl}');
-    print('  - Type: $type');
-    print('  - Email: $email');
-    print('  - First Name: $fName');
-    print('  - Last Name: $lName');
-    print('  - ID: $id');
-    
-    final url = AppUrls.socialSignInUrl;
-
     final data = {
+      'provider': type,         // ✅ correct field name per backend docs
       'email': email,
-      'provider': type,
-      'firstName': fName,
-      'lastName': lName,
-      'socialId': id
+      'firstName': fName,       // ✅ camelCase per backend docs
+      'lastName': lName,        // ✅ camelCase per backend docs
+      'socialId': id,           // ✅ correct field name per backend docs
+      if (image != null) 'image': image,
     };
 
     final headers = {
       'Accept': 'application/json',
-      'secretKey': socialSignInKey
+      'secretKey': socialSignInKey,
     };
 
-    print('📦 Request data: $data');
-    print('📋 Request headers: ${headers.keys.toList()}');
+    final responseData = await NetworkApiServices().postApi(
+      data,
+      AppUrls.socialSignInUrl,
+      LocalKeys.signInWithGoogle,
+      headers: headers,
+    );
 
-    final responseData = await NetworkApiServices()
-        .postApi(data, url, LocalKeys.signInWithGoogle, headers: headers);
-
-    print('📥 Response received: $responseData');
-
-    if (responseData != null) {
-      if (responseData.containsKey("token")) {
-        print('✓ Token received: ${responseData["token"]?.toString().substring(0, 20)}...');
-        setToken(responseData["token"]);
-        return true;
-      } else if (responseData.containsKey("message")) {
-        print('⚠️ Server message: ${responseData["message"]}');
-        responseData["message"]?.toString().showToast();
-        return false;
-      } else {
-        print('⚠️ Unexpected response structure: $responseData');
-        return false;
-      }
-    } else {
-      print('❌ Response is null');
+    // Backend response shape: { success, message, data: { user: {...}, token: "..." } }
+    if (responseData != null && responseData['data'] != null) {
+      final dataObj = responseData['data'];
+      token = dataObj['token'] ?? "";
+      setToken(token);           // persist to SharedPreferences
+      return true;
+    } else if (responseData != null && responseData.containsKey("message")) {
+      responseData["message"]?.toString().showToast();
       return false;
     }
+
+    return false;
   }
 }

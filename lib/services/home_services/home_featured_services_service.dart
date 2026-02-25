@@ -16,16 +16,37 @@ class HomeFeaturedServicesService with ChangeNotifier {
 
   initLocal() {
     final localData = sPref?.getString("feature_services");
-    final tempData = ServiceListModel.fromJson(jsonDecode(localData ?? "{}"));
-    if (tempData.allServices.isNotEmpty) {
-      _homeFeaturedServicesModel = tempData;
+    if (localData == null) return;
+
+    try {
+      final decoded = jsonDecode(localData);
+      // ✅ FIX: Reject stale cache that uses old "all_services" key format
+      if (decoded is Map && decoded.containsKey("all_services")) {
+        sPref?.remove("feature_services");
+        fetchHomeFeaturedServices();
+        return;
+      }
+      final tempData = ServiceListModel.fromJson(decoded);
+      if (tempData.allServices.isNotEmpty) {
+        _homeFeaturedServicesModel = tempData;
+        fetchHomeFeaturedServices();
+      }
+    } catch (_) {
+      sPref?.remove("feature_services");
       fetchHomeFeaturedServices();
     }
   }
 
   fetchHomeFeaturedServices() async {
-    var url =
-        "${AppUrls.homeFeaturedServicesUrl}?variant_id=${sPref?.getString("vId")}";
+    final params = <String, String>{'limit': '10'};
+
+    // ✅ FIX: Only include variant_id if actually set
+    final vId = sPref?.getString("vId") ?? '';
+    if (vId.isNotEmpty) params['variant_id'] = vId;
+
+    final url = Uri.parse(AppUrls.homeFeaturedServicesUrl)
+        .replace(queryParameters: params)
+        .toString();
 
     final responseData = await NetworkApiServices().getApi(url, null);
 

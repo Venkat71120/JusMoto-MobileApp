@@ -1,12 +1,18 @@
+import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 
 import '../../customization.dart';
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
-import '../../helper/extension/string_extension.dart';
 import '../../helper/local_keys.g.dart';
 
+/// Handles franchise / admin authentication.
+///
+/// Admin login response shape (different from regular user login!):
+///   { success, message, data: { admin: { id, name, email, username, role,
+///                                        is_franchise, image, permissions[] },
+///                               token: "JWT" } }
 class FranchiseLoginService with ChangeNotifier {
   var token = "";
   var username = "";
@@ -19,144 +25,133 @@ class FranchiseLoginService with ChangeNotifier {
   var franchiseCode = "";
   var franchiseLocation = "";
   var outletLocationId = "";
-  
-  // Franchise-specific data
+  List<dynamic> permissions = [];
+
   bool isFranchise = false;
-  
-  // ✅ Track if data has been initialized
+
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
-  
-  // ✅ Initialize franchise data from SharedPreferences on app start
+
+  // ─── Restore session from SharedPreferences on app start ─────────────────
+
   Future<void> initFranchiseData() async {
-    if (_isInitialized) {
-      debugPrint('🔧 Franchise data already initialized, skipping');
-      return;
-    }
-    
-    debugPrint('🔧 Initializing franchise data from SharedPreferences');
-    
+    if (_isInitialized) return;
+
     isFranchise = sPref?.getBool("is_franchise") ?? false;
-    
+
     if (isFranchise) {
       token = sPref?.getString("token") ?? "";
       username = sPref?.getString("franchise_username") ?? "";
       franchiseCode = sPref?.getString("franchise_code") ?? "";
       franchiseLocation = sPref?.getString("franchise_location") ?? "";
       userId = sPref?.getString("user_id") ?? "";
-      
-      // ✅ Set the global token if franchise user
-      if (token.isNotEmpty) {
-        setToken(token);
-      }
-      
-      debugPrint('   isFranchise: $isFranchise');
-      debugPrint('   token exists: ${token.isNotEmpty}');
-      debugPrint('   username: $username');
-      debugPrint('   franchiseCode: $franchiseCode');
+
+      if (token.isNotEmpty) setToken(token);
     }
-    
+
     _isInitialized = true;
     notifyListeners();
   }
-  
+
+  // ─── Login ────────────────────────────────────────────────────────────────
+
+  /// Authenticates a franchise/admin user.
+  /// Endpoint: POST /auth/admin/login   Body: { email, password }
+  ///
+  /// Note: backend accepts email OR username in the 'email' field (same as regular login).
+  /// Response key is 'admin' (not 'user') — this is the critical difference.
   Future<bool?> tryFranchiseLogin({
     required String username,
     required String password,
   }) async {
-    debugPrint('📡 Attempting franchise login');
-    debugPrint('   Username: $username');
-    
     final data = {
-      'username': username,
+      'email': username,     // backend accepts email or username in this field
       'password': password,
     };
 
-    try {   
+    try {
       final responseData = await NetworkApiServices().postApi(
         data,
-        AppUrls.franchiseLoginUrl,
+        AppUrls.franchiseLoginUrl, // /auth/admin/login
         LocalKeys.franchiseLogin,
       );
 
-      debugPrint('📥 Franchise login response: $responseData');
+      // ✅ Admin login response uses 'admin' key, not 'user'
+      // Shape: { success, message, data: { admin: {...}, token: "..." } }
+      if (responseData != null && responseData['data'] != null) {
+        final dataObj = responseData['data'];
+        final admin = dataObj['admin'];   // ← 'admin', NOT 'user'
 
-      if (responseData != null && responseData.containsKey("token")) {
+        if (admin == null) {
+          LocalKeys.invalidFranchiseCredentials.showToast();
+          return false;
+        }
 
-        // ✅ Block sign-in if is_franchise is not 1
-        final isFranchiseValue = responseData["user"]["is_franchise"];
-        final int franchiseFlag = isFranchiseValue is bool
-            ? (isFranchiseValue == true ? 1 : 0)
-            : (isFranchiseValue ?? 0);
+        // ✅ Block access if not a franchise user
+        final rawFlag = admin['is_franchise'];
+        final int franchiseFlag = rawFlag is bool
+            ? (rawFlag ? 1 : 0)
+            : int.tryParse(rawFlag?.toString() ?? '0') ?? 0;
 
         if (franchiseFlag != 1) {
-          debugPrint('🚫 Login blocked — not a franchise user (is_franchise = $franchiseFlag)');
           LocalKeys.notAFranchiseUser.showToast();
           return false;
         }
 
-        debugPrint('✅ Franchise login successful');
+        // ── Parse admin fields ──
+        token = dataObj['token'] ?? "";
+        this.username = admin['username'] ?? "";
+        this.email = admin['email'] ?? "";
+        this.name = admin['name'] ?? "";
+        this.image = admin['image']?.toString();
+        this.role = admin['role'] ?? "";
+        userId = admin['id']?.toString() ?? "";
+        permissions = admin['permissions'] ?? [];
 
-        token = responseData["token"] ?? "";
-        this.username = responseData["user"]["username"] ?? "";
-        this.email = responseData["user"]["email"] ?? "";
-        this.phone = responseData["user"]["phone"] ?? "";
-        this.name = responseData["user"]["name"] ?? "";
-        this.image = responseData["user"]["image"];
-        this.role = responseData["user"]["role"] ?? "";
-        userId = responseData["user"]["id"]?.toString() ?? "";
-        franchiseCode = responseData["user"]["franchise_code"] ?? "";
-        franchiseLocation = responseData["user"]["franchise_location"] ?? "";
-        outletLocationId = responseData["user"]["outlet_location_id"]?.toString() ?? "";
+        // Franchise-specific fields (may or may not be in response)
+        franchiseCode = admin['franchise_code'] ?? "";
+        franchiseLocation = admin['franchise_location'] ?? "";
+        outletLocationId = admin['outlet_location_id']?.toString() ?? "";
         isFranchise = true;
         _isInitialized = true;
-        
-        // Save token to shared preferences
+
+        // ── Persist ──
         await sPref?.setString("token", token);
         setToken(token);
-        
-        // Save franchise data
-        await sPref?.setBool("is_franchise", isFranchise);
+        await sPref?.setBool("is_franchise", true);
         await sPref?.setString("franchise_username", this.username);
         await sPref?.setString("franchise_code", franchiseCode);
         await sPref?.setString("franchise_location", franchiseLocation);
         await sPref?.setString("user_id", userId);
-        
-        debugPrint('💾 Saved franchise data to SharedPreferences');
-        
+
         LocalKeys.signedInSuccessfully.showToast();
         notifyListeners();
-        
         return true;
       } else if (responseData != null && responseData.containsKey("message")) {
-        debugPrint('❌ Franchise login failed: ${responseData["message"]}');
         responseData["message"]?.toString().showToast();
         return false;
       }
-      
+
       return null;
     } catch (e) {
       debugPrint('❌ Franchise login error: $e');
       return null;
     }
   }
-  
-  // Check if current user is a franchise
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
   bool get isFranchiseUser => sPref?.getBool("is_franchise") ?? false;
-  
   String get savedUsername => sPref?.getString("franchise_username") ?? "";
-  
-  // Clear franchise data on logout
+
   Future<void> clearFranchiseData() async {
-    debugPrint('🧹 Clearing franchise data');
-    
     await sPref?.remove("is_franchise");
     await sPref?.remove("franchise_username");
     await sPref?.remove("franchise_code");
     await sPref?.remove("franchise_location");
     await sPref?.remove("user_id");
     await sPref?.remove("token");
-    
+
     isFranchise = false;
     token = "";
     username = "";
@@ -165,14 +160,12 @@ class FranchiseLoginService with ChangeNotifier {
     userId = "";
     name = "";
     email = "";
-    phone = "";
     image = null;
     role = "";
+    permissions = [];
     _isInitialized = false;
-    
-    // ✅ Clear the global token
+
     setToken("");
-    
     notifyListeners();
   }
 }

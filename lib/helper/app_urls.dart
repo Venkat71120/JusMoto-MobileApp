@@ -11,8 +11,13 @@ class AppUrls {
   static String get languageListUrl => '$baseEndPoint/language';
   static String get sendOtpUrl => '$baseEndPoint/auth/forgot-password';
   static String get resetPasswordUrl => '$baseEndPoint/auth/reset-password';
+
+  // ✅ UPDATED: Now uses /categories (supports status, is_featured, search params)
   static String get categoryListUrl => '$baseEndPoint/categories';
-  static String get primaryOfferUrl => '$baseEndPoint/primary-offer';
+
+  // ✅ UPDATED: Primary offer now under general namespace
+  static String get primaryOfferUrl => '$baseEndPoint/general/primary-offer';
+
   static String get myBrandsListUrl => '$baseEndPoint/all-brands';
   static String get outletListUrl => '$baseEndPoint/all-outlet';
   static String get carModelsListUrl => '$baseEndPoint/all-cars';
@@ -25,11 +30,16 @@ class AppUrls {
   static String get updateRefundPaymentInfoUrl =>
       '$baseEndPoint/client/service/refund-info-update';
   static String get serviceListByOfferUrl => '$baseEndPoint/offer-services';
-  static String get homeCategoryListUrl =>
-      '$baseEndPoint/categories-with-services';
-  static String get homeProductCategoryListUrl =>
-      '$baseEndPoint/categories-with-products';
-  static String get homeSliderListUrl => '$baseEndPoint/slider-lists';
+
+  // ✅ UPDATED: Categories with services now uses /categories endpoint
+  static String get homeCategoryListUrl => '$baseEndPoint/categories';
+
+  // ✅ UPDATED: Product categories now uses /categories endpoint with type param
+  static String get homeProductCategoryListUrl => '$baseEndPoint/categories';
+
+  // ✅ UPDATED: Sliders now under general namespace
+  static String get homeSliderListUrl => '$baseEndPoint/general/sliders';
+
   static String get homeProvidersListUrl => '$baseEndPoint/provider-lists';
   static String termsAndConditions = '$baseEndPoint/terms-and-conditions';
   static String privacyPolicy = '$baseEndPoint/privacy-policy';
@@ -41,10 +51,10 @@ class AppUrls {
   static String get otpSignInUrl => "$baseEndPoint/login-otp/verification";
   static String get emailSignUpUrl => '$baseEndPoint/auth/register';
   static String get socialSignInUrl => '$baseEndPoint/auth/social/login';
-  
+
   // ✅ NEW: Franchise login endpoint
   static String get franchiseLoginUrl => '$baseEndPoint/auth/admin/login';
-  
+
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';
   static String get orderCancelUrl =>
@@ -80,9 +90,16 @@ class AppUrls {
       '$baseEndPoint/client/orders/complete-request/status-approve';
   static String get declineOrderCompeteRequestUrl =>
       '$baseEndPoint/client/orders/complete-request/status-decline';
-  static String get homeFeaturedServicesUrl => '$baseEndPoint/service/featured';
-  static String get serviceListUrl => '$baseEndPoint/service/all-service';
-  static String get serviceDetailsUrl => '$baseEndPoint/service/details';
+
+  // ✅ UPDATED: Featured services now uses /services/featured
+  static String get homeFeaturedServicesUrl => '$baseEndPoint/services/featured';
+
+  // ✅ UPDATED: All services now uses /services
+  static String get serviceListUrl => '$baseEndPoint/services';
+
+  // ✅ UPDATED: Service details now uses /services/:id
+  static String get serviceDetailsUrl => '$baseEndPoint/services';
+
   static String get staffListUrl => '$baseEndPoint/service/staff-lists';
   static String get providerScheduleListUrl =>
       '$baseEndPoint/service/schedule-lists';
@@ -104,8 +121,7 @@ class AppUrls {
   static String get notificationReadUrl =>
       '$baseEndPoint/user/notifications/clear';
   static String get sentOtpToMailUrl => '$baseEndPoint/auth/resend-otp';
-  static String get verifyEmailUrl =>
-      '$baseEndPoint/auth/verify-email';
+  static String get verifyEmailUrl => '$baseEndPoint/auth/verify-email';
   static String get profileInfoUpdateUrl => '$baseEndPoint/user/profile/update';
   static String get profileInfoUrl => '$baseEndPoint/user/profile';
   static String get reasonListUrl => '$baseEndPoint/reasons';
@@ -121,11 +137,17 @@ class AppUrls {
   static String get hireProviderUrl => '$baseEndPoint/client/job/hire';
   static String get changeJobPublishStatusUrl =>
       '$baseEndPoint/client/job/published-status';
-  static String get homePopularServicesUrl => '$baseEndPoint/service/popular';
+
+  // ✅ UPDATED: Popular services now uses /services with query params
+  static String get homePopularServicesUrl => '$baseEndPoint/services';
+
   static String get unreadCountUrl =>
       '$baseEndPoint/client/chat/unseen-message/count';
   static String get chatCredentialUrl => '$baseEndPoint/live-chat/credentials';
   static String get editJobUrl => '$baseEndPoint/client/job/edit';
+
+  // ✅ NEW: Active offers endpoint
+  static String get activeOffersUrl => '$baseEndPoint/general/offers';
 
   // Wallet URLs
   static String get walletBalanceUrl =>
@@ -137,7 +159,7 @@ class AppUrls {
   static String get walletDepositPaymentUpdateUrl =>
       '$baseEndPoint/client/wallet/deposit/payment-update';
 
-    // Franchise Dashboard URLs
+  // Franchise Dashboard URLs
   static String get franchiseDashboardStatisticsUrl =>
       '$baseEndPoint/franchise/dashboard/statistics';
   static String get franchiseDashboardOrderCountsUrl =>
@@ -147,20 +169,12 @@ class AppUrls {
   static String get franchiseDashboardRecentActivityUrl =>
       '$baseEndPoint/franchise/dashboard/recent-activity';
 
-  static String get franchiseOrdersUrl =>
-    '$baseEndPoint/franchise/orders/all';
-
-static String get franchiseOrderDetailUrl =>
-    '$baseEndPoint/franchise/orders';
-
-static String get franchiseTicketsUrl =>
-    '$baseEndPoint/franchise/support-ticket/all';
-
-static String get franchiseTicketStatisticsUrl =>
-    '$baseEndPoint/franchise/support-ticket/statistics';
-
-static String get franchiseTicketDetailUrl =>
-    '$baseEndPoint/franchise/support-ticket';
-
-
+  static String get franchiseOrdersUrl => '$baseEndPoint/franchise/orders/all';
+  static String get franchiseOrderDetailUrl => '$baseEndPoint/franchise/orders';
+  static String get franchiseTicketsUrl =>
+      '$baseEndPoint/franchise/support-ticket/all';
+  static String get franchiseTicketStatisticsUrl =>
+      '$baseEndPoint/franchise/support-ticket/statistics';
+  static String get franchiseTicketDetailUrl =>
+      '$baseEndPoint/franchise/support-ticket';
 }

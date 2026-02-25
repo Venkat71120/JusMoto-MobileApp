@@ -21,14 +21,14 @@ class HomeSliderService with ChangeNotifier {
   }
 
   fetchHomeSlider() async {
-    var url = AppUrls.homeSliderListUrl;
+    // ✅ UPDATED: Uses new /general/sliders endpoint (no query params required)
+    final url = AppUrls.homeSliderListUrl;
 
     final responseData =
         await NetworkApiServices().getApi(url, LocalKeys.sliders);
     try {
       if (responseData != null) {
         final tempData = SliderListModel.fromJson(responseData);
-
         sliderList = tempData.sliders ?? [];
         sPref?.setString("sliders", jsonEncode(responseData));
       }

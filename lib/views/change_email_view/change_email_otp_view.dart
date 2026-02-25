@@ -228,19 +228,22 @@ class ChangeEmailOtpView extends StatelessWidget {
       length: otp?.length ??
           Provider.of<EmailManageService>(context, listen: false).otp?.length ??
           6,
-      validator: (s) {
+      validator: (String? s) {
+        // ✅ Guard: do nothing if pin is null or empty
+        if (s == null || s.isEmpty) return null;
+
         Provider.of<EmailManageService>(context, listen: false)
-            .tryEmailChange(otp: s)
+            .tryEmailChange(otp: s) // ✅ s is now non-null String
             .then((v) {
           if (v != true) return;
           context.popTrue;
         });
 
-        return;
+        return null;
       },
       pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
       showCursor: true,
-      onCompleted: (pin) => print(pin),
+      onCompleted: (pin) => debugPrint(pin),
     );
   }
 }

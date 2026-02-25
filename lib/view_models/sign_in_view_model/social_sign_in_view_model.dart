@@ -12,19 +12,19 @@ import '../../services/chat_services/chat_credential_service.dart';
 import '../../services/profile_services/profile_info_service.dart';
 import '../../services/push_notification_service.dart';
 
+/// Handles Google, Facebook, and Apple sign-in.
+/// Social login API: POST /auth/social/login
+/// Required params: provider, email, firstName, lastName, socialId
 class SocialSignInViewModel {
-  final googleSignIn = GoogleSignIn(
-    scopes: [
-      'email',
-      'profile',
-    ],
-  );
+  final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+
   String type = "";
   String fName = "";
   String lName = "";
   String id = "";
   String email = "";
-  bool signInSuccess = false;  // ✅ ADDED: Track sign-in success like email sign-in
+  String? imageUrl;
+  bool signInSuccess = false;
 
   SocialSignInViewModel._init();
   static SocialSignInViewModel? _instance;
@@ -39,48 +39,34 @@ class SocialSignInViewModel {
     return true;
   }
 
-  trySocialSignIn(
+  // ─── Entry point ─────────────────────────────────────────────────────────
+
+  Future<void> trySocialSignIn(
     BuildContext context, {
-    type = "google",
+    String type = "google",
   }) async {
-    debugPrint('🔐 ===== STARTING SOCIAL SIGN-IN =====');
-    debugPrint('🔐 Type: $type');
-    
     try {
-      debugPrint('📍 STEP 1: Calling provider method ($type)');
+      // Step 1 — get credentials from the social provider
       switch (type) {
         case "facebook":
-          await facebook();
+          await _getFacebookCredentials();
           break;
         case "apple":
-          await apple();
-          if (id.isEmpty) {
-            debugPrint('❌ Apple sign-in cancelled - no ID received');
-            return;
-          }
+          await _getAppleCredentials();
+          if (id.isEmpty) return; // user cancelled
           break;
         default:
-          await google();
+          await _getGoogleCredentials();
       }
 
-      debugPrint('✅ STEP 1 COMPLETE: Got user data');
-      debugPrint('   First Name: "$fName"');
-      debugPrint('   Last Name: "$lName"');
-      debugPrint('   Email: "$email"');
-      debugPrint('   ID: "$id"');
-
-      // Validate data
       if (email.isEmpty || id.isEmpty) {
-        debugPrint('❌ VALIDATION FAILED: Missing email or ID');
         LocalKeys.signInFailed.showToast();
         return;
       }
 
-      debugPrint('✅ VALIDATION PASSED');
-      sPref?.setString("ss_type", type ?? "");
+      sPref?.setString("ss_type", type);
 
-      debugPrint('📍 STEP 2: Calling backend API');
-      
+      // Step 2 — authenticate with our backend
       final signInService = SignInService();
       final result = await signInService.trySocialSignIn(
         type: type,
@@ -88,204 +74,131 @@ class SocialSignInViewModel {
         lName: lName,
         email: email,
         id: id,
+        image: imageUrl,
       );
-      
-      debugPrint('📥 Backend result: $result');
+
+      if (!context.mounted) return;
 
       if (result == true) {
-        debugPrint('✅ Backend accepted sign-in');
-        
-        // Show success toast like email sign-in does
         LocalKeys.signedInSuccessfully.showToast();
-        
-        debugPrint('🔍 Verifying token was saved...');
-        final savedToken = sPref?.getString("token") ?? "";
-        debugPrint('📋 Token in storage: ${savedToken.isNotEmpty ? "${savedToken.substring(0, 20)}..." : "EMPTY!"}');
-        
-        if (savedToken.isEmpty) {
-          debugPrint('❌ ERROR: Token not found in storage!');
-          LocalKeys.signInFailed.showToast();
-          return;
-        }
-        
-        // Fetch credentials and update tokens (same as email sign-in)
+
         Provider.of<ChatCredentialService>(context, listen: false)
             .fetchCredentials();
-        
-        // ✅ CRITICAL: Set the signInSuccess flag BEFORE API calls
+
         signInSuccess = true;
-        
         await PushNotificationService().updateDeviceToken(forceUpdate: true);
         await Provider.of<ProfileInfoService>(context, listen: false)
             .fetchProfileInfo();
-        
-        debugPrint('📍 STEP 3: Closing sign-in screen');
-        
-        // ✅ FIXED: Pop like email sign-in does - use context.popFalse
+
         if (context.mounted) {
-          // Using the same navigation method as email sign-in
           Navigator.of(context).pop(false);
-          debugPrint('✅ Navigation triggered with popFalse');
         }
-        
-        debugPrint('🎉 Sign-in complete!');
       } else {
-        debugPrint('❌ Backend returned false/null');
         LocalKeys.signInFailed.showToast();
       }
-    } catch (e, stackTrace) {
-      debugPrint('❌ Exception: $e');
-      debugPrint('StackTrace: $stackTrace');
+    } catch (e) {
+      debugPrint('❌ Social sign-in error: $e');
       LocalKeys.signInFailed.showToast();
     }
   }
 
-  google() async {
-    debugPrint('🔍 Starting Google Sign-In...');
-    
-    try {
-      final currentUser = googleSignIn.currentUser;
-      if (currentUser != null) {
-        debugPrint('   Signing out previous user...');
-        await googleSignIn.signOut();
-      }
+  // ─── Provider credential fetchers ────────────────────────────────────────
 
-      debugPrint('   Calling googleSignIn.signIn()...');
-      final googleUser = await googleSignIn.signIn();
+  Future<void> _getGoogleCredentials() async {
+    final currentUser = googleSignIn.currentUser;
+    if (currentUser != null) await googleSignIn.signOut();
 
-      if (googleUser == null) {
-        debugPrint('❌ User cancelled Google sign-in');
-        LocalKeys.signInFailed.showToast();
-        return;
-      }
-
-      debugPrint('✅ Got Google user data');
-      debugPrint('   Email: ${googleUser.email}');
-      debugPrint('   Name: ${googleUser.displayName}');
-      debugPrint('   ID: ${googleUser.id}');
-
-      GoogleSignInAccount user = googleUser;
-
-      type = "google";
-      fName = user.displayName?.split(" ").firstOrNull ?? "";
-      try {
-        lName = user.displayName?.split(" ").sublist(1).join(" ") ?? "";
-      } catch (e) {
-        lName = "";
-      }
-      email = user.email;
-      id = user.id;
-
-      debugPrint('✅ Google sign-in complete');
-    } catch (e, stackTrace) {
-      debugPrint('❌ Google sign-in error: $e');
-      debugPrint('StackTrace: $stackTrace');
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
       LocalKeys.signInFailed.showToast();
-      rethrow;
+      return;
     }
+
+    type = "google";
+    final parts = (googleUser.displayName ?? "").split(" ");
+    fName = parts.firstOrNull ?? "";
+    lName = parts.length > 1 ? parts.sublist(1).join(" ") : "";
+    email = googleUser.email;
+    id = googleUser.id;
+    imageUrl = googleUser.photoUrl;
   }
 
-  facebook() async {
-    debugPrint('🔍 Starting Facebook Sign-In...');
-    
-    try {
-      final facebookAuth = FacebookAuth.instance;
-      final token = await facebookAuth.accessToken;
-      var userDetails = {};
+  Future<void> _getFacebookCredentials() async {
+    final facebookAuth = FacebookAuth.instance;
+    final existingToken = await facebookAuth.accessToken;
 
-      if (token == null) {
-        debugPrint('   Showing Facebook login dialog...');
-        final LoginResult result = await facebookAuth.login();
-        if (result.status != LoginStatus.success) {
-          debugPrint('❌ Facebook login failed: ${result.status}');
-          throw "Facebook login failed";
-        }
+    if (existingToken == null) {
+      final result = await facebookAuth.login();
+      if (result.status != LoginStatus.success) {
+        throw Exception("Facebook login failed: ${result.status}");
       }
-
-      userDetails = await facebookAuth.getUserData(
-        fields: "name,email,id",
-      );
-
-      debugPrint('✅ Got Facebook user data: $userDetails');
-
-      type = "facebook";
-      fName = userDetails["name"]?.split(" ").firstOrNull ?? "";
-      try {
-        lName = userDetails["name"]?.split(" ").sublist(1).join(" ") ?? "";
-      } catch (e) {
-        lName = userDetails["name"] ?? "";
-      }
-      email = userDetails["email"] ?? "";
-      id = userDetails["id"] ?? "";
-
-      debugPrint('✅ Facebook sign-in complete');
-    } catch (e, stackTrace) {
-      debugPrint('❌ Facebook sign-in error: $e');
-      debugPrint('StackTrace: $stackTrace');
-      throw e;
     }
+
+    final userDetails = await facebookAuth.getUserData(
+      fields: "name,email,id,picture",
+    );
+
+    type = "facebook";
+    final parts = ((userDetails["name"] as String?) ?? "").split(" ");
+    fName = parts.firstOrNull ?? "";
+    lName = parts.length > 1 ? parts.sublist(1).join(" ") : "";
+    email = userDetails["email"] ?? "";
+    id = userDetails["id"] ?? "";
+    imageUrl = userDetails["picture"]?["data"]?["url"];
   }
 
-  apple() async {
-    debugPrint('🔍 Starting Apple Sign-In...');
-    
-    try {
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+  Future<void> _getAppleCredentials() async {
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
 
-      debugPrint('✅ Got Apple credential');
+    type = "apple";
+    // Apple only provides name/email on the FIRST sign-in — fall back to saved
+    fName = credential.givenName ?? sPref?.getString("apple_user_fName") ?? "";
+    lName = credential.familyName ?? sPref?.getString("apple_user_lName") ?? "";
+    email = credential.email ?? sPref?.getString("apple_user_email") ?? "";
+    id = credential.userIdentifier ?? "";
 
-      fName = credential.givenName ?? sPref?.getString("apple_user_fName") ?? "";
-      lName = credential.familyName ?? sPref?.getString("apple_user_lName") ?? "";
-      email = credential.email ?? sPref?.getString("apple_user_email") ?? "";
-      id = credential.userIdentifier ?? "";
-      type = "apple";
-
-      // Save for future (Apple only provides on first sign-in)
-      if (credential.givenName != null) {
-        sPref?.setString("apple_user_fName", credential.givenName!);
-      }
-      if (credential.familyName != null) {
-        sPref?.setString("apple_user_lName", credential.familyName!);
-      }
-      if (credential.email != null) {
-        sPref?.setString("apple_user_email", credential.email!);
-      }
-      
-      sPref?.setString("apple_user_token", credential.identityToken ?? "");
-      sPref?.setString("apple_user_id", credential.userIdentifier ?? "");
-
-      debugPrint('✅ Apple sign-in complete');
-    } catch (e, stackTrace) {
-      debugPrint('❌ Apple sign-in error: $e');
-      debugPrint('StackTrace: $stackTrace');
+    if (credential.givenName != null) {
+      sPref?.setString("apple_user_fName", credential.givenName!);
     }
+    if (credential.familyName != null) {
+      sPref?.setString("apple_user_lName", credential.familyName!);
+    }
+    if (credential.email != null) {
+      sPref?.setString("apple_user_email", credential.email!);
+    }
+    sPref?.setString("apple_user_id", credential.userIdentifier ?? "");
   }
+
+  // ─── Sign out ────────────────────────────────────────────────────────────
 
   void signOut() {
     final ssType = sPref?.getString("ss_type");
-    debugPrint('🚪 Signing out: $ssType');
 
     switch (ssType) {
-      case null:
-        break;
       case "facebook":
         FacebookAuth.instance.logOut();
         break;
       case "apple":
-        sPref?.remove("apple_user_token");
-        sPref?.remove("apple_user_id");
-        sPref?.remove("apple_user_email");
-        sPref?.remove("apple_user_fName");
-        sPref?.remove("apple_user_lName");
+        for (final key in [
+          "apple_user_token",
+          "apple_user_id",
+          "apple_user_email",
+          "apple_user_fName",
+          "apple_user_lName",
+        ]) {
+          sPref?.remove(key);
+        }
         break;
-      default:
+      case "google":
         googleSignIn.signOut();
+        break;
     }
+
     sPref?.remove("ss_type");
   }
 }

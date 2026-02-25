@@ -16,16 +16,44 @@ class HomePopularProductsService with ChangeNotifier {
 
   initLocal() {
     final localData = sPref?.getString("popular_products");
-    final tempData = ServiceListModel.fromJson(jsonDecode(localData ?? "{}"));
-    if (tempData.allServices.isNotEmpty) {
-      _homePopularProductsModel = tempData;
+    if (localData == null) return;
+
+    try {
+      final decoded = jsonDecode(localData);
+      // ✅ FIX: Reject stale cache that uses old "all_services" key format
+      // Old cache will have null prices and wrong field names — discard it
+      if (decoded is Map && decoded.containsKey("all_services")) {
+        sPref?.remove("popular_products");
+        fetchHomePopularProducts();
+        return;
+      }
+      final tempData = ServiceListModel.fromJson(decoded);
+      if (tempData.allServices.isNotEmpty) {
+        _homePopularProductsModel = tempData;
+        fetchHomePopularProducts();
+      }
+    } catch (_) {
+      sPref?.remove("popular_products");
       fetchHomePopularProducts();
     }
   }
 
   fetchHomePopularProducts() async {
-    var url =
-        "${AppUrls.homePopularServicesUrl}?variant_id=${sPref?.getString("vId")}&type=1";
+    // type=1 → Products only; sort by newest
+    final params = <String, String>{
+      'type': '1',
+      'sort_by': 'created_at',
+      'sort_order': 'DESC',
+      'limit': '15',
+    };
+
+    // ✅ FIX: Only include variant_id if actually set — avoids sending empty string
+    final vId = sPref?.getString("vId") ?? '';
+    if (vId.isNotEmpty) params['variant_id'] = vId;
+
+    final url = Uri.parse(AppUrls.homePopularServicesUrl)
+        .replace(queryParameters: params)
+        .toString();
 
     final responseData = await NetworkApiServices().getApi(url, null);
 
