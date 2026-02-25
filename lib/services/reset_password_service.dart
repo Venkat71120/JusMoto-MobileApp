@@ -9,15 +9,14 @@ import '../../helper/local_keys.g.dart';
 class ResetPasswordService with ChangeNotifier {
   resetPassword(BuildContext context, email, password, otp) async {
     final data = {
-      'email': '$email',
-      'otp': '$otp',
+      'token': '$otp',
       'password': password,
-      'confirm_password': password,
+      'password_confirmation': password,
     };
 
     final responseData = await NetworkApiServices().postApi(
         data, AppUrls.resetPasswordUrl, LocalKeys.resetPassword,
-        headers: commonAuthHeader);
+        headers: acceptJsonHeader);
 
     if (responseData != null) {
       LocalKeys.passwordResetSuccessful.showToast();

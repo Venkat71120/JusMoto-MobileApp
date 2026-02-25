@@ -3,17 +3,11 @@ import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLa
 import 'package:car_service/views/Franchise_home_view/FranchiseHomeView.dart';
 import 'package:car_service/views/Franchise_landing_nav_view/components/FranchiseLandingNavBar.dart';
 import 'package:car_service/views/Franchise_profile_view/FranchiseProfileView.dart';
-import 'package:car_service/views/Franchise_reports_view/FranchiseReportsView.dart';
 import 'package:car_service/views/franchise_orders_view/franchise_oders_view.dart';
-// import 'package:car_service/views/Franchise_dashboard/franchise_home_view.dart';
-// import 'package:car_service/views/Franchise_dashboard/franchise_orders_view.dart';
-// import 'package:car_service/views/Franchise_dashboard/franchise_profile_view.dart';
-// import 'package:car_service/views/Franchise_dashboard/franchise_reports_view.dart';
+// import 'package:car_service/views/franchise_orders_view/franchise_orders_view.dart';
+// ✅ NEW IMPORT — replaces FranchiseReportsView
+import 'package:car_service/views/franchise_services_view/franchise_services_view.dart';
 import 'package:flutter/material.dart';
-
-// import '../../view_models/franchise_landing_view_model/franchise_landing_view_model.dart';
-// import 'components/franchise_landing_nav_bar.dart';
-
 
 class FranchiseLandingView extends StatelessWidget {
   const FranchiseLandingView({super.key});
@@ -23,10 +17,10 @@ class FranchiseLandingView extends StatelessWidget {
     final fvm = FranchiseLandingViewModel.instance;
 
     final widgets = [
-      const FranchiseHomeView(),      // index 0 — Home / Dashboard
-      const FranchiseOrdersView(),    // index 1 — Orders
-      const FranchiseReportsView(),   // index 2 — Reports
-      const FranchiseProfileView(),   // index 3 — Profile
+      const FranchiseHomeView(),        // index 0 — Home / Dashboard
+      const FranchiseOrdersView(),       // index 1 — Orders
+      const FranchiseServicesView(),     // index 2 — Services (tickets) ✅ CHANGED
+      const FranchiseProfileView(),      // index 3 — Profile
     ];
 
     return PopScope(

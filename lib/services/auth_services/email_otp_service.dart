@@ -77,10 +77,9 @@ class EmailManageService with ChangeNotifier {
     required String token,
   }) async {
     email = emailUsername;
-    final data = {'email_verified': "1", "user_id": userId.toString()};
+    final data = {'email': email, 'otp': otp.toString()};
     final headers = {
       'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
     };
     final responseData = await NetworkApiServices().postApi(
       data,

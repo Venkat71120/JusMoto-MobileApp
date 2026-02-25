@@ -20,8 +20,7 @@ class SignUpService with ChangeNotifier {
     final data = {
       'email': emailUsername,
       'password': password,
-      'type': '1',
-      'terms_conditions': '1',
+      'terms_conditions': true,
     };
     final responseData = await NetworkApiServices().postApi(
       data,

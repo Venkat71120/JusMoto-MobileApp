@@ -64,11 +64,10 @@ class SignInService with ChangeNotifier {
 
     final data = {
       'email': email,
-      'source': type,
-      'firstname': fName,
-      'lastname': lName,
-      "user_type": "1",  // ⚠️ IMPORTANT: This was missing in your second version!
-      'is_go_fb_ap_id': id
+      'provider': type,
+      'firstName': fName,
+      'lastName': lName,
+      'socialId': id
     };
 
     final headers = {

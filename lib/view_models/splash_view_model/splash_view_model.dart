@@ -2,6 +2,8 @@
 
 import 'dart:developer';
 
+import 'package:car_service/services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
+import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
 import 'package:car_service/services/dynamics/cancellation_policy_service.dart';
 import 'package:car_service/services/home_services/home_category_service.dart';
 import 'package:car_service/services/home_services/home_featured_services_service.dart';
@@ -9,7 +11,9 @@ import 'package:car_service/services/home_services/home_popular_services_service
 import 'package:car_service/services/home_services/home_slider_service.dart';
 import 'package:car_service/services/service/cart_service.dart';
 import 'package:car_service/services/service/favorite_services_service.dart';
+import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
 import 'package:car_service/view_models/landding_view_model/landding_view_model.dart';
+import 'package:car_service/views/Franchise_landing_nav_view/FranchiseLandingView.dart';
 import 'package:car_service/views/landing_view/landing_view.dart';
 import 'package:car_service/views/select_car_view/select_car_view.dart';
 import 'package:flutter/material.dart';
@@ -64,32 +68,63 @@ class SplashViewModel {
       context,
       listen: false,
     ).defaultTranslate(context);
+    
     final gotoIntro =
         await Provider.of<IntroService>(context, listen: false).checkIntro();
     debugPrint("intro is $gotoIntro".toString());
+    
     if (gotoIntro) {
       CancellationPolicyService.instance.fetchCancellationPolicy();
       context.toUntilPage(const IntroView());
     } else {
-      initLocalData(context);
-      await Provider.of<ProfileInfoService>(
-        context,
-        listen: false,
-      ).fetchProfileInfo(trySkip: true).then((value) async {});
-
-      final lm = LandingViewModel.instance;
-      lm.initCar();
-      if (lm.selectedCar.value == null) {
-        context.toPage(
-          SelectCarView(),
-          then: (_) {
-            context.toUntilPage(const LandingView());
-          },
-        );
+      // ✅ CRITICAL: Initialize franchise data from SharedPreferences FIRST
+      final flService = Provider.of<FranchiseLoginService>(context, listen: false);
+      await flService.initFranchiseData();
+      
+      final isFranchise = flService.isFranchiseUser;
+      final hasToken = flService.token.isNotEmpty;
+      
+      debugPrint("🔍 Checking user type - isFranchise: $isFranchise, hasToken: $hasToken");
+      
+      if (isFranchise && hasToken) {
+        // ✅ FRANCHISE USER FLOW
+        debugPrint("👤 Franchise user detected - navigating to FranchiseLandingView");
+        
+        await initFranchiseData(context);
+        
+        // ✅ DON'T fetch regular user profile for franchise users
+        // The franchise data is already loaded in FranchiseLoginService
+        
+        FranchiseLandingViewModel.instance.currentIndex.value = 0;
+        context.toUntilPage(const FranchiseLandingView());
+        
       } else {
-        context.toUntilPage(const LandingView());
+        // ✅ REGULAR USER FLOW
+        debugPrint("👤 Regular user detected - navigating to LandingView");
+        
+        initLocalData(context);
+        
+        // ✅ Only fetch profile for regular users
+        await Provider.of<ProfileInfoService>(
+          context,
+          listen: false,
+        ).fetchProfileInfo(trySkip: true);
+
+        final lm = LandingViewModel.instance;
+        lm.initCar();
+        if (lm.selectedCar.value == null) {
+          context.toPage(
+            SelectCarView(),
+            then: (_) {
+              context.toUntilPage(const LandingView());
+            },
+          );
+        } else {
+          context.toUntilPage(const LandingView());
+        }
       }
     }
+    
     try {
       await NotificationHelper().notificationsSetup();
       await NotificationHelper().initiateNotification(context);
@@ -99,6 +134,21 @@ class SplashViewModel {
       debugPrint(e.toString());
       log(e.toString());
     }
+  }
+
+  // ✅ Initialize franchise-specific data
+  initFranchiseData(BuildContext context) {
+    debugPrint("🔧 Initializing franchise data");
+    PushNotificationService().updateDeviceToken();
+    
+    // Fetch franchise dashboard data
+    Provider.of<FranchiseDashboardService>(context, listen: false).fetchDashboard();
+    
+    // Fetch chat credentials
+    Provider.of<ChatCredentialService>(context, listen: false).initLocal();
+    
+    // ✅ DON'T fetch regular user profile info for franchise users
+    // The franchise user info is already in FranchiseLoginService
   }
 
   initLocalData(BuildContext context) {

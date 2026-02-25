@@ -1,3 +1,8 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// UPDATED: FranchiseLandingNavBar.dart
+// Change index 2 from "Reports" → "Services" (support agent icon)
+// ─────────────────────────────────────────────────────────────────────────────
+
 import 'package:badges/badges.dart' as badges;
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
@@ -10,7 +15,6 @@ import '/helper/extension/string_extension.dart';
 import '../../../helper/local_keys.g.dart';
 import '../../../helper/svg_assets.dart';
 import '../../../services/theme_service.dart';
-// import '../franchise_landing_view_model/franchise_landing_view_model.dart';
 
 class FranchiseLandingNavBar extends StatelessWidget {
   const FranchiseLandingNavBar({super.key});
@@ -45,13 +49,16 @@ class FranchiseLandingNavBar extends StatelessWidget {
               1,
               fvm,
             ),
+            // ✅ CHANGED: Reports → Services (ticket/support icon)
             _navBarItem(
               context,
-              'Reports',
-              SvgAssets.store,     // swap to a chart/report icon if available
+              'Services',
+              SvgAssets.store,     // swap to support/ticket icon if you have one
               SvgAssets.storeBold,
               2,
               fvm,
+              // You can pass a badgeCount here once you have unread ticket count:
+              // badgeCount: ticketOpenCount,
             ),
             _navBarItem(
               context,
