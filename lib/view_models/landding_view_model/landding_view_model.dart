@@ -14,6 +14,7 @@ class LandingViewModel {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   BuildContext? context;
   final ValueNotifier<CarModel?> selectedCar = ValueNotifier(null);
+  final ValueNotifier<ModelVariant?> selectedVariant = ValueNotifier(null);
 
   LandingViewModel._init();
   static LandingViewModel? _instance;
@@ -24,9 +25,15 @@ class LandingViewModel {
 
   initCar() {
     final localCar = sPref?.getString("car");
-    if (localCar == null) return;
-    debugPrint("local car is $localCar".toString());
-    selectedCar.value = CarModel.fromJson(jsonDecode(localCar));
+    final localVariant = sPref?.getString("selectedVariant");
+    if (localCar != null) {
+      debugPrint("local car is $localCar".toString());
+      selectedCar.value = CarModel.fromJson(jsonDecode(localCar));
+    }
+    if (localVariant != null) {
+      debugPrint("local variant is $localVariant".toString());
+      selectedVariant.value = ModelVariant.fromJson(jsonDecode(localVariant));
+    }
   }
 
   LandingViewModel._dispose();

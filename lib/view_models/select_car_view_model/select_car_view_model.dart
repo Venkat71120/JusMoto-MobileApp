@@ -12,16 +12,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/car_services/user_cars_service.dart';
 import '../../views/splash_view/splash_view.dart';
 
 class SelectCarViewModel {
   final ValueNotifier<BrandModel?> selectedBrand = ValueNotifier(null);
   final ValueNotifier<CarModel?> selectedCar = ValueNotifier(null);
-  final ValueNotifier<String?> selectedEngine = ValueNotifier(null);
-  final ValueNotifier<String?> selectedFuel = ValueNotifier(null);
+  final ValueNotifier<ModelVariant?> selectedVariant = ValueNotifier(null);
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ScrollController scrollController = ScrollController();
   final PageController pageController = PageController(initialPage: 0);
+  final ValueNotifier<List<ModelVariant>> variantsList = ValueNotifier([]);
+  final TextEditingController regNoController = TextEditingController();
 
   SelectCarViewModel._init();
   static SelectCarViewModel? _instance;
@@ -54,35 +56,42 @@ class SelectCarViewModel {
           LocalKeys.selectYourCarModel.showToast();
           return;
         }
-        final variants = selectedCar.value?.variants ?? [];
-        final uniqIds = variants.map((v) => v.engineType?.id).toSet().toList();
-        final List<VariantTypes> engines = [];
-        for (var element in uniqIds) {
-          final vt =
-              variants
-                  .firstWhere((el) => el.engineType?.id == element)
-                  .engineType;
-          if (vt == null) continue;
-          engines.add(vt);
-        }
-        selectedEngine.value ??= engines.firstOrNull?.id?.toString();
+        
+        // At this step we will fetch the variants and they will be displayed on the next page
+        
         await pageController.nextPage(
           duration: 300.milliseconds,
           curve: Curves.easeIn,
         );
         pageIndex.value = pageController.page?.toInt() ?? 0;
       default:
+        // Variant Page (Index 2)
+        if (selectedVariant.value == null) {
+           "Please select variant type".showToast();
+           return;
+        }
+
+        // Save to backend garage
+        bool success = await Provider.of<UserCarsService>(context, listen: false).addUserCar(
+          brandId: selectedBrand.value?.id,
+          carId: selectedCar.value?.id,
+          variantId: selectedVariant.value?.id,
+          registrationNumber: regNoController.text.trim().isEmpty ? null : regNoController.text.trim(),
+          isDefault: true,
+        );
+
+        if (!success) {
+          "Failed to save car to your profile".showToast();
+        }
+        
         final tempCar = CarModel.fromJson(selectedCar.value?.toJson() ?? {});
-        tempCar.variants.removeWhere((element) {
-          return (element.engineType?.id?.toString() != selectedEngine.value ||
-              element.fuelType?.id?.toString() != selectedFuel.value);
-        });
         LandingViewModel.instance.selectedCar.value = tempCar;
         sPref?.setString("car", jsonEncode(tempCar.toJson()));
         sPref?.setString(
           "vId",
-          tempCar.variants.firstOrNull?.id?.toString() ?? "",
+          selectedVariant.value?.id?.toString() ?? "",
         );
+        sPref?.setString("selectedVariant", jsonEncode(selectedVariant.value?.toJson() ?? {}));
         Provider.of<CartService>(context, listen: false).clearCart();
         if (sPref?.getBool("intro") ?? false) {
           context.toUntilPage(SplashView());

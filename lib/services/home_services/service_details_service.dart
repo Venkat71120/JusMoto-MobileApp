@@ -19,17 +19,21 @@ class ServiceDetailsService with ChangeNotifier {
       !_serviceDetailsModel.containsKey(id.toString()) || token.isInvalid;
 
   fetchServiceDetails(id, {refreshing = false}) async {
-    var url = "${AppUrls.serviceDetailsUrl}/$id/${sPref?.getString("vId")}";
+    var url = "${AppUrls.serviceDetailsUrl}/$id";
     token = getToken;
 
     try {
       final responseData = await NetworkApiServices().getApi(
-          url, LocalKeys.serviceDetails,
-          headers: acceptJsonAuthHeader, timeoutSeconds: 20);
+        url,
+        LocalKeys.serviceDetails,
+        headers: acceptJsonAuthHeader,
+        timeoutSeconds: 20,
+      );
 
       if (responseData != null) {
-        _serviceDetailsModel[id.toString()] =
-            ServiceDetailsModel.fromJson(responseData);
+        _serviceDetailsModel[id.toString()] = ServiceDetailsModel.fromJson(
+          responseData,
+        );
       } else {
         if (!refreshing) {
           _serviceDetailsModel.remove(id.toString());

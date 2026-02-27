@@ -18,9 +18,11 @@ class AppUrls {
   // ✅ UPDATED: Primary offer now under general namespace
   static String get primaryOfferUrl => '$baseEndPoint/general/primary-offer';
 
-  static String get myBrandsListUrl => '$baseEndPoint/all-brands';
+  static String get myBrandsListUrl => '$baseEndPoint/brands';
   static String get outletListUrl => '$baseEndPoint/all-outlet';
-  static String get carModelsListUrl => '$baseEndPoint/all-cars';
+  static String get carModelsListUrl => '$baseEndPoint/cars';
+  static String get carVariantsListUrl => '$baseEndPoint/cars'; // :id/variants
+  static String get userCarsUrl => '$baseEndPoint/user/cars';
   static String get myRefundListUrl =>
       '$baseEndPoint/client/orders/all-refund-list';
   static String get myRefundDetailsUrl =>
@@ -92,7 +94,8 @@ class AppUrls {
       '$baseEndPoint/client/orders/complete-request/status-decline';
 
   // ✅ UPDATED: Featured services now uses /services/featured
-  static String get homeFeaturedServicesUrl => '$baseEndPoint/services/featured';
+  static String get homeFeaturedServicesUrl =>
+      '$baseEndPoint/services/featured';
 
   // ✅ UPDATED: All services now uses /services
   static String get serviceListUrl => '$baseEndPoint/services';

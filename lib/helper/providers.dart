@@ -25,6 +25,8 @@ import '../services/booking_services/hire_provider_from_offer_service.dart';
 import '../services/booking_services/place_order_service.dart';
 import '../services/car_services/brand_list_service.dart';
 import '../services/car_services/model_list_service.dart';
+import '../services/car_services/variant_list_service.dart';
+import '../services/car_services/user_cars_service.dart';
 import '../services/category_service.dart';
 import '../services/chat_services/chat_credential_service.dart';
 import '../services/chat_services/chat_list_service.dart';
@@ -111,6 +113,8 @@ class Providers {
     ChangeNotifierProvider(create: (context) => ProductListService()),
     ChangeNotifierProvider(create: (context) => BrandListService()),
     ChangeNotifierProvider(create: (context) => ModelListService()),
+    ChangeNotifierProvider(create: (context) => VariantListService()),
+    ChangeNotifierProvider(create: (context) => UserCarsService()),
     ChangeNotifierProvider(create: (context) => OutletService()),
     ChangeNotifierProvider(create: (context) => RefundSettingsService()),
     ChangeNotifierProvider(create: (context) => RefundManageService()),

@@ -24,10 +24,12 @@ class ServiceByCategoryService with ChangeNotifier {
 
   fetchServices({refreshing = false, catId}) async {
     var url =
-        "${AppUrls.serviceListUrl}?variant_id=${sPref?.getString("vId")}&cat_id=$catId";
+        "${AppUrls.serviceListUrl}?variant_id=${sPref?.getString("vId")}&category_id=$catId";
     categoryId = catId;
-    final responseData =
-        await NetworkApiServices().getApi(url, LocalKeys.searchService);
+    final responseData = await NetworkApiServices().getApi(
+      url,
+      LocalKeys.searchService,
+    );
 
     try {
       if (responseData != null) {
@@ -47,8 +49,10 @@ class ServiceByCategoryService with ChangeNotifier {
     if (nextPageLoading || nextPage == null) return;
     nextPageLoading = true;
     notifyListeners();
-    final responseData =
-        await NetworkApiServices().getApi(nextPage!, LocalKeys.jobs);
+    final responseData = await NetworkApiServices().getApi(
+      nextPage!,
+      LocalKeys.jobs,
+    );
 
     if (responseData != null) {
       final tempData = ServiceListModel.fromJson(responseData);

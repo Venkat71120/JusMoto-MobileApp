@@ -11,113 +11,170 @@ import 'package:car_service/view_models/landding_view_model/landding_view_model.
 import 'package:car_service/view_models/select_car_view_model/select_car_view_model.dart';
 import 'package:car_service/views/select_car_view/select_car_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../services/car_services/user_cars_service.dart';
 import 'components/car_fuel_card.dart';
 
-class MyCarView extends StatelessWidget {
+class MyCarView extends StatefulWidget {
   const MyCarView({super.key});
 
   @override
+  State<MyCarView> createState() => _MyCarViewState();
+}
+
+class _MyCarViewState extends State<MyCarView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<UserCarsService>(context, listen: false).fetchUserCars();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final lm = LandingViewModel.instance;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(LocalKeys.myCar),
+        actions: [
+          IconButton(
+            onPressed: () {
+              SelectCarViewModel.dispose;
+              context.toPage(SelectCarView());
+            },
+            icon: const Icon(Icons.add),
+            tooltip: "Add Car",
+          )
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SquircleContainer(
+      body: Consumer<UserCarsService>(builder: (context, ucs, child) {
+        if (ucs.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final cars = ucs.userCarsModel.cars ?? [];
+
+        if (cars.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.directions_car_outlined, size: 64, color: Colors.grey),
+                const SizedBox(height: 12),
+                const Text("No cars added yet."),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    SelectCarViewModel.dispose;
+                    context.toPage(SelectCarView());
+                  },
+                  child: const Text("Add a Car"),
+                )
+              ],
+            ),
+          );
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          itemCount: cars.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final car = cars[index];
+            final isDefault = car.isDefault == 1 || car.isDefault == true;
+
+            return SquircleContainer(
               radius: 12,
-              padding: 12.paddingAll,
-              color: context.color.accentContrastColor,
+              padding: const EdgeInsets.all(16),
+              color: isDefault
+                  ? context.color.accentContrastColor
+                  : Colors.grey.shade100,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header row: brand + car name, default badge
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton(
-                          onPressed: () {
-                            SelectCarViewModel.dispose;
-                            context.toPage(SelectCarView());
-                          },
-                          child: Text(LocalKeys.changeCar)),
-                      IconButton(
-                          onPressed: () {
-                            SelectCarViewModel.dispose;
-                            context.toPage(SelectCarView());
-                          },
-                          icon: SvgAssets.edit
-                              .toSVGSized(24, color: primaryColor)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              car.brandName ?? "Unknown Brand",
+                              style: context.labelSmall?.copyWith(
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              car.carName ?? "Unknown Model",
+                              style: context.titleMedium?.bold,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isDefault)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: primaryColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            "Default",
+                            style: TextStyle(
+                                color: Colors.white, fontSize: 11),
+                          ),
+                        ),
                     ],
                   ),
-                  12.toHeight,
-                  Center(
-                    child: CustomNetworkImage(
-                      imageUrl: lm.selectedCar.value?.image,
-                      width: context.width * 0.5,
-                      height: context.width * 0.3,
-                      fit: BoxFit.contain,
-                      carPlaceholder: true,
-                    ),
+                  const SizedBox(height: 8),
+
+                  // Registration number
+                  Row(
+                    children: [
+                      const Icon(Icons.pin, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        car.registrationNumber ?? "No Registration",
+                        style: context.bodyMedium,
+                      ),
+                    ],
                   ),
-                  8.toHeight,
-                  Center(
-                    child: Text(
-                      lm.selectedCar.value?.name ?? "---",
-                      style: context.titleMedium?.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            16.toHeight,
-            SquircleContainer(
-              radius: 12,
-              width: double.infinity,
-              padding: 12.paddingAll,
-              color: context.color.accentContrastColor,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FieldLabel(label: LocalKeys.carTransmissionType),
-                  RadioListTile(
-                    dense: true,
-                    value: true,
-                    contentPadding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                    groupValue: true,
-                    onChanged: (value) {},
-                    title: Text(
-                      lm.selectedCar.value?.variants.firstOrNull?.engineType
-                              ?.name ??
-                          "---",
-                      style: context.titleSmall,
-                    ),
+
+                  const SizedBox(height: 12),
+
+                  // Action buttons
+                  Row(
+                    children: [
+                      if (!isDefault)
+                        OutlinedButton(
+                          onPressed: () async {
+                            await ucs.setDefaultCar(id: car.id);
+                          },
+                          child: const Text("Set as Default"),
+                        ),
+                      const Spacer(),
+                      TextButton.icon(
+                        onPressed: () {
+                          SelectCarViewModel.dispose;
+                          context.toPage(SelectCarView());
+                        },
+                        icon: SvgAssets.edit.toSVGSized(16, color: primaryColor),
+                        label: Text(LocalKeys.changeCar),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-            16.toHeight,
-            FieldLabel(label: LocalKeys.carFuelType),
-            8.toHeight,
-            CarFuelCard(
-              name:
-                  lm.selectedCar.value?.variants.firstOrNull?.fuelType?.name ??
-                      "---",
-              icon:
-                  lm.selectedCar.value?.variants.firstOrNull?.fuelType?.image ??
-                      "---",
-              isSelected: true,
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      }),
     );
   }
 }

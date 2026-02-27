@@ -6,14 +6,14 @@ class SliderListModel {
   });
 
   factory SliderListModel.fromJson(Map json) => SliderListModel(
-        sliders: json["sliders"] == null
+        sliders: json["data"] == null
             ? []
             : List<HomeSliderModel>.from(
-                json["sliders"]!.map((x) => HomeSliderModel.fromJson(x))),
+                json["data"]!.map((x) => HomeSliderModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "sliders": sliders == null
+        "data": sliders == null
             ? []
             : List<dynamic>.from(sliders!.map((x) => x.toJson())),
       };

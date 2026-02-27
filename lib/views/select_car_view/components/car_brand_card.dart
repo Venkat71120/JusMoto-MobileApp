@@ -21,14 +21,32 @@ class CarBrandCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SquircleContainer(
-      height: (context.width - 88) / 5,
+      // Give more height to accommodate the text below the image
+      height: ((context.width - 88) / 5) + 36,
       width: (context.width - 88) / 5,
       radius: 8,
-      padding: 12.paddingAll,
+      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       borderColor: isSelected ? primaryColor : context.color.primaryBorderColor,
       color: isSelected ? mutedPrimaryColor : context.color.backgroundColor,
-      child: CustomNetworkImage(
-        imageUrl: imageUrl,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: CustomNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.contain,
+              carPlaceholder: true,
+            ),
+          ),
+          4.toHeight,
+          Text(
+            name,
+            style: context.titleSmall?.copyWith(fontSize: 10),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          )
+        ],
       ),
     );
   }

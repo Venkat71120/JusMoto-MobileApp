@@ -21,20 +21,25 @@ class ServiceDetailsModel {
 
   ServiceDetailsModel({this.allServices, this.relatedServices});
 
-  factory ServiceDetailsModel.fromJson(json) => ServiceDetailsModel(
-    allServices:
-        json["service_details"] == null
-            ? null
-            : ServiceDetails.fromJson(json["service_details"]),
-    relatedServices:
-        json["relevant_service_lists"] == null
-            ? []
-            : List<ServiceModel>.from(
-              json["relevant_service_lists"]!.map(
-                (x) => ServiceModel.fromJson(x),
+  factory ServiceDetailsModel.fromJson(json) {
+    if (json == null) return ServiceDetailsModel();
+    final serviceData = json["data"] ?? json["service_details"] ?? json;
+    final related =
+        json["relevant_service_lists"] ??
+        json["related_services"] ??
+        serviceData["related_services"] ??
+        serviceData["relevant_service_lists"];
+    return ServiceDetailsModel(
+      allServices:
+          serviceData == null ? null : ServiceDetails.fromJson(serviceData),
+      relatedServices:
+          related == null
+              ? []
+              : List<ServiceModel>.from(
+                related.map((x) => ServiceModel.fromJson(x)),
               ),
-            ),
-  );
+    );
+  }
 
   Map<String, dynamic> toJson() => {"service_details": allServices?.toJson()};
 }

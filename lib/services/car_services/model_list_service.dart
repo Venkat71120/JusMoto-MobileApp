@@ -30,7 +30,7 @@ class ModelListService with ChangeNotifier {
     token = getToken;
     brandId = bId.toString();
 
-    final url = "${AppUrls.carModelsListUrl}?brand_id=$bId";
+    final url = "${AppUrls.myBrandsListUrl}/$bId/cars";
     final responseData = await NetworkApiServices()
         .getApi(url, LocalKeys.brandList, headers: commonAuthHeader);
 
@@ -39,6 +39,9 @@ class ModelListService with ChangeNotifier {
       nextPage = _carModelsModel?.pagination?.nextPageUrl;
     } else {}
     _carModelsModel ??= CarModelListModel(allCarModels: []);
+    
+    print("Parsed model count: ${_carModelsModel?.allCarModels?.length}");
+    
     notifyListeners();
   }
 

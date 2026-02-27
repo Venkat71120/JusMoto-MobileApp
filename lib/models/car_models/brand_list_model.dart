@@ -16,14 +16,17 @@ class BrandListModel {
     this.pagination,
   });
 
-  factory BrandListModel.fromJson(Map json) => BrandListModel(
-      allBrands: json["all_brands"] == null
+  factory BrandListModel.fromJson(Map json) {
+    final list = json["data"] ?? json["all_brands"];
+    return BrandListModel(
+      allBrands: list == null
           ? []
-          : List<BrandModel>.from(
-              json["all_brands"]!.map((x) => BrandModel.fromJson(x))),
+          : List<BrandModel>.from(list.map((x) => BrandModel.fromJson(x))),
       pagination: json["pagination"] == null
           ? null
-          : Pagination.fromJson(json["pagination"]));
+          : Pagination.fromJson(json["pagination"])
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "all_brands": allBrands == null

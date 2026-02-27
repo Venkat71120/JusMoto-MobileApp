@@ -103,6 +103,44 @@ class NetworkApiServices extends BaseApiServices {
     return responseJson;
   }
 
+  @override
+  Future<Map?> putApi(var data, String url, requestName, {headers}) async {
+    if (kDebugMode) {
+      debugPrint(url);
+      debugPrint(data.toString());
+    }
+    final hasConnection = await networkConnectivity.currentStatus();
+    if (!hasConnection) {
+      debugPrint("connection state is $hasConnection".toString());
+
+      LocalKeys.noConnectionFound.showToast();
+      return null;
+    }
+    Map<String, String> h = headers ?? {};
+    h.putIfAbsent('Accept', () => 'application/json');
+    Map? responseJson;
+    try {
+      final response = await http
+          .put(Uri.parse(url), body: data, headers: h)
+          .timeout(const Duration(seconds: 10));
+      if (kDebugMode) {
+        debugPrint(response.body.toString());
+        debugPrint(response.statusCode.toString());
+      }
+      responseJson = returnResponse(response);
+    } on SocketException {
+      debugPrint("invalid url");
+      showError(requestName, LocalKeys.invalidUrl);
+    } on RequestTimeOut {
+      debugPrint("request timeout");
+      showError(requestName, LocalKeys.requestTimeOut);
+    } catch (e) {
+      showError(requestName, e.toString());
+      debugPrint(e.toString());
+    }
+    return responseJson;
+  }
+
   Future<Map?> postWithFileApi(
     http.MultipartRequest request,
     requestName, {

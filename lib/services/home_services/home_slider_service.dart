@@ -13,15 +13,20 @@ class HomeSliderService with ChangeNotifier {
 
   initLocal() {
     final localData = sPref?.getString("sliders");
-    final tempData = SliderListModel.fromJson(jsonDecode(localData ?? "{}"));
-    if ((tempData.sliders ?? []).isNotEmpty) {
-      sliderList = tempData.sliders;
+    if (localData == null) return;
+    try {
+      final tempData = SliderListModel.fromJson(jsonDecode(localData));
+      if ((tempData.sliders ?? []).isNotEmpty) {
+        sliderList = tempData.sliders;
+        notifyListeners();
+        fetchHomeSlider();
+      }
+    } catch (_) {
       fetchHomeSlider();
     }
   }
 
   fetchHomeSlider() async {
-    // ✅ UPDATED: Uses new /general/sliders endpoint (no query params required)
     final url = AppUrls.homeSliderListUrl;
 
     final responseData =
@@ -32,6 +37,8 @@ class HomeSliderService with ChangeNotifier {
         sliderList = tempData.sliders ?? [];
         sPref?.setString("sliders", jsonEncode(responseData));
       }
+    } catch (e) {
+      debugPrint("Slider parse error: $e");
     } finally {
       sliderList ??= [];
       notifyListeners();
