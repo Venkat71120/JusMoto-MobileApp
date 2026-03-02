@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,8 +9,6 @@ import '../../helper/extension/string_extension.dart';
 import '../../helper/local_keys.g.dart';
 import '../../view_models/sign_up_view_model/sign_up_view_model.dart';
 
-/// Registers new users and sets up their profile after sign-up.
-/// Backend wraps all responses in: { success, message, data: { user, token } }
 class SignUpService with ChangeNotifier {
   bool emailVerified = true;
   bool verifyEnabled = true;
@@ -22,21 +21,26 @@ class SignUpService with ChangeNotifier {
     required String emailUsername,
     required String password,
   }) async {
-    final data = {
+    final Map<String, dynamic> data = {
       'email': emailUsername,
       'password': password,
-      'terms_condition': true,
+      'terms_conditions': true,
+    };
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
     };
 
     final responseData = await NetworkApiServices().postApi(
-      data,
+      jsonEncode(data),
       AppUrls.emailSignUpUrl,
       LocalKeys.signUp,
+      headers: headers,
     );
 
     debugPrint('📥 Register response: $responseData');
 
-    // Backend response shape: { success, message, data: { user: {...}, token: "..." } }
     if (responseData != null && responseData['data'] != null) {
       final dataObj = responseData['data'];
       final user = dataObj['user'];
@@ -45,15 +49,18 @@ class SignUpService with ChangeNotifier {
       email = user['email']?.toString() ?? "";
       userId = user['id']?.toString() ?? "";
 
-      // ✅ FIX: email_verified can come back as bool, int, or string.
-      //    Calling .toString() on a bool works fine, but parseToBool
-      //    extension was blowing up when the raw value was already bool
-      //    and something upstream tried to cast it to String first.
-      //    Use _parseToBool() which handles all three types safely.
       emailVerified = _parseToBool(user['email_verified']);
       verifyEnabled = _parseToBool(responseData['verify_enabled']);
 
-      debugPrint('   token: ${token.isNotEmpty ? "present" : "MISSING"}');
+      // ✅ CRITICAL FIX: Set global token immediately after registration
+      // so acceptJsonAuthHeader is populated when profile setup is called.
+      if (token.isNotEmpty) {
+        setToken(token);
+        debugPrint('✅ Token set globally after registration');
+      } else {
+        debugPrint('❌ Token missing from registration response!');
+      }
+
       debugPrint('   emailVerified: $emailVerified');
       debugPrint('   verifyEnabled: $verifyEnabled');
 
@@ -66,60 +73,89 @@ class SignUpService with ChangeNotifier {
     return null;
   }
 
-  /// Called after sign-up to save first name, last name, and optional profile photo.
-  /// Uses the token obtained during registration.
   Future tryToSetProfileInfos() async {
     final sum = SignUpViewModel.instance;
-    final data = {
-      'update_type': 'after_login',
-      'first_name': sum.fNameController.text,
-      'last_name': sum.lNameController.text,
-    };
 
-    var headers = {
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(AppUrls.profileInfoUpdateUrl),
-    );
-    request.fields.addAll(data);
-    request.headers.addAll(headers);
-
-    if (sum.profileImage.value != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath('file', sum.profileImage.value!.path),
-      );
+    // Safety net — re-set token if global token was cleared somehow
+    if (token.isNotEmpty && getToken.isEmpty) {
+      setToken(token);
+      debugPrint('🔁 Token re-set before profile update');
     }
 
-    final responseData = await NetworkApiServices().postWithFileApi(
-      request,
-      LocalKeys.profileSetup,
+    debugPrint('🔑 Auth header token present: ${getToken.isNotEmpty}');
+    debugPrint(
+      '📤 Sending profile update: '
+      '${sum.fNameController.text.trim()} ${sum.lNameController.text.trim()}',
     );
 
-    if (responseData != null) {
-      LocalKeys.profileSetupComplete.showToast();
-      setToken(token);
-      return true;
-    } else if (responseData != null && responseData.containsKey("message")) {
-      responseData["message"]?.toString().showToast();
+    final Map<String, String> fields = {
+      'update_type': 'after_login',
+      'first_name': sum.fNameController.text.trim(),
+      'last_name': sum.lNameController.text.trim(),
+    };
+
+    try {
+      // Always use MultipartRequest — endpoint is multipart/form-data.
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(AppUrls.profileInfoUpdateUrl),
+      );
+
+      request.fields.addAll(fields);
+      request.headers.addAll(acceptJsonAuthHeader);
+
+      debugPrint('🔑 Request headers: ${request.headers}');
+      debugPrint('📦 Request fields: ${request.fields}');
+
+      // Attach profile image only when the user selected one
+      if (sum.profileImage.value != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'image',
+            sum.profileImage.value!.path,
+          ),
+        );
+        debugPrint('🖼️ Profile image attached');
+      }
+
+      final responseData = await NetworkApiServices().postWithFileApi(
+        request,
+        LocalKeys.profileSetup,
+      );
+
+      debugPrint('📥 Profile update response: $responseData');
+
+      if (responseData != null && responseData.isNotEmpty) {
+        final message = responseData['message']?.toString() ?? '';
+
+        if (message.toLowerCase().contains('success') ||
+            responseData.containsKey('user') ||
+            responseData.containsKey('data')) {
+          LocalKeys.profileSetupComplete.showToast();
+          return true;
+        } else if (message.isNotEmpty) {
+          message.showToast();
+        }
+      } else {
+        // Empty {} response means the server returned HTML (not JSON).
+        // This happens when the Authorization header is missing/wrong,
+        // causing the request to hit the web frontend instead of the API.
+        debugPrint(
+          '❌ Empty response — auth header missing or URL not found on server',
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Profile Update Error: $e');
     }
 
     return null;
   }
 
-  /// Used to share the registration token with profile setup steps.
   void sToken(String newToken) {
     token = newToken;
     notifyListeners();
   }
 
-  /// Safely converts bool / int / String / null → Dart bool.
-  ///   true,  1, "1", "true"  → true
-  ///   false, 0, "0", "false" → false
-  ///   null or anything else  → false
   bool _parseToBool(dynamic value) {
     if (value == null) return false;
     if (value is bool) return value;

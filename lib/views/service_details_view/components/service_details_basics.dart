@@ -14,7 +14,22 @@ class ServiceDetailsBasics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final service = serviceDetails.allServices!;
+    // 1. Safe access to avoid crashes if data hasn't loaded yet
+    final service = serviceDetails.allServices;
+
+    if (service == null) {
+      return const SizedBox.shrink(); // Or a loading shimmer
+    }
+
+    // 2. Determine which price to show (Car-specific price OR general service price)
+    final displayPrice = service.serviceCar?.price != 0 
+        ? service.serviceCar?.price 
+        : service.price;
+
+    final displayDiscount = service.serviceCar?.discountPrice != null 
+        ? service.serviceCar?.discountPrice 
+        : service.discountPrice;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       color: context.color.accentContrastColor,
@@ -31,9 +46,10 @@ class ServiceDetailsBasics extends StatelessWidget {
             style: context.titleLarge?.bold,
           ),
           6.toHeight,
+          // 3. Use the fallback prices we calculated above
           ServiceCardPrice(
-              price: service.serviceCar?.price ?? 0,
-              discountPrice: service.serviceCar?.discountPrice ?? 0),
+              price: displayPrice ?? 0,
+              discountPrice: displayDiscount ?? 0),
         ],
       ),
     );

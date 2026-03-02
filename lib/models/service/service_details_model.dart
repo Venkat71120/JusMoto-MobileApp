@@ -105,75 +105,53 @@ class ServiceDetails {
     this.afterBookingSteps,
   });
 
-  factory ServiceDetails.fromJson(Map<String, dynamic> json) => ServiceDetails(
-    id: json["id"],
-    categoryId: json["category_id"],
-    category:
-        json["category"] == null ? null : Category.fromJson(json["category"]),
-    subCategoryId: json["sub_category_id"],
-    childCategoryId: json["child_category_id"],
-    title: json["title"],
-    type: json["type"]?.toString(),
-    slug: json["slug"],
-    unit: json["unit"],
-    price: json["price"].toString().tryToParse,
-    discountPrice: json["discount_price"]?.toString().tryToParse,
-    description: json["description"],
-    videoId: json["video_url"]?.toString(),
-    avgRating: json["average_rating"].toString().tryToParse,
-    view: json["view"].toString().tryToParse,
-    soldCount: json["sold_count"].toString().tryToParse,
-    totalReviews: json["total_reviews"].toString().tryToParse,
-    averageRating: json["average_rating"].toString().tryToParse,
-    isFeatured: json["is_featured"],
-    image: json["image"],
-    serviceCar:
-        json["service_car"] == null
-            ? null
-            : ServiceCar.fromJson(json["service_car"]),
-    galleryImages:
-        json["gallery_images"] == null
-            ? []
-            : List<String>.from(json["gallery_images"]!.map((x) => x)),
-    serviceAdditional:
-        json["service_additionals"] == null
-            ? []
-            : List<ServiceAdditional>.from(
-              json["service_additionals"]!.map(
-                (x) => ServiceAdditional.fromJson(x),
-              ),
-            ),
-    offers:
-        json["includes"] == null
-            ? []
-            : List<AdditionalInfo>.from(
-              json["includes"]!.map((x) => AdditionalInfo.fromJson(x)),
-            ),
-    faqs:
-        json["faqs"] == null
-            ? []
-            : List<AdditionalInfo>.from(
-              json["faqs"]!.map((x) => AdditionalInfo.fromJson(x)),
-            ),
-    reviews:
-        (json["reviews"] ?? json["reviews_all"] ?? json["review"]) == null
-            ? []
-            : List<ReviewModel>.from(
-              (json["reviews"] ?? json["reviews_all"] ?? json["review"])!.map(
-                (x) => ReviewModel.fromJson(x),
-              ),
-            ),
-    admin: json["admin"] == null ? null : AdminModel.fromJson(json["admin"]),
-    afterBookingSteps:
-        json["after_booking_steps"] == null
-            ? []
-            : List<AfterBookingStep>.from(
-              json["after_booking_steps"]!.map(
-                (x) => AfterBookingStep.fromJson(x),
-              ),
-            ),
-  );
+ factory ServiceDetails.fromJson(Map<String, dynamic> json) {
+    // Helper to safely parse strings or numbers into a num
+    num parseNum(dynamic value) {
+      if (value == null) return 0;
+      if (value is num) return value;
+      return num.tryParse(value.toString()) ?? 0;
+    }
 
+    return ServiceDetails(
+      id: json["id"],
+      categoryId: json["category_id"],
+      category: json["category"] == null ? null : Category.fromJson(json["category"]),
+      subCategoryId: json["sub_category_id"],
+      childCategoryId: json["child_category_id"],
+      title: json["title"],
+      type: json["type"]?.toString(),
+      slug: json["slug"],
+      unit: json["unit"],
+      // Use the helper for price fields
+      price: parseNum(json["price"]),
+      discountPrice: json["discount_price"] == null ? null : parseNum(json["discount_price"]),
+      description: json["description"],
+      videoId: json["video_url"]?.toString(),
+      avgRating: parseNum(json["average_rating"]),
+      view: parseNum(json["view"]),
+      soldCount: parseNum(json["sold_count"]),
+      totalReviews: parseNum(json["total_reviews"]),
+      averageRating: parseNum(json["average_rating"]),
+      isFeatured: json["is_featured"],
+      image: json["image"],
+      // ... rest of your mappings stay the same
+      serviceCar: json["service_car"] == null ? null : ServiceCar.fromJson(json["service_car"]),
+      galleryImages: json["gallery_images"] == null ? [] : List<String>.from(json["gallery_images"]!.map((x) => x)),
+      serviceAdditional: json["service_additionals"] == null
+          ? []
+          : List<ServiceAdditional>.from(json["service_additionals"]!.map((x) => ServiceAdditional.fromJson(x))),
+      offers: json["includes"] == null ? [] : List<AdditionalInfo>.from(json["includes"]!.map((x) => AdditionalInfo.fromJson(x))),
+      faqs: json["faqs"] == null ? [] : List<AdditionalInfo>.from(json["faqs"]!.map((x) => AdditionalInfo.fromJson(x))),
+      reviews: (json["reviews"] ?? json["reviews_all"] ?? json["review"]) == null
+          ? []
+          : List<ReviewModel>.from((json["reviews"] ?? json["reviews_all"] ?? json["review"])!.map((x) => ReviewModel.fromJson(x))),
+      admin: json["admin"] == null ? null : AdminModel.fromJson(json["admin"]),
+      afterBookingSteps: json["after_booking_steps"] == null
+          ? []
+          : List<AfterBookingStep>.from(json["after_booking_steps"]!.map((x) => AfterBookingStep.fromJson(x))),
+    );
+  }
   Map<String, dynamic> toJson() => {
     "id": id,
     "category_id": categoryId,

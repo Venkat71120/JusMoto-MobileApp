@@ -15,16 +15,37 @@ class CartService with ChangeNotifier {
     return jsonDecode(tempList);
   }
 
+  // ✅ NEW: Helper to get the correct unit price from a ServiceModel.
+  // Handles: null serviceCar, discount_price that is wrongly HIGHER than price.
+  num _getEffectivePrice(ServiceModel service) {
+    final carDiscountPrice = service.serviceCar?.discountPrice ?? 0;
+    final carPrice = service.serviceCar?.price ?? 0;
+
+    if (carPrice > 0) {
+      // Only use car discount if it is genuinely lower
+      return (carDiscountPrice > 0 && carDiscountPrice < carPrice)
+          ? carDiscountPrice
+          : carPrice;
+    }
+
+    // No service_car → use service-level price (products like brake pads, etc.)
+    final discountPrice = service.discountPrice;
+    final price = service.price;
+
+    if (discountPrice > 0 && discountPrice < price) {
+      return discountPrice;
+    }
+
+    return price;
+  }
+
   num get subTotal {
     num amount = 0;
 
     cartList.values.toList().forEach((item) {
       final service = ServiceModel.fromJson(item["service"]);
-      final price = ((service.serviceCar?.discountPrice ?? 0) > 0
-              ? service.serviceCar?.discountPrice
-              : service.serviceCar?.price)
-          .toString()
-          .tryToParse;
+      // ✅ FIXED: was null when serviceCar is null → always 0
+      final price = _getEffectivePrice(service);
       amount += price * item["quantity"].toString().tryToParse;
     });
 
@@ -45,7 +66,8 @@ class CartService with ChangeNotifier {
     num amount = 0;
 
     cartList.values.toList().forEach((item) {
-      amount += item["tax"].toString().tryToParse;
+      // ✅ FIXED: null-safe — old cart rows may not have "tax" key
+      amount += (item["tax"] ?? 0).toString().tryToParse;
     });
 
     return amount;
@@ -74,13 +96,16 @@ class CartService with ChangeNotifier {
     });
     for (var add in serviceAddons) {
       try {
-        add.values.toList().forEach((a) {
-          addons.add({
-            "addon_service_id": a["addon_service_id"],
-            "service_id": a["service_id"],
-            "quantity": a["quantity"]
+        // ✅ FIXED: null-safe — old cart rows may not have "addons" key
+        if (add != null && add is Map) {
+          add.values.toList().forEach((a) {
+            addons.add({
+              "addon_service_id": a["addon_service_id"],
+              "service_id": a["service_id"],
+              "quantity": a["quantity"]
+            });
           });
-        });
+        }
       } catch (e) {}
     }
     return addons;
@@ -90,7 +115,8 @@ class CartService with ChangeNotifier {
     num amount = 0;
 
     cartList.values.toList().forEach((item) {
-      amount += item["tax"].toString().tryToParse;
+      // ✅ FIXED: null-safe
+      amount += (item["tax"] ?? 0).toString().tryToParse;
     });
 
     return amount;
@@ -99,43 +125,46 @@ class CartService with ChangeNotifier {
   List<ServiceModel> get jobs => List<ServiceModel>.from(
       cartList.values.toList().map((x) => ServiceModel.fromJson(x)));
 
-  addToCart(
-    String id,
-    service,
-  ) async {
+  addToCart(String id, service) async {
     final cartId = id;
     final item = {
       'serviceId': id,
       "service": jsonEncode(service),
       "quantity": 1.toString(),
+      "tax": "0",               // ✅ ADDED
+      "addons": jsonEncode({}), // ✅ ADDED
     };
     debugPrint(item.toString());
     await DbHelper.insert('cart', item);
+
     final cartI = {
       'serviceId': id,
       "service": service,
       "quantity": 1,
+      "tax": 0,    // ✅ ADDED
+      "addons": {}, // ✅ ADDED
     };
     _cartItem.putIfAbsent(cartId, () => cartI);
     LocalKeys.addedToCartSuccessfully.showToast();
     notifyListeners();
   }
 
-  updateToCart(
-    String id,
-    service,
-    quantity,
-  ) async {
+  updateToCart(String id, service, quantity) async {
     final item = {
       'serviceId': id.toString(),
       "service": jsonEncode(service),
       "quantity": quantity.toString(),
+      "tax": "0",               // ✅ ADDED
+      "addons": jsonEncode({}), // ✅ ADDED
     };
     await DbHelper.updatedb('cart', id.toString(), item);
+
     final cartI = {
       'serviceId': id.toString(),
       "service": service,
       "quantity": quantity,
+      "tax": 0,    // ✅ ADDED
+      "addons": {}, // ✅ ADDED
     };
     _cartItem.update(id, (_) => cartI);
     notifyListeners();
@@ -151,18 +180,24 @@ class CartService with ChangeNotifier {
   fetchCarts() async {
     final dbData = await DbHelper.fetchDb('cart');
 
-    if (dbData.isEmpty) {
-      return;
-    }
+    if (dbData.isEmpty) return;
+
     for (var element in dbData) {
       try {
         final data = {
           'serviceId': element["serviceId"].toString(),
           "service": jsonDecode(element["service"]),
           "quantity": element["quantity"].toString().tryToParse,
+          // ✅ FIXED: handle older DB rows missing tax/addons columns
+          "tax": element["tax"]?.toString().tryToParse ?? 0,
+          "addons": element["addons"] != null
+              ? jsonDecode(element["addons"])
+              : {},
         };
         _cartItem.putIfAbsent(element['serviceId'], () => data);
-      } catch (e) {}
+      } catch (e) {
+        debugPrint("fetchCarts error: $e");
+      }
     }
 
     notifyListeners();

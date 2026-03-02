@@ -64,7 +64,7 @@ class ProfileEditService {
       Uri.parse(AppUrls.profileInfoUpdateUrl),
     );
     request.files.add(
-      await http.MultipartFile.fromPath('file', pem.selectedImage.value!.path),
+      await http.MultipartFile.fromPath('image', pem.selectedImage.value!.path),
     );
     request.headers.addAll(acceptJsonAuthHeader);
     request.fields.addAll(data);

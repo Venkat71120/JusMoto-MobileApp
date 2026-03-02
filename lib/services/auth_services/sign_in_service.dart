@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../customization.dart';
@@ -22,16 +23,22 @@ class SignInService with ChangeNotifier {
     required String emailUsername,
     required String password,
   }) async {
-    final data = {
-      'email': emailUsername,   // backend accepts email OR username in this field
+    final Map<String, dynamic> data = {
+      'email': emailUsername, // backend accepts email OR username in this field
       'password': password,
       // NOTE: backend /auth/login does NOT require user_type — removed
     };
 
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
     final responseData = await NetworkApiServices().postApi(
-      data,
+      jsonEncode(data),
       AppUrls.signInUrl,
       LocalKeys.signIn,
+      headers: headers,
     );
 
     // Backend response shape: { success, message, data: { user: {...}, token: "..." } }
@@ -45,7 +52,8 @@ class SignInService with ChangeNotifier {
       userId = user['id']?.toString() ?? "";
 
       // These fields may not exist on the new backend — default to verified/disabled
-      verifyEnabled = (responseData['verify_enabled'] ?? false).toString().parseToBool;
+      verifyEnabled =
+          (responseData['verify_enabled'] ?? false).toString().parseToBool;
       emailVerified = (user['email_verified'] ?? 1).toString().parseToBool;
       emailToken = user['email_verify_token']?.toString() ?? "";
 
@@ -60,7 +68,7 @@ class SignInService with ChangeNotifier {
   /// Social login — Google, Facebook, Apple.
   /// Backend expects: provider, email, firstName, lastName, socialId, (optional) image
   Future trySocialSignIn({
-    required String type,      // "google" | "facebook" | "apple"
+    required String type, // "google" | "facebook" | "apple"
     required String fName,
     required String lName,
     required String email,
@@ -68,11 +76,11 @@ class SignInService with ChangeNotifier {
     String? image,
   }) async {
     final data = {
-      'provider': type,         // ✅ correct field name per backend docs
+      'provider': type, // ✅ correct field name per backend docs
       'email': email,
-      'firstName': fName,       // ✅ camelCase per backend docs
-      'lastName': lName,        // ✅ camelCase per backend docs
-      'socialId': id,           // ✅ correct field name per backend docs
+      'firstName': fName, // ✅ camelCase per backend docs
+      'lastName': lName, // ✅ camelCase per backend docs
+      'socialId': id, // ✅ correct field name per backend docs
       if (image != null) 'image': image,
     };
 
@@ -92,7 +100,7 @@ class SignInService with ChangeNotifier {
     if (responseData != null && responseData['data'] != null) {
       final dataObj = responseData['data'];
       token = dataObj['token'] ?? "";
-      setToken(token);           // persist to SharedPreferences
+      setToken(token); // persist to SharedPreferences
       return true;
     } else if (responseData != null && responseData.containsKey("message")) {
       responseData["message"]?.toString().showToast();

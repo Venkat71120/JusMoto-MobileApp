@@ -21,6 +21,29 @@ import '../../services/service/cart_service.dart';
 class CartView extends StatelessWidget {
   const CartView({super.key});
 
+  // ✅ FIXED: Helper to get correct unit price.
+  // Old code: serviceCar?.price → null for products → "null".tryToParse = 0
+  // New code: falls back to service.price when serviceCar is null
+  num _getEffectivePrice(ServiceModel service) {
+    final carDiscountPrice = service.serviceCar?.discountPrice ?? 0;
+    final carPrice = service.serviceCar?.price ?? 0;
+
+    if (carPrice > 0) {
+      return (carDiscountPrice > 0 && carDiscountPrice < carPrice)
+          ? carDiscountPrice
+          : carPrice;
+    }
+
+    final discountPrice = service.discountPrice;
+    final price = service.price;
+
+    if (discountPrice > 0 && discountPrice < price) {
+      return discountPrice;
+    }
+
+    return price;
+  }
+
   @override
   Widget build(BuildContext context) {
     final sbm = ServiceBookingViewModel.instance;
@@ -52,51 +75,51 @@ class CartView extends StatelessWidget {
                   ),
                 ],
               ),
-              body:
-                  cs.cartList.values.isEmpty
-                      ? EmptyWidget(title: LocalKeys.noServiceAddedYet)
-                      : CustomScrollView(
-                        slivers: [
-                          8.toHeight.toSliver,
-                          SliverList.separated(
-                            itemBuilder: (context, index) {
-                              final cartItem =
-                                  cs.cartList.values.toList()[index];
-                              final service = ServiceModel.fromJson(
-                                cartItem["service"],
-                              );
-                              return CartTile(
-                                totalAmount:
-                                    ((service.serviceCar?.discountPrice ?? 0) >
-                                                0
-                                            ? service.serviceCar!.discountPrice!
-                                            : service.serviceCar?.price)
-                                        .toString()
-                                        .tryToParse *
-                                    cartItem["quantity"].toString().tryToParse,
-                                serviceTitle: service.title,
-                                serviceImage:
-                                    service.serviceCar?.image ?? service.image,
-                                serviceId: service.id,
-                                cartItem: cartItem,
-                                maxQuantity: service.maxQuantity ?? index,
-                                quantity:
-                                    cartItem["quantity"].toString().tryToParse,
-                                serviceType: service.type,
-                              );
-                            },
-                            separatorBuilder: (context, index) {
-                              return 8.toHeight;
-                            },
-                            itemCount: cs.cartList.length,
-                          ),
-                          8.toHeight.toSliver,
-                        ],
-                      ).hp20,
-              bottomNavigationBar:
-                  cs.cartList.values.isEmpty
-                      ? const SizedBox()
-                      : CartPriceInfos(cs: cs),
+              body: cs.cartList.values.isEmpty
+                  ? EmptyWidget(title: LocalKeys.noServiceAddedYet)
+                  : CustomScrollView(
+                      slivers: [
+                        8.toHeight.toSliver,
+                        SliverList.separated(
+                          itemBuilder: (context, index) {
+                            final cartItem =
+                                cs.cartList.values.toList()[index];
+                            final service = ServiceModel.fromJson(
+                              cartItem["service"],
+                            );
+
+                            // ✅ FIXED: replaces the old broken chain
+                            // ((service.serviceCar?.discountPrice ?? 0) > 0
+                            //     ? service.serviceCar!.discountPrice!
+                            //     : service.serviceCar?.price)   ← was null
+                            //     .toString().tryToParse          ← "null" → 0
+                            final unitPrice = _getEffectivePrice(service);
+
+                            return CartTile(
+                              totalAmount: unitPrice *
+                                  cartItem["quantity"].toString().tryToParse,
+                              serviceTitle: service.title,
+                              serviceImage:
+                                  service.serviceCar?.image ?? service.image,
+                              serviceId: service.id,
+                              cartItem: cartItem,
+                              maxQuantity: service.maxQuantity ?? index,
+                              quantity:
+                                  cartItem["quantity"].toString().tryToParse,
+                              serviceType: service.type,
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return 8.toHeight;
+                          },
+                          itemCount: cs.cartList.length,
+                        ),
+                        8.toHeight.toSliver,
+                      ],
+                    ).hp20,
+              bottomNavigationBar: cs.cartList.values.isEmpty
+                  ? const SizedBox()
+                  : CartPriceInfos(cs: cs),
             );
           },
         );
