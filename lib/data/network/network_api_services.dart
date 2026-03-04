@@ -19,6 +19,7 @@ import '../app_exceptions.dart';
 
 class NetworkApiServices extends BaseApiServices {
   final NetworkConnectivity networkConnectivity = NetworkConnectivity.instance;
+
   @override
   Future<Map?> getApi(
     String url,
@@ -33,7 +34,6 @@ class NetworkApiServices extends BaseApiServices {
     final hasConnection = await networkConnectivity.currentStatus();
     if (!hasConnection) {
       debugPrint("connection state is $hasConnection".toString());
-
       LocalKeys.noConnectionFound.showToast();
       return null;
     }
@@ -74,17 +74,35 @@ class NetworkApiServices extends BaseApiServices {
     final hasConnection = await networkConnectivity.currentStatus();
     if (!hasConnection) {
       debugPrint("connection state is $hasConnection".toString());
-
       LocalKeys.noConnectionFound.showToast();
       return null;
     }
-    Map<String, String> h = headers ?? {};
+
+    Map<String, String> h = Map<String, String>.from(headers ?? {});
     h.putIfAbsent('Accept', () => 'application/json');
+
     Map? responseJson;
     try {
-      final response = await http
-          .post(Uri.parse(url), body: data, headers: h)
-          .timeout(const Duration(seconds: 10));
+      http.Response response;
+
+      // ✅ FIX: If data contains any non-String value (nested List, Map, int,
+      // bool, null…), send as JSON. Otherwise use the original form-encoded
+      // path so all existing callers (Map<String,String>) are unaffected.
+      final bool needsJson = data is Map &&
+          data.values.any((v) => v is! String);
+
+      if (needsJson) {
+        h['Content-Type'] = 'application/json';
+        response = await http
+            .post(Uri.parse(url), body: jsonEncode(data), headers: h)
+            .timeout(const Duration(seconds: 10));
+      } else {
+        // Original behaviour — form-encoded, works for Map<String,String>
+        response = await http
+            .post(Uri.parse(url), body: data, headers: h)
+            .timeout(const Duration(seconds: 10));
+      }
+
       if (kDebugMode) {
         debugPrint(response.body.toString());
         debugPrint(response.statusCode.toString());
@@ -112,7 +130,6 @@ class NetworkApiServices extends BaseApiServices {
     final hasConnection = await networkConnectivity.currentStatus();
     if (!hasConnection) {
       debugPrint("connection state is $hasConnection".toString());
-
       LocalKeys.noConnectionFound.showToast();
       return null;
     }
@@ -153,7 +170,6 @@ class NetworkApiServices extends BaseApiServices {
     final hasConnection = await networkConnectivity.currentStatus();
     if (!hasConnection) {
       debugPrint("connection state is $hasConnection".toString());
-
       LocalKeys.noConnectionFound.showToast();
       return null;
     }
@@ -189,7 +205,6 @@ class NetworkApiServices extends BaseApiServices {
       case 200:
         try {
           dynamic responseJson = jsonDecode(response.body);
-
           return responseJson;
         } catch (_) {
           return {};
@@ -197,12 +212,10 @@ class NetworkApiServices extends BaseApiServices {
       case 201:
         try {
           dynamic responseJson = jsonDecode(response.body);
-
           return responseJson;
         } catch (_) {
           return {};
         }
-
       case 400:
         try {
           dynamic responseJson = jsonDecode(response.body);
@@ -218,7 +231,6 @@ class NetworkApiServices extends BaseApiServices {
         try {
           checkAuthentication(response);
           dynamic responseJson = jsonDecode(response.body);
-
           showValidationErrors(responseJson);
         } catch (error) {
           if (error is String) {
@@ -239,12 +251,10 @@ class NetworkApiServices extends BaseApiServices {
           debugPrint(response.body.toString());
           throw FetchDataException('${response.reasonPhrase}');
         }
-
       default:
         try {
           checkAuthentication(response);
           dynamic responseJson = jsonDecode(response.body);
-
           showValidationErrors(responseJson);
         } catch (e) {
           if (e is String) {

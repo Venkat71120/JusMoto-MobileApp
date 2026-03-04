@@ -29,52 +29,121 @@ class PlaceOrderService with ChangeNotifier {
     var url = AppUrls.placeOrderUrl;
     final sbm = ServiceBookingViewModel.instance;
 
-    var data = {
-      'items': jsonEncode(services),
-      'car_variant': sPref?.getString("vId") ?? "",
-      'date': DateFormat("yyyy-MM-dd").format(sbm.selectedDate.value!),
-      'time': sbm.selectedTime.value!.format(context),
-      'order_note': sbm.descriptionController.text,
-      'delivery_mode': sbm.serviceMethod.value == DeliveryOption.OUTLET
-          ? 'walkin'
-          : 'pickup',
-      'outlet_id': sbm.serviceMethod.value == DeliveryOption.OUTLET
-          ? sbm.selectedOutlet.value?.id?.toString() ?? ""
-          : "",
-      'selected_payment_gateway': gateway.toString(),
-      'coupon_code': coupon.toString(),
-    };
+    // ✅ FIXED: Build items as a proper List, not a JSON string
+    // Also move variant_id inside each item, not at top level
+    final variantId = sPref?.getString("vId");
+    final List itemsWithVariant = (services as List).map((item) {
+      final Map<String, dynamic> mapped = {
+        "id": item["id"] ?? item["service_id"],
+        "qty": item["qty"] ?? item["quantity"] ?? 1,
+      };
+      if (variantId != null && variantId.isNotEmpty) {
+        mapped["variant_id"] = int.tryParse(variantId);
+      }
+      if (item["car_id"] != null) mapped["car_id"] = item["car_id"];
+      if (item["addons"] != null) mapped["addons"] = item["addons"];
+      return mapped;
+    }).toList();
+
+    // ✅ FIXED: delivery_mode — API only accepts "home" or "pickup", not "walkin"
+    final deliveryMode = sbm.serviceMethod.value == DeliveryOption.OUTLET
+        ? 'pickup'
+        : 'home';
+
+    // ✅ FIXED: Build address object (renamed from "location"), not JSON string
+    Map<String, dynamic>? addressData;
     if (sbm.serviceMethod.value != DeliveryOption.OUTLET) {
-      final locData = {
-        "state_id": sbm.selectedAddress.value?.stateId,
-        "city_id": sbm.selectedAddress.value?.cityId,
-        "area_id": sbm.selectedAddress.value?.areaId,
+      addressData = {
+        "address": sbm.addressController.text,
         "phone": sbm.selectedAddress.value?.phone,
         "emergency_phone": sbm.selectedAddress.value?.emergencyPhone,
-        "post_code": sbm.selectedAddress.value?.stateId,
-        "address": sbm.addressController.text,
         "latitude": sbm.selectedLatLng.value?.latitude,
         "longitude": sbm.selectedLatLng.value?.longitude,
+        "type": 0,
       };
-      data["location"] = jsonEncode(locData);
     }
-    if (sbm.selectedStaff.value != null) {
-      data["staff_id"] = sbm.selectedStaff.value?.id?.toString() ?? "2";
-    }
-    log(jsonEncode(data));
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.fields.addAll(data);
 
-    if (gateway == "manual_payment" && file != null) {
+    final bool isManualWithFile =
+        gateway == "manual_payment" && file != null;
+
+    if (isManualWithFile) {
+      // ── Multipart path (only when attaching a payment screenshot) ──────────
+      // Multipart fields must all be strings, so we JSON-encode nested objects
+      final Map<String, String> fields = {
+        'items': jsonEncode(itemsWithVariant),   // encoded once, intentionally
+        'date': DateFormat("yyyy-MM-dd").format(sbm.selectedDate.value!),
+        'time': sbm.selectedTime.value!.format(context),
+        'order_note': sbm.descriptionController.text,
+        'delivery_mode': deliveryMode,
+        'selected_payment_gateway': gateway.toString(),
+        'coupon_code': coupon.toString(),
+      };
+
+      if (sbm.serviceMethod.value == DeliveryOption.OUTLET) {
+        fields['outlet_id'] =
+            sbm.selectedOutlet.value?.id?.toString() ?? "";
+      }
+      if (sbm.selectedStaff.value != null) {
+        fields['staff_id'] =
+            sbm.selectedStaff.value?.id?.toString() ?? "";
+      }
+      if (addressData != null) {
+        fields['address'] = jsonEncode(addressData); // encoded once
+      }
+
+      log('Multipart fields: ${jsonEncode(fields)}');
+
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+      request.fields.addAll(fields);
       request.files.add(await http.MultipartFile.fromPath('image', file.path));
-    }
-    log(jsonEncode(data));
-    request.headers.addAll(acceptJsonAuthHeader);
-    final responseData = await NetworkApiServices()
-        .postWithFileApi(request, LocalKeys.payAndConfirmOrder);
-    if (responseData != null) {
-      _orderResponseModel = OrderResponseModel.fromJson(responseData);
-      return true;
+      request.headers.addAll({
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $getToken',
+      });
+
+      final responseData = await NetworkApiServices()
+          .postWithFileApi(request, LocalKeys.payAndConfirmOrder);
+      if (responseData != null) {
+        _orderResponseModel = OrderResponseModel.fromJson(responseData);
+        return true;
+      }
+    } else {
+      // ── JSON POST path (all other gateways) ─────────────────────────────────
+      // ✅ FIXED: items is a real List here — no jsonEncode wrapping
+      final Map<String, dynamic> body = {
+        'items': itemsWithVariant,
+        'date': DateFormat("yyyy-MM-dd").format(sbm.selectedDate.value!),
+        'time': sbm.selectedTime.value!.format(context),
+        'order_note': sbm.descriptionController.text,
+        'delivery_mode': deliveryMode,
+        'selected_payment_gateway': gateway.toString(),
+        'coupon_code': coupon.toString(),
+      };
+
+      if (sbm.serviceMethod.value == DeliveryOption.OUTLET) {
+        body['outlet_id'] = sbm.selectedOutlet.value?.id;
+      }
+      if (sbm.selectedStaff.value != null) {
+        body['staff_id'] = sbm.selectedStaff.value?.id;
+      }
+      if (addressData != null) {
+        // ✅ FIXED: key is "address", value is a Map object (not a string)
+        body['address'] = addressData;
+      }
+
+      log('JSON body: ${jsonEncode(body)}');
+
+      final responseData = await NetworkApiServices().postApi(
+        body,
+        url,
+        LocalKeys.payAndConfirmOrder,
+        headers: commonAuthHeader,
+      );
+
+      if (responseData != null) {
+        _orderResponseModel = OrderResponseModel.fromJson(responseData);
+        return true;
+      }
     }
   }
 
@@ -107,28 +176,3 @@ class PlaceOrderService with ChangeNotifier {
     }
   }
 }
-
-/* services dummy
-
-{
-    "all_services": [
-        {
-            "service_id": "17",
-            "staff_id": "1",
-            "location_id": 1,
-            "date": "2024-08-30",
-            "schedule": "10:00AM - 1:00PM",
-            "order_note": "Test Order notes data"
-        },
-        {
-            "service_id": "20",
-            "staff_id": "4",
-            "location_id": 3,
-            "date": "2024-08-30",
-            "schedule": "10:00AM - 1:00PM",
-            "order_note": "Test Order notes data"
-        }
-    ]
-}
-
-*/

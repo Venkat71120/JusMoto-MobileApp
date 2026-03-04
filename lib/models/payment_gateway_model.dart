@@ -33,6 +33,7 @@ class PaymentGatewayModel {
 }
 
 class Gateway {
+  final int? id;
   final String? name;
   final String? image;
   final String? description;
@@ -41,6 +42,7 @@ class Gateway {
   final Credentials? credentials;
 
   Gateway({
+    this.id,
     this.name,
     this.image,
     this.description,
@@ -50,17 +52,23 @@ class Gateway {
   });
 
   factory Gateway.fromJson(Map<String, dynamic> json) => Gateway(
+        id: json["id"],
         name: json["name"],
         image: json["image"],
         description: json["description"],
         status: json["status"],
         testMode: json["test_mode"].toString().parseToBool,
-        credentials: json["credentials"] == null
-            ? null
-            : Credentials.fromJson(json["credentials"]),
+        credentials: _parseCredentials(json["credentials"]),
       );
 
+  static Credentials? _parseCredentials(dynamic raw) {
+    if (raw == null || raw == "" || raw is String) return null;
+    if (raw is Map<String, dynamic>) return Credentials.fromJson(raw);
+    return null;
+  }
+
   Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
         "image": image,
         "description": description,
@@ -68,7 +76,6 @@ class Gateway {
         "test_mode": testMode,
       };
 }
-
 class Credentials {
   final String? sandboxClientId;
   final String? sandboxClientSecret;

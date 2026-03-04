@@ -43,83 +43,61 @@ class OrderDetailsView extends StatelessWidget {
             },
             refreshKey: odm.refreshKey,
             child: CustomFutureWidget(
-              function:
-                  od.shouldAutoFetch(orderId)
-                      ? od.fetchOrderDetails(orderId: orderId)
-                      : null,
+              function: od.shouldAutoFetch(orderId)
+                  ? od.fetchOrderDetails(orderId: orderId)
+                  : null,
               shimmer: const OrderDetailsSkeleton1(),
-              child:
-                  od.orderDetailsModel.orderDetails?.id == null
-                      ? EmptyWidget(title: LocalKeys.orderNotFound)
-                      : Scrollbar(
-                        child: SingleChildScrollView(
-                          padding: 8.paddingV,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: Column(
-                            spacing: 12,
-                            children: [
-                              OrderDetailsItems(
-                                orderItems:
-                                    od.orderDetailsModel.orderDetails?.items,
+              child: od.orderDetailsModel.orderDetails?.id == null
+                  ? EmptyWidget(title: LocalKeys.orderNotFound)
+                  : Scrollbar(
+                      child: SingleChildScrollView(
+                        padding: 8.paddingV,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          spacing: 12,
+                          children: [
+                            OrderDetailsItems(
+                              orderItems:
+                                  od.orderDetailsModel.orderDetails?.items,
+                            ),
+
+                            // ✅ FIXED: userLocation is now OrderLocation (not Address)
+                            if (od.orderDetailsModel.orderDetails?.userLocation != null)
+                              OrderDetailsAddress(
+                                address: od.orderDetailsModel.orderDetails!.userLocation!,
                               ),
-                              if (od
-                                      .orderDetailsModel
-                                      .orderDetails
-                                      ?.userLocation !=
-                                  null)
-                                OrderDetailsAddress(
-                                  address:
-                                      od
-                                          .orderDetailsModel
-                                          .orderDetails!
-                                          .userLocation!,
-                                ),
-                              if (od
-                                      .orderDetailsModel
-                                      .orderDetails
-                                      ?.outletDetails !=
-                                  null)
-                                OrderDetailsOutlet(
-                                  outlet:
-                                      od
-                                          .orderDetailsModel
-                                          .orderDetails!
-                                          .outletDetails!,
-                                ),
-                              if (od.orderDetailsModel.orderDetails?.date !=
-                                  null)
-                                OrderDetailsBookingDate(
-                                  date:
-                                      od.orderDetailsModel.orderDetails!.date!,
-                                ),
+
+                            if (od.orderDetailsModel.orderDetails?.outletDetails != null)
+                              OrderDetailsOutlet(
+                                outlet: od.orderDetailsModel.orderDetails!.outletDetails!,
+                              ),
+
+                            if (od.orderDetailsModel.orderDetails?.date != null)
+                              OrderDetailsBookingDate(
+                                date: od.orderDetailsModel.orderDetails!.date!,
+                              ),
+
+                            // ✅ FIXED: guard null — "schedule" can be null from API
+                            if (od.orderDetailsModel.orderDetails?.time != null)
                               OrderDetailsBookingTime(
                                 time: od.orderDetailsModel.orderDetails!.time!,
                               ),
-                              if (od
-                                      .orderDetailsModel
-                                      .orderDetails
-                                      ?.staffDetails !=
-                                  null)
-                                OrderDetailsStaff(
-                                  staff:
-                                      od
-                                          .orderDetailsModel
-                                          .orderDetails!
-                                          .staffDetails!,
-                                ),
-                              if (od.orderDetailsModel.orderDetails?.time !=
-                                  null)
-                                OrderDetailsCostInfo(od: od),
-                            ],
-                          ),
+
+                            if (od.orderDetailsModel.orderDetails?.staffDetails != null)
+                              OrderDetailsStaff(
+                                staff: od.orderDetailsModel.orderDetails!.staffDetails!,
+                              ),
+
+                            OrderDetailsCostInfo(od: od),
+                          ],
                         ),
                       ),
+                    ),
             ),
           ),
-          bottomNavigationBar:
-              od.orderDetailsModel.orderDetails?.id == null
-                  ? null
-                  : const OrderDetailsButtons(),
+          bottomNavigationBar: od.orderDetailsModel.orderDetails?.id == null
+              ? null
+              : const OrderDetailsButtons(),
         );
       },
     );

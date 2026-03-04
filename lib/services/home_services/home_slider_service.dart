@@ -26,22 +26,32 @@ class HomeSliderService with ChangeNotifier {
     }
   }
 
-  fetchHomeSlider() async {
-    final url = AppUrls.homeSliderListUrl;
+ fetchHomeSlider() async {
+  final url = AppUrls.homeSliderListUrl;
+  final responseData = await NetworkApiServices().getApi(url, LocalKeys.sliders);
+  try {
+    if (responseData != null) {
+      final tempData = SliderListModel.fromJson(responseData);
+      sliderList = tempData.sliders ?? [];
+      sPref?.setString("sliders", jsonEncode(responseData));
+    }
+  } catch (e) {
+    debugPrint("Slider parse error: $e");
+  } finally {
+    sliderList ??= [];
+    notifyListeners();
+  }
+}
 
-    final responseData =
-        await NetworkApiServices().getApi(url, LocalKeys.sliders);
-    try {
-      if (responseData != null) {
-        final tempData = SliderListModel.fromJson(responseData);
-        sliderList = tempData.sliders ?? [];
-        sPref?.setString("sliders", jsonEncode(responseData));
-      }
-    } catch (e) {
-      debugPrint("Slider parse error: $e");
-    } finally {
-      sliderList ??= [];
-      notifyListeners();
+// Add this new method
+Future<void> precacheSliderImages(BuildContext context) async {
+  for (final slider in sliderList ?? []) {
+    final url = slider.image?.trim() ?? "";
+    if (url.isNotEmpty) {
+      try {
+        await precacheImage(NetworkImage(url), context);
+      } catch (_) {}
     }
   }
+}
 }

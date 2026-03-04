@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import '../../../customizations/colors.dart';
 import '../../../helper/local_keys.g.dart';
 import '../../../helper/svg_assets.dart';
-import '../../../models/address_models/address_model.dart';
+import '../../../models/order_models/order_response_model.dart';
 
 class OrderDetailsAddress extends StatelessWidget {
-  final Address address;
+  // ✅ UPDATED: accepts OrderLocation instead of Address
+  final OrderLocation address;
   const OrderDetailsAddress({super.key, required this.address});
 
   @override
@@ -38,6 +39,13 @@ class OrderDetailsAddress extends StatelessWidget {
                   address.address ?? "---",
                   style: context.bodySmall,
                 ),
+                if (address.phone != null) ...[
+                  4.toHeight,
+                  Text(
+                    address.phone!,
+                    style: context.bodySmall,
+                  ),
+                ],
               ],
             ),
           ),

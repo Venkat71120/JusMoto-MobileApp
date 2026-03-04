@@ -21,6 +21,9 @@ class OrderListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ UPDATED: Convert int? status to String for existing string extensions
+    final statusStr = (order.status ?? 0).toString();
+
     return GestureDetector(
       onTap: () {
         context.toPage(OrderDetailsView(
@@ -60,14 +63,13 @@ class OrderListTile extends StatelessWidget {
                 SquircleContainer(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    color: (order.status).toString().getOrderMutedStatusColor,
+                    // ✅ UPDATED: Use pre-converted statusStr
+                    color: statusStr.getOrderMutedStatusColor,
                     radius: 4,
                     child: Text(
-                      (order.status).toString().getOrderStatus,
+                      statusStr.getOrderStatus,
                       style: context.bodySmall?.copyWith(
-                          color: (order.status)
-                              .toString()
-                              .getOrderPrimaryStatusColor),
+                          color: statusStr.getOrderPrimaryStatusColor),
                     ))
               ],
             ),
@@ -79,8 +81,9 @@ class OrderListTile extends StatelessWidget {
                 Text(order.total.cur,
                     style:
                         context.titleSmall?.bold.copyWith(color: primaryColor)),
+                // ✅ UPDATED: paymentStatus is now int? — convert to String for the chip
                 OrderPaymentStatusChip(
-                    status: order.paymentStatus ?? "0",
+                    status: (order.paymentStatus ?? 0).toString(),
                     isCOD: ["cod", "cash_on_delivery"]
                         .contains(order.paymentGateway)),
               ],
@@ -88,16 +91,14 @@ class OrderListTile extends StatelessWidget {
             8.toHeight,
             Wrap(
               children: [
+                // ✅ UPDATED: `time` is removed from API — show `schedule` instead
                 FittedBox(
                   child: Row(
                     children: [
                       SvgAssets.clock.toSVGSized(16, color: primaryColor),
                       4.toWidth,
                       Text(
-                        order.time == null
-                            ? "---"
-                            : DateFormat("hh:mm a").format(
-                                DateFormat("hh:mm").parse("${order.time}")),
+                        order.schedule?.capitalize ?? "---",
                         style: context.bodySmall?.bold,
                       ),
                     ],

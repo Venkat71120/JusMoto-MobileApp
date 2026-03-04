@@ -69,6 +69,8 @@ class OrderListViewModel {
   tryToLoadMore(BuildContext context) {
     try {
       final moProvider = Provider.of<OrderListService>(context, listen: false);
+
+      // ✅ UPDATED: nextPage is now int? — check for non-null instead of URL string
       final nextPage = moProvider.nextPage;
       final nextPageLoading = moProvider.nextPageLoading;
 

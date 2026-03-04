@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:car_service/helper/extension/string_extension.dart';
-import 'package:car_service/models/address_models/address_model.dart';
 import 'package:car_service/models/outlet_model.dart';
 
 import '../service/admin_staff_list_model.dart';
@@ -20,10 +19,13 @@ class OrderResponseModel {
   });
 
   factory OrderResponseModel.fromJson(Map json) => OrderResponseModel(
-        orderDetails: (json["order_details"] ?? json["all_services"]) == null
-            ? null
-            : OrderDetails.fromJson(
-                json["order_details"] ?? json["all_services"]),
+        // ✅ UPDATED: API now returns "data"; keep old keys as fallback
+        orderDetails:
+            (json["data"] ?? json["order_details"] ?? json["all_services"]) ==
+                    null
+                ? null
+                : OrderDetails.fromJson(
+                    json["data"] ?? json["order_details"] ?? json["all_services"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,8 +54,12 @@ class OrderDetails {
   final Staff? staffDetails;
   final num deliveryCharge;
   final String? deliveryMode;
+
+  // ✅ UPDATED: "schedule" field holds the time slot (e.g. "9:25 AM")
   final String? time;
-  final Address? userLocation;
+
+  // ✅ UPDATED: location is now OrderLocation (not Address)
+  final OrderLocation? userLocation;
   final List<OrderItem>? items;
   final Outlet? outletDetails;
   final DateTime? date;
@@ -92,16 +98,22 @@ class OrderDetails {
         subTotal: json["sub_total"].toString().tryToParse,
         tax: json["tax"].toString().tryToParse,
         total: json["total"].toString().tryToParse,
-        userLocation: json["user_location"] == null
+
+        // ✅ UPDATED: key changed from "user_location" → "location"
+        userLocation: (json["location"] ?? json["user_location"]) == null
             ? null
-            : Address.fromJson(json["user_location"]),
+            : OrderLocation.fromJson(json["location"] ?? json["user_location"]),
+
         outletDetails: json["outlet_details"] == null
             ? null
             : Outlet.fromJson(json["outlet_details"]),
         deliveryCharge: json["delivery_charge"].toString().tryToParse,
         deliveryMode: json["delivery_mode"],
-        time: json["time"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+
+        // ✅ UPDATED: API stores time in "schedule"; fall back to "time"
+        time: json["schedule"]?.toString() ?? json["time"]?.toString(),
+
+        date: json["date"] == null ? null : DateTime.tryParse(json["date"]),
         couponCode: json["coupon_code"],
         couponType: json["coupon_type"],
         couponAmount: json["coupon_amount"].toString().tryToParse,
@@ -113,10 +125,13 @@ class OrderDetails {
         staffDetails: json["staff_details"] == null
             ? null
             : Staff.fromJson(json["staff_details"]),
+
+        // ✅ UPDATED: items now contain nested "service" object for title/image
         items: json["items"] == null
             ? []
             : List<OrderItem>.from(
                 json["items"]!.map((x) => OrderItem.fromJson(x))),
+
         commissionCharge: json["commission_charge"],
         commissionAmount: json["commission_amount"],
         status: json["status"],
@@ -143,6 +158,115 @@ class OrderDetails {
         "created_at": createdAt,
       };
 }
+
+// ✅ NEW: Lightweight location model matching the "location" object in the API
+class OrderLocation {
+  final dynamic id;
+  final dynamic orderId;
+  final String? address;
+  final String? phone;
+  final String? emergencyPhone;
+  final String? postCode;
+  final double? latitude;
+  final double? longitude;
+
+  OrderLocation({
+    this.id,
+    this.orderId,
+    this.address,
+    this.phone,
+    this.emergencyPhone,
+    this.postCode,
+    this.latitude,
+    this.longitude,
+  });
+
+  factory OrderLocation.fromJson(Map<String, dynamic> json) => OrderLocation(
+        id: json["id"],
+        orderId: json["order_id"],
+        address: json["address"]?.toString(),
+        phone: json["phone"]?.toString(),
+        emergencyPhone: json["emergency_phone"]?.toString(),
+        postCode: json["post_code"]?.toString(),
+        latitude: double.tryParse(json["latitude"]?.toString() ?? ''),
+        longitude: double.tryParse(json["longitude"]?.toString() ?? ''),
+      );
+}
+
+class OrderItem {
+  final dynamic id;
+  final String? image;
+  final String? itemTitle;
+  final String? type;
+  final String? serviceId;
+  final num qty;
+  final num price;
+  final List<dynamic>? reviewsAll;
+  final OrderItemService? service;
+
+  OrderItem({
+    this.id,
+    this.image,
+    this.itemTitle,
+    this.type,
+    this.serviceId,
+    this.qty = 0,
+    this.price = 0,
+    this.reviewsAll,
+    this.service,
+  });
+
+  factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
+        id: json["id"],
+        // ✅ Prefer service.image > item.image
+        image: json["image"]?.toString() ??
+            json["service"]?["image"]?.toString(),
+        // ✅ Prefer service.title > item_title
+        itemTitle: json["item_title"]?.toString() ??
+            json["service"]?["title"]?.toString(),
+        type: json["type"]?.toString(),
+        serviceId: json["service_id"]?.toString(),
+        qty: json["qty"].toString().tryToParse,
+        price: json["price"].toString().tryToParse,
+        reviewsAll: json["reviews_all"] == null
+            ? []
+            : List<dynamic>.from(json["reviews_all"]!.map((x) => x)),
+        service: json["service"] == null
+            ? null
+            : OrderItemService.fromJson(json["service"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "image": image,
+        "item_title": itemTitle,
+        "type": type,
+        "qty": qty,
+        "price": price,
+        "reviews_all": reviewsAll == null
+            ? []
+            : List<dynamic>.from(reviewsAll!.map((x) => x)),
+      };
+}
+
+class OrderItemService {
+  final dynamic id;
+  final String? title;
+  final String? image;
+  final int? type;
+
+  OrderItemService({this.id, this.title, this.image, this.type});
+
+  factory OrderItemService.fromJson(Map<String, dynamic> json) =>
+      OrderItemService(
+        id: json["id"],
+        title: json["title"]?.toString(),
+        image: json["image"]?.toString(),
+        type: json["type"],
+      );
+}
+
+// ── Unchanged models below ────────────────────────────────────────────────────
 
 class Review {
   final dynamic id;
@@ -213,11 +337,7 @@ class User {
   final String? fullName;
   final String? image;
 
-  User({
-    this.id,
-    this.fullName,
-    this.image,
-  });
+  User({this.id, this.fullName, this.image});
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
@@ -277,52 +397,5 @@ class OrderCompleteRequest {
         "message": message,
         "status": status,
         "image": image,
-      };
-}
-
-class OrderItem {
-  final dynamic id;
-  final String? image;
-  final String? itemTitle;
-  final String? type;
-  final String? serviceId;
-  final num qty;
-  final num price;
-  final List<dynamic>? reviewsAll;
-
-  OrderItem({
-    this.id,
-    this.image,
-    this.itemTitle,
-    this.type,
-    this.serviceId,
-    this.qty = 0,
-    this.price = 0,
-    this.reviewsAll,
-  });
-
-  factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
-        id: json["id"],
-        image: json["image"],
-        itemTitle: json["item_title"],
-        type: json["type"]?.toString(),
-        serviceId: json["service_id"]?.toString(),
-        qty: json["qty"].toString().tryToParse,
-        price: json["price"].toString().tryToParse,
-        reviewsAll: json["reviews_all"] == null
-            ? []
-            : List<dynamic>.from(json["reviews_all"]!.map((x) => x)),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "image": image,
-        "item_title": itemTitle,
-        "type": type,
-        "qty": qty,
-        "price": price,
-        "reviews_all": reviewsAll == null
-            ? []
-            : List<dynamic>.from(reviewsAll!.map((x) => x)),
       };
 }
