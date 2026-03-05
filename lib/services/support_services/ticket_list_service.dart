@@ -25,30 +25,56 @@ class TicketListService with ChangeNotifier {
   fetchTicketList() async {
     token = getToken;
 
-    final url = AppUrls.ticketListListUrl;
-    final responseData = await NetworkApiServices()
-        .getApi(url, LocalKeys.supportTicket, headers: commonAuthHeader);
+    final url = '${AppUrls.ticketListListUrl}?status=open&page=1&limit=15';
+    final responseData = await NetworkApiServices().getApi(
+      url,
+      LocalKeys.supportTicket,
+      headers: commonAuthHeader,
+    );
 
     if (responseData != null) {
       _ticketListModel = TicketListModel.fromJson(responseData);
-      nextPage = _ticketListModel?.pagination?.nextPageUrl;
+      final p = _ticketListModel?.pagination;
+      if (p != null && (p.hasNextPage == true || p.nextPageUrl != null)) {
+        if (p.nextPageUrl != null) {
+          nextPage = p.nextPageUrl;
+        } else {
+          nextPage =
+              '${AppUrls.ticketListListUrl}?status=open&page=${(p.currentPage + 1).toInt()}&limit=15';
+        }
+      } else {
+        nextPage = null;
+      }
     } else {}
     notifyListeners();
   }
 
   fetchNextPage() async {
     token = getToken;
-    if (nextPageLoading) return;
+    if (nextPageLoading || nextPage == null) return;
     nextPageLoading = true;
-    final responseData = await NetworkApiServices()
-        .getApi(nextPage, LocalKeys.supportTicket, headers: commonAuthHeader);
+    final responseData = await NetworkApiServices().getApi(
+      nextPage,
+      LocalKeys.supportTicket,
+      headers: commonAuthHeader,
+    );
 
     if (responseData != null) {
       final tempData = TicketListModel.fromJson(responseData);
       for (var element in tempData.tickets) {
         _ticketListModel?.tickets.add(element);
       }
-      nextPage = tempData.pagination?.nextPageUrl;
+      final p = tempData.pagination;
+      if (p != null && (p.hasNextPage == true || p.nextPageUrl != null)) {
+        if (p.nextPageUrl != null) {
+          nextPage = p.nextPageUrl;
+        } else {
+          nextPage =
+              '${AppUrls.ticketListListUrl}?status=open&page=${(p.currentPage + 1).toInt()}&limit=15';
+        }
+      } else {
+        nextPage = null;
+      }
     } else {
       nexLoadingFailed = true;
       Future.delayed(const Duration(seconds: 1)).then((value) {
@@ -66,8 +92,10 @@ class TicketListService with ChangeNotifier {
       return;
     }
     final responseData = await NetworkApiServices().getApi(
-        AppUrls.stDepartmentsUrl, LocalKeys.department,
-        headers: commonAuthHeader);
+      AppUrls.stDepartmentsUrl,
+      LocalKeys.department,
+      headers: commonAuthHeader,
+    );
 
     if (responseData != null) {
       departments = TicketDepartmentsModel.fromJson(responseData).departments;

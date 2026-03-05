@@ -12,49 +12,110 @@ import '../../../helper/svg_assets.dart';
 class TicketAttachmentBubble extends StatelessWidget {
   final String? file;
   final bool senderFromWeb;
-  const TicketAttachmentBubble(
-      {super.key, this.file, this.senderFromWeb = false});
+  const TicketAttachmentBubble({
+    super.key,
+    this.file,
+    this.senderFromWeb = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    bool isImage = file != null && isImageUrl(file!);
+
     return InkWell(
       onTap: () async {
         debugPrint("file".toString());
         debugPrint(file.toString());
         if (file?.trim().isNotEmpty ?? false) {
-          final Uri launchUri = Uri(
-            scheme: 'https',
-            path: file!.replaceAll("https://", ""),
+          final Uri launchUri = Uri.parse(file!);
+          await urlLauncher.launchUrl(
+            launchUri,
+            mode: urlLauncher.LaunchMode.externalApplication,
           );
-          await urlLauncher.launchUrl(launchUri);
         }
       },
-      child: SquircleContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: senderFromWeb ? context.color.accentContrastColor : primaryColor,
-        margin: const EdgeInsets.only(top: 4),
-        radius: 12,
-        child: FittedBox(
-          child: Row(
-            children: [
-              SvgAssets.download.toSVGSized(18,
-                  color: senderFromWeb
-                      ? primaryColor
-                      : context.color.accentContrastColor),
-              6.toWidth,
-              Text(
-                LocalKeys.downloadAttachment,
-                textAlign: senderFromWeb ? null : TextAlign.end,
-                style: context.titleMedium?.copyWith(
-                    fontSize: 14,
-                    color: senderFromWeb
-                        ? primaryColor
-                        : context.color.accentContrastColor),
+      child:
+          isImage
+              ? Container(
+                margin: const EdgeInsets.only(top: 4),
+                constraints: BoxConstraints(maxWidth: context.width / 1.5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color:
+                        senderFromWeb
+                            ? context.color.accentContrastColor
+                            : primaryColor,
+                    width: 2,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    file!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 150,
+                        width: 150,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(color: primaryColor),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 150,
+                        width: 150,
+                        color: Colors.grey[200],
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[500],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
+              : SquircleContainer(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                color:
+                    senderFromWeb
+                        ? context.color.accentContrastColor
+                        : primaryColor,
+                margin: const EdgeInsets.only(top: 4),
+                radius: 12,
+                child: FittedBox(
+                  child: Row(
+                    children: [
+                      SvgAssets.download.toSVGSized(
+                        18,
+                        color:
+                            senderFromWeb
+                                ? primaryColor
+                                : context.color.accentContrastColor,
+                      ),
+                      6.toWidth,
+                      Text(
+                        LocalKeys.downloadAttachment,
+                        textAlign: senderFromWeb ? null : TextAlign.end,
+                        style: context.titleMedium?.copyWith(
+                          fontSize: 14,
+                          color:
+                              senderFromWeb
+                                  ? primaryColor
+                                  : context.color.accentContrastColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 

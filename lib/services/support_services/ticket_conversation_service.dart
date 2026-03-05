@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
@@ -47,8 +48,11 @@ class TicketConversationService with ChangeNotifier {
 
   Future fetchSingleTickets(BuildContext context, id) async {
     final url = "${AppUrls.fetchTicketConversationUrl}/$id";
-    final responseData = await NetworkApiServices()
-        .getApi(url, LocalKeys.message, headers: commonAuthHeader);
+    final responseData = await NetworkApiServices().getApi(
+      url,
+      LocalKeys.message,
+      headers: commonAuthHeader,
+    );
 
     if (responseData != null) {
       final temTicketModel = TicketMessagesModel.fromJson(responseData);
@@ -63,33 +67,90 @@ class TicketConversationService with ChangeNotifier {
     setIsLoading(false);
   }
 
-  Future sendMessage(BuildContext context, id,
-      {required String message, bool notifyViaMail = false, File? file}) async {
-    final url = AppUrls.sendTicketMessageUrl;
+  Future fetchSingleTicketsSilently(BuildContext context, id) async {
+    final url = "${AppUrls.fetchTicketConversationUrl}/$id";
+    final responseData = await NetworkApiServices().getApi(
+      url,
+      LocalKeys.message,
+      headers: commonAuthHeader,
+    );
+
+    if (responseData != null) {
+      final temTicketModel = TicketMessagesModel.fromJson(responseData);
+      // Update only if there are new messages to prevent unnecessary rebuilds if possible
+      if (temTicketModel.messages.length != messagesList.length) {
+        messagesList = temTicketModel.messages.reversed.toList();
+        ticketDetails = temTicketModel.ticketDetails;
+        noMessage = temTicketModel.messages.isEmpty;
+        nextPage = temTicketModel.pagination?.nextPageUrl;
+        if (messagesList.length < 20) {
+          noMoreMessages = true;
+        }
+        notifyListeners();
+      }
+    }
+  }
+
+  Future sendMessage(
+    BuildContext context,
+    id, {
+    required String message,
+    bool notifyViaMail = false,
+    File? file,
+  }) async {
+    final url = "${AppUrls.sendTicketMessageUrl}/$id/messages";
     nextPageLoading = false;
     var headers = {'Authorization': 'Bearer $getToken'};
     var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.fields.addAll({
-      'ticket_id': '$id',
-      'message': message,
-      'email_notify': notifyViaMail ? 'on' : 'off'
-    });
+    request.fields.addAll({'message': message});
     if (file != null) {
-      request.files
-          .add(await http.MultipartFile.fromPath('attachment', file.path));
+      String extension = file.path.split('.').last.toLowerCase();
+      MediaType? mediaType;
+      if (['jpg', 'jpeg'].contains(extension)) {
+        mediaType = MediaType('image', 'jpeg');
+      } else if (extension == 'png') {
+        mediaType = MediaType('image', 'png');
+      } else if (extension == 'gif') {
+        mediaType = MediaType('image', 'gif');
+      } else if (extension == 'webp') {
+        mediaType = MediaType('image', 'webp');
+      } else if (extension == 'pdf') {
+        mediaType = MediaType('application', 'pdf');
+      } else if (extension == 'doc') {
+        mediaType = MediaType('application', 'msword');
+      } else if (extension == 'docx') {
+        mediaType = MediaType(
+          'application',
+          'vnd.openxmlformats-officedocument.wordprocessingml.document',
+        );
+      }
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'attachment',
+          file.path,
+          contentType: mediaType,
+        ),
+      );
     }
     request.headers.addAll(headers);
 
-    final responseData = await NetworkApiServices()
-        .postWithFileApi(request, LocalKeys.sendMessage);
+    final responseData = await NetworkApiServices().postWithFileApi(
+      request,
+      LocalKeys.sendMessage,
+    );
 
     if (responseData != null) {
       debugPrint(responseData.toString());
-      if (responseData["ticket_message_lists"] is List) {
+      if (responseData["data"] != null) {
+        messagesList.insert(0, TicketMessage.fromJson(responseData["data"]));
+      } else if (responseData["ticket_message_lists"] is List) {
         messagesList.insert(
-            0,
-            TicketMessage.fromJson(
-                (responseData["ticket_message_lists"] as List).firstOrNull));
+          0,
+          TicketMessage.fromJson(
+            (responseData["ticket_message_lists"] as List).firstOrNull,
+          ),
+        );
       }
     } else {}
     setIsLoading(false);
@@ -99,8 +160,11 @@ class TicketConversationService with ChangeNotifier {
     nextPageLoading = true;
     notifyListeners();
     final url = "$nextPage";
-    final responseData = await NetworkApiServices()
-        .getApi(url, LocalKeys.message, headers: commonAuthHeader);
+    final responseData = await NetworkApiServices().getApi(
+      url,
+      LocalKeys.message,
+      headers: commonAuthHeader,
+    );
 
     if (responseData != null) {
       final tempData = TicketMessagesModel.fromJson(responseData);
@@ -115,13 +179,10 @@ class TicketConversationService with ChangeNotifier {
     } else {
       noMoreMessages = true;
     }
-    Future.delayed(
-      const Duration(milliseconds: 600),
-      () {
-        noMoreMessages = false;
-        notifyListeners();
-      },
-    );
+    Future.delayed(const Duration(milliseconds: 600), () {
+      noMoreMessages = false;
+      notifyListeners();
+    });
     nextPageLoading = false;
     notifyListeners();
   }

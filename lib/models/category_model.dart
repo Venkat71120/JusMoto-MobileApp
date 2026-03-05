@@ -12,26 +12,27 @@ class CategoryListModel {
   final List<Category>? categories;
   final Pagination? pagination;
 
-  CategoryListModel({
-    this.categories,
-    this.pagination,
-  });
+  CategoryListModel({this.categories, this.pagination});
 
   factory CategoryListModel.fromJson(json) => CategoryListModel(
-        categories: json["categories"] == null
+    categories:
+        json["categories"] == null
             ? []
             : List<Category>.from(
-                json["categories"]!.map((x) => Category.fromJson(x))),
-        pagination: json["pagination"] == null
+              json["categories"]!.map((x) => Category.fromJson(x)),
+            ),
+    pagination:
+        json["pagination"] == null
             ? null
             : Pagination.fromJson(json["pagination"]),
-      );
+  );
 
   Map<String, dynamic> toJson() => {
-        "categories": categories == null
+    "categories":
+        categories == null
             ? []
             : List<dynamic>.from(categories!.map((x) => x.toJson())),
-      };
+  };
 }
 
 class Category {
@@ -52,20 +53,20 @@ class Category {
   });
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
-        id: json["id"],
-        name: json["name"],
-        slug: json["slug"],
-        icon: json["icon"],
-        description: json["description"],
-        image: json["image"],
-      );
+    id: json["id"],
+    name: json["name"]?.toString(),
+    slug: json["slug"]?.toString(),
+    icon: json["icon"]?.toString(),
+    description: json["description"],
+    image: json["image"]?.toString(),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "slug": slug,
-        "icon": icon,
-        "description": description,
-        "image": image,
-      };
+    "id": id,
+    "name": name,
+    "slug": slug,
+    "icon": icon,
+    "description": description,
+    "image": image,
+  };
 }

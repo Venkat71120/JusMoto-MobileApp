@@ -102,7 +102,7 @@ class OrderDetailsItemTile extends StatelessWidget {
                     ],
                   ),
                   if ((orderItem.reviewsAll?.isEmpty ?? true) &&
-                      ["2", "complete"].contains(
+                      ["2", "3", "complete", "delivered"].contains(
                         odProvider.orderDetailsModel.orderDetails?.status
                             .toString(),
                       ))

@@ -33,13 +33,16 @@ class UnreadCountService {
 
     if (responseData != null) {
       debugPrint(responseData.toString());
-      notificationCount.value =
-          responseData["unread_notifications"].toString().tryToParse;
-      messageCount.value = (responseData["unseen_message"]
-              ?["client_unseen_message_count"])
-          .toString()
-          .tryToParse;
-
+      if (responseData["data"] != null && responseData["data"] is Map) {
+        notificationCount.value = responseData["data"]["count"] ?? 0;
+      } else {
+        notificationCount.value =
+            responseData["unread_notifications"].toString().tryToParse;
+        messageCount.value =
+            (responseData["unseen_message"]?["client_unseen_message_count"])
+                .toString()
+                .tryToParse;
+      }
       return true;
     }
   }

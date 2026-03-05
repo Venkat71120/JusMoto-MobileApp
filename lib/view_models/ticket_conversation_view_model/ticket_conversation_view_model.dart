@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:car_service/helper/extension/context_extension.dart';
@@ -17,6 +18,9 @@ class TicketConversationViewModel {
 
   final ScrollController scrollController = ScrollController();
 
+  // Timer for auto-refreshing messages
+  Timer? refreshTimer;
+
   TicketConversationViewModel._init();
   static TicketConversationViewModel? _instance;
   static TicketConversationViewModel get instance {
@@ -24,8 +28,26 @@ class TicketConversationViewModel {
     return _instance!;
   }
 
+  void startAutoRefresh(BuildContext context, dynamic ticketId) {
+    refreshTimer?.cancel();
+    refreshTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      final tcProvider = Provider.of<TicketConversationService>(
+        context,
+        listen: false,
+      );
+      // Fetch tickets without showing generic loading indicators
+      tcProvider.fetchSingleTicketsSilently(context, ticketId);
+    });
+  }
+
+  void cancelAutoRefresh() {
+    refreshTimer?.cancel();
+    refreshTimer = null;
+  }
+
   TicketConversationViewModel._dispose();
   static bool get dispose {
+    _instance?.cancelAutoRefresh();
     _instance = null;
     return true;
   }
@@ -45,23 +67,28 @@ class TicketConversationViewModel {
 
   void trySendingMessage(BuildContext context) async {
     context.unFocus;
-    final tcProvider =
-        Provider.of<TicketConversationService>(context, listen: false);
+    final tcProvider = Provider.of<TicketConversationService>(
+      context,
+      listen: false,
+    );
     isLoading.value = true;
     await tcProvider
-        .sendMessage(context, tcProvider.ticketDetails!.id,
-            message: messageController.text,
-            notifyViaMail: notifyEmail.value,
-            file: selectedFile.value)
+        .sendMessage(
+          context,
+          tcProvider.ticketDetails!.id,
+          message: messageController.text,
+          notifyViaMail: notifyEmail.value,
+          file: selectedFile.value,
+        )
         .then((value) {
-      if (value != null) {
-        isLoading.value = false;
-        return;
-      }
-      messageController.clear();
-      selectedFile.value = null;
-      isLoading.value = false;
-    });
+          if (value != null) {
+            isLoading.value = false;
+            return;
+          }
+          messageController.clear();
+          selectedFile.value = null;
+          isLoading.value = false;
+        });
   }
 
   void tryToLoadMoreMessages(BuildContext context) {

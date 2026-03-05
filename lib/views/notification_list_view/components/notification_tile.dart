@@ -22,19 +22,24 @@ class NotificationTile extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         debugPrint(notification.type.toString());
+        final id =
+            notification.data?['order_id'] ??
+            notification.data?['ticket_id'] ??
+            notification.identity;
         switch (notification.type) {
           case "order":
-            context.toPage(OrderDetailsView(
-              orderId: notification.identity,
-            ));
+            if (id != null) {
+              context.toPage(OrderDetailsView(orderId: id));
+            }
             break;
           case "ticket":
-            Provider.of<TicketConversationService>(context, listen: false)
-                .fetchSingleTickets(context, notification.identity);
-            context.toPage(TicketConversationView(
-              id: notification.identity,
-              title: "",
-            ));
+            if (id != null) {
+              Provider.of<TicketConversationService>(
+                context,
+                listen: false,
+              ).fetchSingleTickets(context, id);
+              context.toPage(TicketConversationView(id: id, title: ""));
+            }
             break;
           default:
         }
@@ -50,7 +55,8 @@ class NotificationTile extends StatelessWidget {
                 position: badges.BadgePosition.custom(end: 2),
                 showBadge: notification.isRead,
                 badgeStyle: badges.BadgeStyle(
-                    badgeColor: context.color.primaryWarningColor),
+                  badgeColor: context.color.primaryWarningColor,
+                ),
                 child: SvgAssets.notificationBell.toSVGSized(
                   24,
                   color: context.color.tertiaryContrastColo,
@@ -58,22 +64,32 @@ class NotificationTile extends StatelessWidget {
               ),
               16.toWidth,
               Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (notification.title != null) ...[
                       Text(
-                        notification.message ?? LocalKeys.na,
+                        notification.title!,
                         style: context.titleMedium?.bold.copyWith(),
                       ),
                       4.toHeight,
-                      Text(
-                        timeago
-                            .format(notification.createdAt ?? DateTime.now()),
-                        style: context.titleSmall?.copyWith(),
-                      ),
                     ],
-                  ))
+                    Text(
+                      notification.message ?? LocalKeys.na,
+                      style:
+                          notification.title != null
+                              ? context.titleSmall?.copyWith()
+                              : context.titleMedium?.bold.copyWith(),
+                    ),
+                    4.toHeight,
+                    Text(
+                      timeago.format(notification.createdAt ?? DateTime.now()),
+                      style: context.titleSmall?.copyWith(),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

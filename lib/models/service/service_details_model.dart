@@ -105,7 +105,7 @@ class ServiceDetails {
     this.afterBookingSteps,
   });
 
- factory ServiceDetails.fromJson(Map<String, dynamic> json) {
+  factory ServiceDetails.fromJson(Map<String, dynamic> json) {
     // Helper to safely parse strings or numbers into a num
     num parseNum(dynamic value) {
       if (value == null) return 0;
@@ -116,17 +116,21 @@ class ServiceDetails {
     return ServiceDetails(
       id: json["id"],
       categoryId: json["category_id"],
-      category: json["category"] == null ? null : Category.fromJson(json["category"]),
+      category:
+          json["category"] == null ? null : Category.fromJson(json["category"]),
       subCategoryId: json["sub_category_id"],
       childCategoryId: json["child_category_id"],
-      title: json["title"],
+      title: json["title"]?.toString(),
       type: json["type"]?.toString(),
-      slug: json["slug"],
-      unit: json["unit"],
+      slug: json["slug"]?.toString(),
+      unit: json["unit"]?.toString(),
       // Use the helper for price fields
       price: parseNum(json["price"]),
-      discountPrice: json["discount_price"] == null ? null : parseNum(json["discount_price"]),
-      description: json["description"],
+      discountPrice:
+          json["discount_price"] == null
+              ? null
+              : parseNum(json["discount_price"]),
+      description: json["description"]?.toString(),
       videoId: json["video_url"]?.toString(),
       avgRating: parseNum(json["average_rating"]),
       view: parseNum(json["view"]),
@@ -134,22 +138,53 @@ class ServiceDetails {
       totalReviews: parseNum(json["total_reviews"]),
       averageRating: parseNum(json["average_rating"]),
       isFeatured: json["is_featured"],
-      image: json["image"],
+      image: json["image"]?.toString(),
       // ... rest of your mappings stay the same
-      serviceCar: json["service_car"] == null ? null : ServiceCar.fromJson(json["service_car"]),
-      galleryImages: json["gallery_images"] == null ? [] : List<String>.from(json["gallery_images"]!.map((x) => x)),
-      serviceAdditional: json["service_additionals"] == null
-          ? []
-          : List<ServiceAdditional>.from(json["service_additionals"]!.map((x) => ServiceAdditional.fromJson(x))),
-      offers: json["includes"] == null ? [] : List<AdditionalInfo>.from(json["includes"]!.map((x) => AdditionalInfo.fromJson(x))),
-      faqs: json["faqs"] == null ? [] : List<AdditionalInfo>.from(json["faqs"]!.map((x) => AdditionalInfo.fromJson(x))),
-      reviews: (json["reviews"] ?? json["reviews_all"] ?? json["review"]) == null
-          ? []
-          : List<ReviewModel>.from((json["reviews"] ?? json["reviews_all"] ?? json["review"])!.map((x) => ReviewModel.fromJson(x))),
+      serviceCar:
+          json["service_car"] == null
+              ? null
+              : ServiceCar.fromJson(json["service_car"]),
+      galleryImages:
+          json["gallery_images"] == null
+              ? []
+              : List<String>.from(json["gallery_images"]!.map((x) => x)),
+      serviceAdditional:
+          json["service_additionals"] == null
+              ? []
+              : List<ServiceAdditional>.from(
+                json["service_additionals"]!.map(
+                  (x) => ServiceAdditional.fromJson(x),
+                ),
+              ),
+      offers:
+          json["includes"] == null
+              ? []
+              : List<AdditionalInfo>.from(
+                json["includes"]!.map((x) => AdditionalInfo.fromJson(x)),
+              ),
+      faqs:
+          json["faqs"] == null
+              ? []
+              : List<AdditionalInfo>.from(
+                json["faqs"]!.map((x) => AdditionalInfo.fromJson(x)),
+              ),
+      reviews:
+          (json["reviews"] ?? json["reviews_all"] ?? json["review"]) == null
+              ? []
+              : List<ReviewModel>.from(
+                (json["reviews"] ?? json["reviews_all"] ?? json["review"])!.map(
+                  (x) => ReviewModel.fromJson(x),
+                ),
+              ),
       admin: json["admin"] == null ? null : AdminModel.fromJson(json["admin"]),
-      afterBookingSteps: json["after_booking_steps"] == null
-          ? []
-          : List<AfterBookingStep>.from(json["after_booking_steps"]!.map((x) => AfterBookingStep.fromJson(x))),
+      afterBookingSteps:
+          json["after_booking_steps"] == null
+              ? []
+              : List<AfterBookingStep>.from(
+                json["after_booking_steps"]!.map(
+                  (x) => AfterBookingStep.fromJson(x),
+                ),
+              ),
     );
   }
   Map<String, dynamic> toJson() => {
@@ -206,11 +241,11 @@ class Addon {
   factory Addon.fromJson(Map<String, dynamic> json) => Addon(
     id: json["id"],
     serviceId: json["service_id"],
-    title: json["title"],
+    title: json["title"]?.toString(),
     price: json["price"].toString().tryToParse,
     quantity: json["quantity"].toString().tryToParse,
-    image: json["image"],
-    description: json["description"],
+    image: json["image"]?.toString(),
+    description: json["description"]?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -234,8 +269,8 @@ class AdditionalInfo {
   factory AdditionalInfo.fromJson(Map<String, dynamic> json) => AdditionalInfo(
     id: json["id"],
     serviceId: json["service_id"],
-    title: json["title"],
-    description: json["description"],
+    title: (json["title"] ?? json["question"])?.toString(),
+    description: (json["description"] ?? json["answer"])?.toString(),
   );
 
   dynamic toFaq() => {
@@ -269,7 +304,7 @@ class AfterBookingStep {
       AfterBookingStep(
         id: json["id"],
         stepNo: json["step_no"],
-        steps: json["steps"],
+        steps: json["steps"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -298,8 +333,8 @@ class AdminModel {
 
   factory AdminModel.fromJson(Map<String, dynamic> json) => AdminModel(
     id: json["id"],
-    name: json["name"],
-    email: json["email"],
+    name: json["name"]?.toString(),
+    email: json["email"]?.toString(),
     image: json["image"],
     staffs:
         (json["staffs"]?["all_staffs"]) == null
@@ -340,9 +375,9 @@ class ServiceAdditional {
       ServiceAdditional(
         id: json["id"],
         serviceId: json["service_id"],
-        title: json["title"],
-        image: json["image"],
-        type: json["type"],
+        title: json["title"]?.toString(),
+        image: json["image"]?.toString(),
+        type: json["type"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -373,8 +408,8 @@ class ServiceCar {
 
   factory ServiceCar.fromJson(Map<String, dynamic> json) => ServiceCar(
     id: json["id"],
-    name: json["name"],
-    image: json["image"],
+    name: json["name"]?.toString(),
+    image: json["image"]?.toString(),
     price: json["price"].toString().tryToParse,
     discountPrice: num.tryParse(json["discount_price"].toString()),
     variant:

@@ -17,235 +17,287 @@ import '../../utils/components/custom_preloader.dart';
 class TicketConversationView extends StatelessWidget {
   final String title;
   final dynamic id;
-  const TicketConversationView(
-      {required this.title, required this.id, super.key});
+  const TicketConversationView({
+    required this.title,
+    required this.id,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final tcm = TicketConversationViewModel.instance;
+    // Start auto-refreshing messages when the view is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tcm.startAutoRefresh(context, id);
+    });
+
     return Consumer<TicketConversationService>(
-        builder: (context, tcProvider, child) {
-      return WillPopScope(
-        onWillPop: () async {
-          tcProvider.clearAllMessages();
-          return true;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            foregroundColor: context.color.primaryContrastColor,
-            centerTitle: true,
-            title: RichText(
-              softWrap: true,
-              text: TextSpan(
+      builder: (context, tcProvider, child) {
+        return WillPopScope(
+          onWillPop: () async {
+            tcm.cancelAutoRefresh();
+            tcProvider.clearAllMessages();
+            return true;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              foregroundColor: context.color.primaryContrastColor,
+              centerTitle: true,
+              title: RichText(
+                softWrap: true,
+                text: TextSpan(
                   text: '#$id',
                   style: const TextStyle(
-                      color: primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 19),
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 19,
+                  ),
                   children: [
                     TextSpan(
-                        text: ' $title',
-                        style: TextStyle(
-                            color: context.color.primaryContrastColor)),
-                  ]),
+                      text: ' $title',
+                      style: TextStyle(
+                        color: context.color.primaryContrastColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              leading: NavigationPopIcon(
+                onTap: () {
+                  tcm.cancelAutoRefresh();
+                  tcProvider.clearAllMessages();
+                  Navigator.of(context).pop();
+                },
+              ),
             ),
-            leading: NavigationPopIcon(
-              onTap: () {
+            body: WillPopScope(
+              onWillPop: () async {
+                tcm.cancelAutoRefresh();
                 tcProvider.clearAllMessages();
                 Navigator.of(context).pop();
+                return true;
               },
-            ),
-          ),
-          body: WillPopScope(
-            onWillPop: () async {
-              tcProvider.clearAllMessages();
-              Navigator.of(context).pop();
-              return true;
-            },
-            child: Consumer<TicketConversationService>(
+              child: Consumer<TicketConversationService>(
                 builder: (context, tcProvider, child) {
-              return Column(
-                children: [
-                  Expanded(
-                    child: messageListView(context, tcProvider),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 20),
-                    decoration: BoxDecoration(
-                        color: context.color.accentContrastColor,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: context.height / 7,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: TextField(
-                              maxLines: 4,
-                              controller: tcm.messageController,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                hintText: LocalKeys.writeMessage,
-                                hintStyle: TextStyle(
-                                    color: context.color.tertiaryContrastColo,
-                                    fontSize: 14),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: context.color.primaryBorderColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: context.color.primaryBorderColor),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: context.color.primaryBorderColor),
-                                ),
-                              ),
-                              onChanged: (value) {
-                                tcProvider.setMessage(value);
-                              },
-                            ),
-                          ),
+                  return Column(
+                    children: [
+                      Expanded(child: messageListView(context, tcProvider)),
+                      Container(
+                        padding: const EdgeInsets.only(top: 20),
+                        decoration: BoxDecoration(
+                          color: context.color.accentContrastColor,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Row(
-                            children: [
-                              Text(
-                                LocalKeys.file,
-                                style: TextStyle(
-                                    color: context.color.tertiaryContrastColo,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  tcm.fileSelector();
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color: context
-                                              .color.primaryBorderColor)),
-                                  child: Text(
-                                    LocalKeys.selectFile,
-                                    style: TextStyle(
-                                        color:
-                                            context.color.tertiaryContrastColo),
-                                  ),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: context.height / 7,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              ValueListenableBuilder(
-                                  valueListenable: tcm.selectedFile,
-                                  builder: (context, file, child) {
-                                    return SizedBox(
-                                      width: context.width / 3,
-                                      child: Text(
-                                        file == null
-                                            ? LocalKeys.noFileChosen
-                                            : file.path.split('/').last,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall,
+                                child: TextField(
+                                  maxLines: 4,
+                                  controller: tcm.messageController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    hintText: LocalKeys.writeMessage,
+                                    hintStyle: TextStyle(
+                                      color: context.color.tertiaryContrastColo,
+                                      fontSize: 14,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                        color: context.color.primaryBorderColor,
                                       ),
-                                    );
-                                  }),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ValueListenableBuilder(
-                            valueListenable: tcm.notifyEmail,
-                            builder: (context, notify, child) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                  children: [
-                                    Transform.scale(
-                                      scale: 1.3,
-                                      child: Checkbox(
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: context.color.primaryBorderColor,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: context.color.primaryBorderColor,
+                                      ),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    tcProvider.setMessage(value);
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    LocalKeys.file,
+                                    style: TextStyle(
+                                      color: context.color.tertiaryContrastColo,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  GestureDetector(
+                                    onTap: () {
+                                      tcm.fileSelector();
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color:
+                                              context.color.primaryBorderColor,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        LocalKeys.selectFile,
+                                        style: TextStyle(
+                                          color:
+                                              context
+                                                  .color
+                                                  .tertiaryContrastColo,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ValueListenableBuilder(
+                                    valueListenable: tcm.selectedFile,
+                                    builder: (context, file, child) {
+                                      return SizedBox(
+                                        width: context.width / 3,
+                                        child: Text(
+                                          file == null
+                                              ? LocalKeys.noFileChosen
+                                              : file.path.split('/').last,
+                                          style:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.titleSmall,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ValueListenableBuilder(
+                              valueListenable: tcm.notifyEmail,
+                              builder: (context, notify, child) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Transform.scale(
+                                        scale: 1.3,
+                                        child: Checkbox(
                                           materialTapTargetSize:
                                               MaterialTapTargetSize.shrinkWrap,
                                           side: BorderSide(
                                             width: 1,
-                                            color: context
-                                                .color.primaryBorderColor,
+                                            color:
+                                                context
+                                                    .color
+                                                    .primaryBorderColor,
                                           ),
                                           activeColor: primaryColor,
                                           shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                              side: BorderSide(
-                                                width: 1,
-                                                color: context
-                                                    .color.primaryBorderColor,
-                                              )),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                            side: BorderSide(
+                                              width: 1,
+                                              color:
+                                                  context
+                                                      .color
+                                                      .primaryBorderColor,
+                                            ),
+                                          ),
                                           value: notify,
                                           onChanged: (value) {
                                             tcm.notifyEmail.value = !notify;
-                                          }),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    RichText(
-                                      softWrap: true,
-                                      text: TextSpan(
-                                        text: LocalKeys.notifyViaMail,
-                                        style: TextStyle(
-                                            color: context
-                                                .color.tertiaryContrastColo,
-                                            fontSize: 13),
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 5),
+                                      RichText(
+                                        softWrap: true,
+                                        text: TextSpan(
+                                          text: LocalKeys.notifyViaMail,
+                                          style: TextStyle(
+                                            color:
+                                                context
+                                                    .color
+                                                    .tertiaryContrastColo,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            SingleChildScrollView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
                                 ),
-                              );
-                            }),
-                        const SizedBox(height: 8),
-                        SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Builder(builder: (context) {
-                              return ValueListenableBuilder(
-                                  valueListenable: tcm.isLoading,
-                                  builder: (context, loading, child) {
-                                    return CustomButton(
-                                      btText: LocalKeys.send,
-                                      isLoading: loading,
-                                      onPressed: () async {
-                                        tcProvider.setIsLoading(true);
-                                        tcm.trySendingMessage(context);
+                                child: Builder(
+                                  builder: (context) {
+                                    return ValueListenableBuilder(
+                                      valueListenable: tcm.isLoading,
+                                      builder: (context, loading, child) {
+                                        return CustomButton(
+                                          btText: LocalKeys.send,
+                                          isLoading: loading,
+                                          onPressed: () async {
+                                            tcProvider.setIsLoading(true);
+                                            tcm.trySendingMessage(context);
+                                          },
+                                        );
                                       },
                                     );
-                                  });
-                            }),
-                          ),
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SingleChildScrollView(
+                              physics: NeverScrollableScrollPhysics(),
+                              child: SizedBox(height: 25),
+                            ),
+                          ],
                         ),
-                        const SingleChildScrollView(
-                            physics: NeverScrollableScrollPhysics(),
-                            child: SizedBox(height: 25)),
-                      ],
-                    ),
-                  )
-                ],
-              );
-            }),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Widget messageListView(
-      BuildContext context, TicketConversationService tcProvider) {
+    BuildContext context,
+    TicketConversationService tcProvider,
+  ) {
     final tcm = TicketConversationViewModel.instance;
     tcm.scrollController.addListener(() {
       tcm.tryToLoadMoreMessages(context);
@@ -253,11 +305,7 @@ class TicketConversationView extends StatelessWidget {
     if (tcProvider.ticketDetails == null) {
       return const Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: CustomPreloader(),
-          ),
-        ],
+        children: [Center(child: CustomPreloader())],
       );
     } else if ((tcProvider.messagesList ?? []).isEmpty) {
       return Center(
@@ -271,7 +319,8 @@ class TicketConversationView extends StatelessWidget {
         controller: tcm.scrollController,
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         reverse: true,
-        itemCount: tcProvider.messagesList.length +
+        itemCount:
+            tcProvider.messagesList.length +
             (!tcProvider.noMoreMessages ? 1 : 0),
         itemBuilder: ((context, index) {
           if (tcProvider.messagesList.length == index) {
@@ -296,7 +345,11 @@ class TicketConversationView extends StatelessWidget {
   }
 
   Widget showFile(
-      BuildContext context, String? url, int id, AlignmentGeometry alignment) {
+    BuildContext context,
+    String? url,
+    int id,
+    AlignmentGeometry alignment,
+  ) {
     print('Url is: $url');
     if (url != null &&
         (!url.contains('.png') &&
@@ -306,53 +359,61 @@ class TicketConversationView extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 10),
         height: 50,
         width: 50,
-        child: SvgAssets.fileText
-            .toSVGSized(24, color: context.color.tertiaryContrastColo),
+        child: SvgAssets.fileText.toSVGSized(
+          24,
+          color: context.color.tertiaryContrastColo,
+        ),
       );
     }
     return GestureDetector(
       onTap: () {},
-      child: url != null
-          ? GestureDetector(
-              child: Container(
-                alignment: alignment,
-                constraints: BoxConstraints(maxWidth: context.width / 1.5),
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                child: Image.network(
-                  url,
+      child:
+          url != null
+              ? GestureDetector(
+                child: Container(
                   alignment: alignment,
-                  loadingBuilder: (context, child, loding) {
-                    if (loding == null) {
-                      return child;
-                    }
-                    return Container(
-                      height: 200,
-                      margin: const EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
+                  constraints: BoxConstraints(maxWidth: context.width / 1.5),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Image.network(
+                    url,
+                    alignment: alignment,
+                    loadingBuilder: (context, child, loding) {
+                      if (loding == null) {
+                        return child;
+                      }
+                      return Container(
+                        height: 200,
+                        margin: const EdgeInsets.symmetric(vertical: 15),
+                        decoration: BoxDecoration(
                           image: DecorationImage(
-                              alignment: alignment,
-                              image: const AssetImage(
-                                'assets/images/app_icon.png',
-                              ),
-                              opacity: .4)),
-                    );
-                  },
-                  errorBuilder: (context, str, some) {
-                    return Container(
-                      height: 200,
-                      margin: const EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
+                            alignment: alignment,
+                            image: const AssetImage(
+                              'assets/images/app_icon.png',
+                            ),
+                            opacity: .4,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, str, some) {
+                      return Container(
+                        height: 200,
+                        margin: const EdgeInsets.symmetric(vertical: 15),
+                        decoration: BoxDecoration(
                           image: DecorationImage(
-                              alignment: alignment,
-                              image: const AssetImage(
-                                  'assets/images/app_icon.png'),
-                              opacity: .4)),
-                    );
-                  },
+                            alignment: alignment,
+                            image: const AssetImage(
+                              'assets/images/app_icon.png',
+                            ),
+                            opacity: .4,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            )
-          : const SizedBox(),
+              )
+              : const SizedBox(),
     );
   }
 }

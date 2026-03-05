@@ -110,17 +110,13 @@ class AppUrls {
       '$baseEndPoint/client/service/order-create';
   static String get orderPaymentUpdateUrl =>
       '$baseEndPoint/client/service/order-payment-status-update';
-  static String get ticketListListUrl =>
-      '$baseEndPoint/user/support-ticket/all';
+  static String get ticketListListUrl => '$baseEndPoint/tickets';
   static String get stDepartmentsUrl => '$baseEndPoint/user/all-departments';
   static String get createTicketUrl =>
       '$baseEndPoint/user/support-ticket/create';
-  static String get fetchTicketConversationUrl =>
-      '$baseEndPoint/user/support-ticket/view-ticket';
-  static String get sendTicketMessageUrl =>
-      '$baseEndPoint/user/support-ticket/message-send';
-  static String get myNotificationsListUrl =>
-      '$baseEndPoint/user/notifications/all';
+  static String get fetchTicketConversationUrl => '$baseEndPoint/tickets';
+  static String get sendTicketMessageUrl => '$baseEndPoint/tickets';
+  static String get myNotificationsListUrl => '$baseEndPoint/notifications';
   static String get notificationReadUrl =>
       '$baseEndPoint/user/notifications/clear';
   static String get sentOtpToMailUrl => '$baseEndPoint/auth/resend-otp';
@@ -145,7 +141,7 @@ class AppUrls {
   static String get homePopularServicesUrl => '$baseEndPoint/services';
 
   static String get unreadCountUrl =>
-      '$baseEndPoint/client/chat/unseen-message/count';
+      '$baseEndPoint/notifications/unread-count';
   static String get chatCredentialUrl => '$baseEndPoint/live-chat/credentials';
   static String get editJobUrl => '$baseEndPoint/client/job/edit';
 

@@ -14,26 +14,27 @@ class ReviewListModel {
   final List<ReviewModel> clientAllReviews;
   final Pagination? pagination;
 
-  ReviewListModel({
-    required this.clientAllReviews,
-    this.pagination,
-  });
+  ReviewListModel({required this.clientAllReviews, this.pagination});
 
   factory ReviewListModel.fromJson(Map json) => ReviewListModel(
-        clientAllReviews: json["client_all_reviews"] == null
+    clientAllReviews:
+        json["client_all_reviews"] == null
             ? []
-            : List<ReviewModel>.from(json["client_all_reviews"]!
-                .map((x) => ReviewModel.fromJson(x))),
-        pagination: json["pagination"] == null
+            : List<ReviewModel>.from(
+              json["client_all_reviews"]!.map((x) => ReviewModel.fromJson(x)),
+            ),
+    pagination:
+        json["pagination"] == null
             ? null
             : Pagination.fromJson(json["pagination"]),
-      );
+  );
 
   Map<String, dynamic> toJson() => {
-        "client_all_reviews": clientAllReviews == null
+    "client_all_reviews":
+        clientAllReviews == null
             ? []
             : List<dynamic>.from(clientAllReviews.map((x) => x.toJson())),
-      };
+  };
 }
 
 class ReviewModel {
@@ -58,29 +59,31 @@ class ReviewModel {
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) => ReviewModel(
-        id: json["id"],
-        userId: json["user_id"],
-        rating: json["rating"].toString().tryToParse,
-        type: json["type"],
-        message: json["message"],
-        status: json["status"],
-        createdAt: DateTime.tryParse(json["created_at"].toString()),
-        reviewer: (json["provider_reviews"] ?? json["reviewer"]) == null
+    id: json["id"],
+    userId: json["user_id"],
+    rating: json["rating"].toString().tryToParse,
+    type: json["type"]?.toString(),
+    message: json["message"]?.toString(),
+    status: json["status"]?.toString(),
+    createdAt: DateTime.tryParse(json["created_at"].toString()),
+    reviewer:
+        (json["provider_reviews"] ?? json["reviewer"]) == null
             ? null
             : ReviewerModel.fromJson(
-                (json["provider_reviews"] ?? json["reviewer"])),
-      );
+              (json["provider_reviews"] ?? json["reviewer"]),
+            ),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "user_id": userId,
-        "rating": rating,
-        "type": type,
-        "message": message,
-        "status": status,
-        "created_at": createdAt?.toIso8601String(),
-        "provider_reviews": reviewer?.toJson(),
-      };
+    "id": id,
+    "user_id": userId,
+    "rating": rating,
+    "type": type,
+    "message": message,
+    "status": status,
+    "created_at": createdAt?.toIso8601String(),
+    "provider_reviews": reviewer?.toJson(),
+  };
 }
 
 class ReviewerModel {
@@ -109,26 +112,26 @@ class ReviewerModel {
   });
 
   factory ReviewerModel.fromJson(Map<String, dynamic> json) => ReviewerModel(
-        id: json["id"],
-        firstName: json["first_name"],
-        name: json["full_name"],
-        image: json["image"],
-        email: json["email"],
-        reviewCount: json["review_count"],
-        averageRating: json["average_rating"],
-        createdAt: DateTime.tryParse(json["created_at"].toString()),
-        clientLastSeen: DateTime.tryParse(json["client_last_seen"].toString()),
-        clientTotalJobs: json["client_total_jobs"],
-      );
+    id: json["id"],
+    firstName: json["first_name"]?.toString(),
+    name: json["full_name"]?.toString(),
+    image: json["image"]?.toString(),
+    email: json["email"]?.toString(),
+    reviewCount: json["review_count"],
+    averageRating: json["average_rating"]?.toString(),
+    createdAt: DateTime.tryParse(json["created_at"].toString()),
+    clientLastSeen: DateTime.tryParse(json["client_last_seen"].toString()),
+    clientTotalJobs: json["client_total_jobs"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "first_name": firstName,
-        "image": image,
-        "review_count": reviewCount,
-        "average_rating": averageRating,
-        "created_at": createdAt?.toIso8601String(),
-        "client_last_seen": clientLastSeen?.toIso8601String(),
-        "client_total_jobs": clientTotalJobs,
-      };
+    "id": id,
+    "first_name": firstName,
+    "image": image,
+    "review_count": reviewCount,
+    "average_rating": averageRating,
+    "created_at": createdAt?.toIso8601String(),
+    "client_last_seen": clientLastSeen?.toIso8601String(),
+    "client_total_jobs": clientTotalJobs,
+  };
 }
