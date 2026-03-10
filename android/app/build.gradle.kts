@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.jusMoto.jusMoto"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
     android.ndkVersion = "27.0.12077973"
 
@@ -37,32 +37,33 @@ android {
         applicationId = "com.jusMoto.jusMoto"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
-        signingConfigs {
-    if (keystorePropertiesFile.exists()) {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"]?.toString()
-            keyPassword = keystoreProperties["keyPassword"]?.toString()
-            storeFile = keystoreProperties["storeFile"]?.toString()?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"]?.toString()
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"]?.toString()
+                keyPassword = keystoreProperties["keyPassword"]?.toString()
+                storeFile = keystoreProperties["storeFile"]?.toString()?.let { file(it) }
+                storePassword = keystoreProperties["storePassword"]?.toString()
+            }
         }
     }
-}
+
     buildTypes {
-    release {
-        isMinifyEnabled = true
-        proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        
-        // Only use release signing config if it exists, otherwise use debug
-        signingConfig = if (keystorePropertiesFile.exists()) {
-            signingConfigs.getByName("release")
-        } else {
-            signingConfigs.getByName("debug")
+        getByName("release") {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
@@ -73,16 +74,14 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("com.stripe:stripe-android:20.0.0") 
+    implementation("com.stripe:stripe-android:20.0.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation ("com.pusher:pusher-java-client:2.2.8")
-     implementation ("com.android.support:multidex:1.0.3")
-    implementation ("androidx.window:window:1.0.0")
-    implementation ("androidx.window:window-java:1.0.0")
+    implementation("com.pusher:pusher-java-client:2.2.8")
+    implementation("com.android.support:multidex:1.0.3")
+    implementation("androidx.window:window:1.0.0")
+    implementation("androidx.window:window-java:1.0.0")
 
-    testImplementation ("junit:junit:4.12")
-    androidTestImplementation ("androidx.test:runner:1.2.0")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.2.0")
-}
-
+    testImplementation("junit:junit:4.12")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
