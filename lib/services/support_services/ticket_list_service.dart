@@ -87,7 +87,7 @@ class TicketListService with ChangeNotifier {
   }
 
   fetchDepartments() async {
-    if (departments != null) {
+    if (departments != null && departments!.isNotEmpty) {
       debugPrint(departments?.map((e) => e.name).toList().toString());
       return;
     }
@@ -97,12 +97,13 @@ class TicketListService with ChangeNotifier {
       headers: commonAuthHeader,
     );
 
-    if (responseData != null) {
+    if (responseData != null && responseData is Map && responseData.containsKey('data')) {
       departments = TicketDepartmentsModel.fromJson(responseData).departments;
     } else {
       departments = [];
       Future.delayed(const Duration(seconds: 1)).then((value) {
         departments = null;
+        notifyListeners();
       });
     }
     notifyListeners();

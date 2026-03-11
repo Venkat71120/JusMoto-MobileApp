@@ -111,7 +111,7 @@ class AppUrls {
   static String get orderPaymentUpdateUrl =>
       '$baseEndPoint/client/service/order-payment-status-update';
   static String get ticketListListUrl => '$baseEndPoint/tickets';
-  static String get stDepartmentsUrl => '$baseEndPoint/user/all-departments';
+  static String get stDepartmentsUrl => '$baseEndPoint/tickets/departments';
   static String get createTicketUrl =>
       '$baseEndPoint/user/support-ticket/create';
   static String get fetchTicketConversationUrl => '$baseEndPoint/tickets';

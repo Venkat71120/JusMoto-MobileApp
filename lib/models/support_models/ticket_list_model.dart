@@ -147,15 +147,15 @@ class TicketDepartmentsModel {
 
   factory TicketDepartmentsModel.fromJson(Map json) => TicketDepartmentsModel(
     departments:
-        json["departments"] == null
+        json["data"] == null
             ? []
             : List<Department>.from(
-              json["departments"]!.map((x) => Department.fromJson(x)),
+              json["data"]!.map((x) => Department.fromJson(x)),
             ),
   );
 
   Map<String, dynamic> toJson() => {
-    "departments":
+    "data":
         departments == null
             ? []
             : List<dynamic>.from(departments.map((x) => x.toJson())),

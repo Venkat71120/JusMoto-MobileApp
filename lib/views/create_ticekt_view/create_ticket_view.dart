@@ -10,12 +10,25 @@ import 'package:provider/provider.dart';
 
 import '../../services/support_services/ticket_list_service.dart';
 import '../../utils/components/custom_button.dart';
-import '../../utils/components/custom_future_widget.dart';
+
 import '../../utils/components/custom_preloader.dart';
 import '../../view_models/create_ticket_view_model/create_ticket_view_model.dart';
 
-class CreateTicketView extends StatelessWidget {
+class CreateTicketView extends StatefulWidget {
   const CreateTicketView({super.key});
+
+  @override
+  State<CreateTicketView> createState() => _CreateTicketViewState();
+}
+
+class _CreateTicketViewState extends State<CreateTicketView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TicketListService>(context, listen: false).fetchDepartments();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,27 +67,56 @@ class CreateTicketView extends StatelessWidget {
                 ),
                 Consumer<TicketListService>(
                     builder: (context, tlProvider, child) {
-                  return CustomFutureWidget(
-                    function: 1 == 1 ? tlProvider.fetchDepartments() : null,
-                    shimmer: const CustomPreloader(),
-                    child: ValueListenableBuilder(
-                      valueListenable: ctm.selectedDepartment,
-                      builder: (context, value, child) {
-                        return CustomDropdown(
-                          LocalKeys.selectDepartment,
-                          (tlProvider.departments
-                                  ?.map((e) => e.name ?? "")
-                                  .toList()) ??
-                              [],
-                          (value) {
-                            ctm.selectedDepartment.value =
-                                tlProvider.departments?.firstWhere(
-                                    (element) => element.name == value);
-                          },
-                          value: value?.name,
-                        );
+                  // Still loading
+                  if (tlProvider.departments == null) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: CustomPreloader(),
+                    );
+                  }
+                  // Failed to load or empty — show retry button
+                  if (tlProvider.departments!.isEmpty) {
+                    return TextButton.icon(
+                      onPressed: () {
+                        tlProvider.fetchDepartments();
                       },
-                    ),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("Retry loading departments"),
+                    );
+                  }
+                  // Data available — show dropdown
+                  return ValueListenableBuilder(
+                    valueListenable: ctm.selectedDepartment,
+                    builder: (context, value, child) {
+                      // Deduplicate names to prevent DropdownButton from throwing an error
+                      // if the backend returns multiple departments with the same name or nulls.
+                      final Set<String> uniqueNames = {};
+                      for (var dept in tlProvider.departments!) {
+                        final name = dept.name == null || dept.name!.isEmpty 
+                             ? "Department ${dept.id ?? 'Unknown'}" 
+                             : dept.name!;
+                        uniqueNames.add(name);
+                      }
+
+                      return CustomDropdown(
+                        LocalKeys.selectDepartment,
+                        uniqueNames.toList(),
+                        (selected) {
+                          ctm.selectedDepartment.value =
+                              tlProvider.departments?.firstWhere(
+                                  (element) {
+                                    final name = element.name == null || element.name!.isEmpty 
+                                        ? "Department ${element.id ?? 'Unknown'}" 
+                                        : element.name!;
+                                    return name == selected;
+                                  },
+                                  orElse: () => tlProvider.departments!.first);
+                        },
+                        value: value?.name == null || value!.name!.isEmpty 
+                            ? (value?.id != null ? "Department ${value!.id}" : null)
+                            : value.name,
+                      );
+                    },
                   );
                 }),
                 FieldLabel(
