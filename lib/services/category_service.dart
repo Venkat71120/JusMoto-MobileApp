@@ -41,7 +41,14 @@ class CategoryService with ChangeNotifier {
   }
 
   fetchCategories({autoFetching = false}) async {
-    var url = "${AppUrls.categoryListUrl}?name=$categorySearchText";
+    final url = Uri.parse(AppUrls.categoryListUrl)
+        .replace(queryParameters: {
+          'name': categorySearchText,
+          'status': '1',
+          'sort_by': 'id',
+          'sort_order': 'ASC',
+        })
+        .toString();
 
     if (!autoFetching) {
       categoryLoading = true;

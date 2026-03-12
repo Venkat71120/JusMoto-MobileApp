@@ -52,13 +52,14 @@ class ServiceResultView extends StatelessWidget {
                   leading: SizedBox(),
                   title: ResultViwSearchBar(),
                 ),
-                if (ss.isLoading) const ServiceResultSkeleton().toSliver,
+                if (ss.isLoading && ss.searchResultModel.allServices.isEmpty)
+                  const ServiceResultSkeleton().toSliver,
                 if (ss.searchResultModel.allServices.isEmpty)
                   SizedBox(
                           height: context.height * .8,
                           child: EmptyWidget(title: LocalKeys.serviceNotFound))
                       .toSliver,
-                if (!ss.isLoading)
+                if (ss.searchResultModel.allServices.isNotEmpty)
                   SliverList.separated(
                     itemBuilder: (context, index) {
                       final service = ss.searchResultModel.allServices[index];

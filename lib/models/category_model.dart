@@ -14,18 +14,21 @@ class CategoryListModel {
 
   CategoryListModel({this.categories, this.pagination});
 
-  factory CategoryListModel.fromJson(json) => CategoryListModel(
-    categories:
-        json["categories"] == null
-            ? []
-            : List<Category>.from(
-              json["categories"]!.map((x) => Category.fromJson(x)),
-            ),
-    pagination:
-        json["pagination"] == null
-            ? null
-            : Pagination.fromJson(json["pagination"]),
-  );
+  factory CategoryListModel.fromJson(json) {
+    var categoryData = json["data"] ?? json["categories"];
+    return CategoryListModel(
+      categories:
+          categoryData == null
+              ? []
+              : List<Category>.from(
+                categoryData.map((x) => Category.fromJson(x)),
+              ),
+      pagination:
+          json["pagination"] == null
+              ? null
+              : Pagination.fromJson(json["pagination"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "categories":
@@ -42,6 +45,7 @@ class Category {
   final String? icon;
   final dynamic description;
   final String? image;
+  final List<Category>? subCategories;
 
   Category({
     this.id,
@@ -50,6 +54,7 @@ class Category {
     this.icon,
     this.description,
     this.image,
+    this.subCategories,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
@@ -59,6 +64,12 @@ class Category {
     icon: json["icon"]?.toString(),
     description: json["description"],
     image: json["image"]?.toString(),
+    subCategories:
+        json["subCategories"] == null
+            ? []
+            : List<Category>.from(
+              json["subCategories"]!.map((x) => Category.fromJson(x)),
+            ),
   );
 
   Map<String, dynamic> toJson() => {
@@ -68,5 +79,9 @@ class Category {
     "icon": icon,
     "description": description,
     "image": image,
+    "subCategories":
+        subCategories == null
+            ? []
+            : List<dynamic>.from(subCategories!.map((x) => x.toJson())),
   };
 }

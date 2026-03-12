@@ -53,7 +53,7 @@ import '../services/rating_and_reviews_service.dart';
 import '../services/reset_password_service.dart';
 import '../services/service/cart_service.dart';
 import '../services/service/favorite_services_service.dart';
-import '../services/service/product_list_service.dart';
+
 import '../services/service/service_by_category_service.dart';
 import '../services/service/service_by_offer_service.dart';
 import '../services/service/services_search_service.dart';
@@ -110,7 +110,7 @@ class Providers {
     ChangeNotifierProvider(create: (context) => ChatCredentialService()),
     ChangeNotifierProvider(create: (context) => ServiceByOfferService()),
     ChangeNotifierProvider(create: (context) => AdminStaffListService()),
-    ChangeNotifierProvider(create: (context) => ProductListService()),
+
     ChangeNotifierProvider(create: (context) => BrandListService()),
     ChangeNotifierProvider(create: (context) => ModelListService()),
     ChangeNotifierProvider(create: (context) => VariantListService()),

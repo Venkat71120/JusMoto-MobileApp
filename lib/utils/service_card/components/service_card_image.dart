@@ -3,7 +3,7 @@ import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/models/home_models/services_list_model.dart';
 import 'package:car_service/services/service/favorite_services_service.dart';
-import 'package:car_service/utils/components/marquee.dart';
+// import 'package:car_service/utils/components/marquee.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -64,30 +64,30 @@ class ServiceCardImage extends StatelessWidget {
                 );
               }),
               SizedBox(),
-              if (duration != null)
-                Container(
-                  constraints: BoxConstraints(maxWidth: 72),
-                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(44),
-                    color: context.color.accentContrastColor,
-                  ),
-                  child: Row(
-                    children: [
-                      SvgAssets.clock.toSVGSized(14, color: primaryColor),
-                      4.toWidth,
-                      Expanded(
-                        flex: 1,
-                        child: Marquee(
-                          child: Text(
-                            duration!,
-                            style: context.bodySmall,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+              // if (duration != null && duration!.isNotEmpty)
+              //   Container(
+              //     constraints: BoxConstraints(maxWidth: 72),
+              //     padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              //     decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(44),
+              //       color: context.color.accentContrastColor,
+              //     ),
+              //     child: Row(
+              //       children: [
+              //         SvgAssets.clock.toSVGSized(14, color: primaryColor),
+              //         4.toWidth,
+              //         Expanded(
+              //           flex: 1,
+              //           child: Marquee(
+              //             child: Text(
+              //               duration!,
+              //               style: context.bodySmall,
+              //             ),
+              //           ),
+              //         )
+              //       ],
+              //     ),
+              //   ),
             ],
           ),
         )

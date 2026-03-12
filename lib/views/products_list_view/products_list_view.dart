@@ -49,6 +49,7 @@ class ProductsListView extends StatelessWidget {
               child: CustomFutureWidget(
                 function:
                     ss.shouldAutoFetch ? ss.fetchHomeFeaturedServices() : null,
+                isLoading: ss.isLoading,
                 shimmer: const ServiceResultSkeleton(),
                 child: CustomScrollView(
                   controller: plm.scrollController,
@@ -65,7 +66,7 @@ class ProductsListView extends StatelessWidget {
                       leading: SizedBox(),
                       title: ProductSearchBar(),
                     ),
-                    if (ss.isLoading)
+                    if (ss.isLoading && ss.searchResultModel.allServices.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -88,7 +89,7 @@ class ProductsListView extends StatelessWidget {
                         height: context.height * .8,
                         child: EmptyWidget(title: LocalKeys.serviceNotFound),
                       ).toSliver,
-                    if (!ss.isLoading)
+                    if (ss.searchResultModel.allServices.isNotEmpty)
                       SliverList.separated(
                         itemBuilder: (context, index) {
                           final leftIndex = index * 2;

@@ -27,23 +27,39 @@ class ServicesSearchService with ChangeNotifier {
   bool nexLoadingFailed = false;
   bool isLoading = false;
 
-  String get getFilter {
-    String param =
-        "?variant_id=${sPref?.getString("vId")}&title=${title ?? ""}";
+  Map<String, String> get getFilter {
+    final params = <String, String>{};
+
+    final vId = sPref?.getString("vId") ?? '';
+    if (vId.isNotEmpty) params['variant_id'] = vId;
+
+    if (title != null && title!.isNotEmpty) {
+      params['search'] = title!;
+    }
+
     if (selectedCategory?.id != null) {
-      param = "$param&cat_id=${selectedCategory!.id}";
+      params['category_id'] = selectedCategory!.id.toString();
     }
+    
     if (minPrice != null) {
-      param = "$param&min_price=$minPrice";
+      params['min_price'] = minPrice.toString();
     }
+    
     if ((maxPrice ?? 0) > 0) {
-      param = "$param&max_price=$maxPrice";
+      params['max_price'] = maxPrice.toString();
     }
+    
     if ((ratingCount ?? 0) > 0) {
-      param = "$param&rating=${ratingCount!.toInt()}";
+      params['rating'] = ratingCount!.toInt().toString();
     }
-    param = "$param&search_type=${typeValues.reverse[searchType]}";
-    return param;
+
+    if (searchType == SearchType.service) {
+      params['type'] = '0';
+    } else if (searchType == SearchType.product) {
+      params['type'] = '1';
+    }
+
+    return params;
   }
 
   setFilters({
@@ -73,7 +89,9 @@ class ServicesSearchService with ChangeNotifier {
   bool get shouldAutoFetch => _searchResultModel?.allServices == null;
 
   fetchHomeFeaturedServices({refreshing = false}) async {
-    var url = "${AppUrls.serviceListUrl}$getFilter";
+    var url = Uri.parse(AppUrls.serviceListUrl)
+        .replace(queryParameters: getFilter)
+        .toString();
     if (!refreshing) {
       isLoading = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {

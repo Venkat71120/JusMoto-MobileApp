@@ -27,6 +27,7 @@ class HomeFeaturedServicesService with ChangeNotifier {
         return;
       }
       final tempData = ServiceListModel.fromJson(decoded);
+      tempData.allServices.retainWhere((element) => element.type == '0');
       if (tempData.allServices.isNotEmpty) {
         _homeFeaturedServicesModel = tempData;
         fetchHomeFeaturedServices();
@@ -38,13 +39,17 @@ class HomeFeaturedServicesService with ChangeNotifier {
   }
 
   fetchHomeFeaturedServices() async {
-    final params = <String, String>{'limit': '10'};
+    final params = <String, String>{
+      'limit': '10',
+      'is_featured': '1',
+      'type': '0',
+    };
 
     // ✅ FIX: Only include variant_id if actually set
     final vId = sPref?.getString("vId") ?? '';
     if (vId.isNotEmpty) params['variant_id'] = vId;
 
-    final url = Uri.parse(AppUrls.homeFeaturedServicesUrl)
+    final url = Uri.parse(AppUrls.serviceListUrl)
         .replace(queryParameters: params)
         .toString();
 
@@ -53,6 +58,7 @@ class HomeFeaturedServicesService with ChangeNotifier {
     try {
       if (responseData != null) {
         final tempData = ServiceListModel.fromJson(responseData);
+        tempData.allServices.retainWhere((element) => element.type == '0');
         _homeFeaturedServicesModel = tempData;
         sPref?.setString("feature_services", jsonEncode(responseData));
       }

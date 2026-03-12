@@ -4,7 +4,7 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/helper/svg_assets.dart';
-import 'package:car_service/services/service/product_list_service.dart';
+import 'package:car_service/services/service/services_search_service.dart';
 import 'package:figma_squircle_updated/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class ProductSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fvm = FilterViewModel.instance;
-    return Consumer<ProductListService>(
+    return Consumer<ServicesSearchService>(
       builder: (context, ss, child) {
         return Row(
           children: [
@@ -86,7 +86,7 @@ class ProductSearchBar extends StatelessWidget {
                 onChanged: (value) {
                   fvm.timer?.cancel();
                   fvm.timer = Timer(const Duration(seconds: 1), () {
-                    ss.setSearchTitle(fvm.searchController.text);
+                    ss.setSearchTitle(value);
                   });
                 },
                 onFieldSubmitted: (value) {

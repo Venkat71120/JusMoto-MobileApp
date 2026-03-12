@@ -2,6 +2,8 @@ import 'package:car_service/services/category_service.dart';
 import 'package:car_service/utils/components/custom_future_widget.dart';
 import 'package:car_service/view_models/category_view_model/category_view_model.dart';
 import 'package:car_service/views/home_view/components/category_card_skeleton.dart';
+import 'package:car_service/helper/local_keys.g.dart';
+import 'package:car_service/utils/components/empty_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,26 +37,29 @@ class CategoryViewList extends StatelessWidget {
           builder: (context, category, child) {
             return SizedBox(
               width: double.infinity,
-              child: Center(
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 24,
-                  alignment: WrapAlignment.start,
-                  children: cat.categoryList
-                      .map((e) => GestureDetector(
-                            onTap: () {
-                              selectedCat?.value = e;
-                              cvm.selectedCategory.value = e;
-                            },
-                            child: CategoryCard(
-                              category: e,
-                              isSelected:
-                                  category?.id.toString() == e.id.toString(),
-                            ),
-                          ))
-                      .toList(),
-                ),
-              ),
+              child: cat.categoryList.isEmpty
+                  ? EmptyWidget(title: LocalKeys.noResultFound)
+                  : Center(
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 24,
+                        alignment: WrapAlignment.start,
+                        children: cat.categoryList
+                            .map((e) => GestureDetector(
+                                  onTap: () {
+                                    selectedCat?.value = e;
+                                    cvm.selectedCategory.value = e;
+                                  },
+                                  child: CategoryCard(
+                                    category: e,
+                                    isSelected:
+                                        category?.id.toString() ==
+                                            e.id.toString(),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
             );
           },
         ),

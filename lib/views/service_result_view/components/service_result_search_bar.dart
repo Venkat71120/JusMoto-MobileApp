@@ -69,7 +69,7 @@ class ResultViwSearchBar extends StatelessWidget {
                 onChanged: (value) {
                   fvm.timer?.cancel();
                   fvm.timer = Timer(const Duration(seconds: 1), () {
-                    ss.setSearchTitle(fvm.searchController.text);
+                    ss.setSearchTitle(value);
                   });
                 },
                 onFieldSubmitted: (value) {

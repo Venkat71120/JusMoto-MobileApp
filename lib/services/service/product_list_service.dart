@@ -25,22 +25,33 @@ class ProductListService with ChangeNotifier {
   bool nexLoadingFailed = false;
   bool isLoading = false;
 
-  String get getFilter {
-    String param =
-        "?variant_id=${sPref?.getString("vId")}&title=${title ?? ""}";
+  Map<String, String> get getFilter {
+    final params = <String, String>{};
+
+    final vId = sPref?.getString("vId") ?? '';
+    if (vId.isNotEmpty) params['variant_id'] = vId;
+
+    if (title != null && title!.isNotEmpty) {
+      params['search'] = title!;
+    }
+    
     if (selectedCategory?.id != null) {
-      param = "&${param}cat_id=${selectedCategory!.id}";
+      params['category_id'] = selectedCategory!.id.toString();
     }
+    
     if ((minPrice ?? 0) > 0) {
-      param = "&${param}min_price=$minPrice";
+      params['min_price'] = minPrice.toString();
     }
+    
     if ((maxPrice ?? 0) > 0) {
-      param = "&${param}max_price=$maxPrice";
+      params['max_price'] = maxPrice.toString();
     }
+    
     if ((ratingCount ?? 0) > 0) {
-      param = "&${param}rating=${ratingCount!.toInt()}";
+      params['rating'] = ratingCount!.toInt().toString();
     }
-    return param;
+    
+    return params;
   }
 
   setFilters({
@@ -57,13 +68,24 @@ class ProductListService with ChangeNotifier {
     fetchProductListServices();
   }
 
+  resetFilters() {
+    selectedCategory = null;
+    minPrice = null;
+    maxPrice = null;
+    ratingCount = null;
+  }
+
   bool get shouldAutoFetch => _searchResultModel?.allServices == null;
 
   fetchProductListServices({refreshing = false}) async {
-    var url = "${AppUrls.serviceListUrl}$getFilter";
+    var url = Uri.parse(AppUrls.serviceListUrl)
+        .replace(queryParameters: getFilter)
+        .toString();
     if (!refreshing) {
       isLoading = true;
-      notifyListeners();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     }
     final responseData =
         await NetworkApiServices().getApi(url, LocalKeys.searchService);
@@ -78,14 +100,18 @@ class ProductListService with ChangeNotifier {
       }
     } finally {
       isLoading = false;
-      notifyListeners();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     }
   }
 
   fetchNextPage() async {
     if (nextPageLoading) return;
     nextPageLoading = true;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
     final responseData =
         await NetworkApiServices().getApi(nextPage, LocalKeys.jobs);
 
@@ -99,11 +125,15 @@ class ProductListService with ChangeNotifier {
       nexLoadingFailed = true;
       Future.delayed(const Duration(seconds: 1)).then((value) {
         nexLoadingFailed = false;
-        notifyListeners();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
       });
     }
     nextPageLoading = false;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   void setSearchTitle(String text) {

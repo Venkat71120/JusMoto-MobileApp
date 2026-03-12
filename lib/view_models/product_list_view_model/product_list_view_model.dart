@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/service/services_search_service.dart';
+import 'package:car_service/services/service/services_search_service.dart';
 
 class ProductListViewModel {
   ScrollController scrollController = ScrollController();
