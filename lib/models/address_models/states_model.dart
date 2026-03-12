@@ -15,10 +15,10 @@ class StatesModel {
 
   factory StatesModel.fromJson(json) => StatesModel(
     states:
-        json["states"] == null
+        json["data"] == null
             ? []
             : List<States?>.from(
-              json["states"]!.map((x) => States.fromJson(x)),
+              json["data"]!.map((x) => States.fromJson(x)),
             ),
     pagination:
         json["pagination"] == null

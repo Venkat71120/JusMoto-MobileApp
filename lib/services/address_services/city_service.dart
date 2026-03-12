@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
-import '../../helper/constant_helper.dart';
 import '../../helper/local_keys.g.dart';
 import '../../models/address_models/city_model.dart';
 
@@ -24,6 +23,7 @@ class CityService with ChangeNotifier {
       return;
     }
     citySearchText = value;
+    notifyListeners();
   }
 
   resetList(cId) {
@@ -40,9 +40,9 @@ class CityService with ChangeNotifier {
     cityLoading = true;
     nextPage = null;
     notifyListeners();
-    final url = "${AppUrls.cityUrl}?state_id=$stateId&q=$citySearchText";
+    final url = "${AppUrls.cityUrl}/$stateId?search=$citySearchText";
     final responseData = await NetworkApiServices()
-        .getApi(url, LocalKeys.city, headers: commonAuthHeader);
+        .getApi(url, LocalKeys.city);
 
     if (responseData != null) {
       final tempData = CityModel.fromJson(responseData);

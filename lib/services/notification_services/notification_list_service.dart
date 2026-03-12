@@ -1,5 +1,5 @@
 import 'package:car_service/helper/extension/string_extension.dart';
-import 'package:car_service/services/notification_services/notification_manage_service.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../data/network/network_api_services.dart';
@@ -29,11 +29,31 @@ class NotificationListService with ChangeNotifier {
         .getApi(url, LocalKeys.orderList, headers: commonAuthHeader);
 
     if (responseData != null) {
-      NotificationManageService().tryMarkingRead();
       _notificationListModel = NotificationListModel.fromJson(responseData);
       nextPage = _notificationListModel?.pagination?.nextPageUrl;
     } else {}
     notifyListeners();
+  }
+
+  markAsReadLocally(id) {
+    if (_notificationListModel == null) return;
+    final index = _notificationListModel!.notifications
+        .indexWhere((element) => element.id == id);
+    if (index != -1) {
+      final oldNotification = _notificationListModel!.notifications[index];
+      _notificationListModel!.notifications[index] = NotificationModel(
+        id: oldNotification.id,
+        identity: oldNotification.identity,
+        userId: oldNotification.userId,
+        type: oldNotification.type,
+        title: oldNotification.title,
+        message: oldNotification.message,
+        isRead: true,
+        data: oldNotification.data,
+        createdAt: oldNotification.createdAt,
+      );
+      notifyListeners();
+    }
   }
 
   fetchNextPage() async {

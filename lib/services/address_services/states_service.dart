@@ -23,6 +23,7 @@ class StatesService with ChangeNotifier {
       return;
     }
     stateSearchText = value;
+    notifyListeners();
   }
 
   resetList() {
@@ -38,7 +39,7 @@ class StatesService with ChangeNotifier {
     stateLoading = true;
     nextPage = null;
     notifyListeners();
-    final url = "${AppUrls.statesUrl}?q=$stateSearchText";
+    final url = "${AppUrls.statesUrl}?search=$stateSearchText";
     final responseData = await NetworkApiServices()
         .getApi(url, LocalKeys.state, headers: commonAuthHeader);
 

@@ -515,50 +515,61 @@ extension JobStatusExtension on String {
 
 extension RefundStatusExtension on String {
   String get getRefundStatus {
-    switch (this) {
+    switch (toLowerCase()) {
       case "0":
+      case "pending":
         return LocalKeys.pending;
       case "1":
-        return LocalKeys.canceled;
       case "2":
-        return LocalKeys.canceled;
       case "3":
+      case "cancelled":
         return LocalKeys.canceled;
+      case "approved":
+        return "Approved"; // Or use a LocalKeys if available
+      case "rejected":
+        return "Rejected"; // Or use a LocalKeys if available
       default:
-        return LocalKeys.pending;
+        return this.capitalize;
     }
   }
 
   Color get getRefundPrimaryStatusColor {
-    switch (this) {
+    switch (toLowerCase()) {
       case "0":
+      case "pending":
         return color.primaryPendingColor;
       case "1":
-        return color.primarySuccessColor;
       case "2":
-        return color.primaryWarningColor;
       case "3":
+      case "cancelled":
+      case "rejected":
         return color.primaryWarningColor;
+      case "approved":
+        return color.primarySuccessColor;
       default:
         return color.primaryPendingColor;
     }
   }
 
   Color get getRefundMutedStatusColor {
-    switch (this) {
+    switch (toLowerCase()) {
       case "0":
+      case "pending":
         return color.mutedPendingColor;
       case "1":
-        return color.mutedSuccessColor;
       case "2":
-        return color.mutedWarningColor;
       case "3":
+      case "cancelled":
+      case "rejected":
         return color.mutedWarningColor;
+      case "approved":
+        return color.mutedSuccessColor;
       default:
         return color.mutedPendingColor;
     }
   }
 }
+
 
 extension TicketStatusExtension on String {
   String get getTicketStatus {

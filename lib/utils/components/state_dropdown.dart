@@ -101,91 +101,86 @@ class StatesDropdown extends StatelessWidget {
                                 onChanged: (value) async {
                                   scheduleTimeout?.cancel();
                                   scheduleTimeout =
-                                      Timer(const Duration(seconds: 1), () {
+                                      Timer(const Duration(milliseconds: 400), () {
                                     cProvider.setStatesSearchValue(value);
                                     cProvider.getStates();
                                   });
                                 }),
                           ),
                           Expanded(
-                            child: ListView.separated(
-                                controller: controller,
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.only(
-                                    right: 20, left: 20, bottom: 20),
-                                itemBuilder: (context, index) {
-                                  if (cProvider.stateLoading ||
-                                      (cProvider.stateDropdownList.length ==
-                                              index &&
-                                          cProvider.nextPage != null)) {
-                                    return const SizedBox(
-                                        height: 50,
-                                        width: double.infinity,
-                                        child:
-                                            Center(child: CustomPreloader()));
-                                  }
-                                  if (cProvider.stateDropdownList.isEmpty) {
-                                    return SizedBox(
-                                      width: context.width - 60,
-                                      height: 64,
-                                      child: Center(
+                            child: Consumer<StatesService>(builder: (context, cProvider, child) {
+                              // Local filtering for instant "live search" feel
+                              final filteredList = cProvider.stateDropdownList.where((element) {
+                                if (cProvider.stateSearchText.isEmpty) return true;
+                                return (element?.state ?? "")
+                                    .toLowerCase()
+                                    .contains(cProvider.stateSearchText.toLowerCase());
+                              }).toList();
+
+                              if (cProvider.stateLoading && filteredList.isEmpty) {
+                                return const Center(child: CustomPreloader());
+                              }
+
+                              if (filteredList.isEmpty && !cProvider.stateLoading) {
+                                return SizedBox(
+                                  width: context.width - 60,
+                                  height: 64,
+                                  child: Center(
+                                    child: Text(
+                                      LocalKeys.noResultFound,
+                                      style: textStyle,
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return ListView.separated(
+                                  controller: controller,
+                                  shrinkWrap: true,
+                                  padding: const EdgeInsets.only(
+                                      right: 20, left: 20, bottom: 20),
+                                  itemBuilder: (context, index) {
+                                    if (index == filteredList.length) {
+                                      if (cProvider.nextPage != null && !cProvider.nexLoadingFailed) {
+                                        return const SizedBox(
+                                            height: 50,
+                                            width: double.infinity,
+                                            child: Center(child: CustomPreloader()));
+                                      }
+                                      return const SizedBox();
+                                    }
+
+                                    final element = filteredList[index];
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        if (element == selectedValue) {
+                                          return;
+                                        }
+                                        stateNotifier.value = element;
+                                        if (onChanged == null) {
+                                          return;
+                                        }
+                                        onChanged(element);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 14),
                                         child: Text(
-                                          LocalKeys.noResultFound,
+                                          element?.state ?? '',
                                           style: textStyle,
                                         ),
                                       ),
                                     );
-                                  }
-                                  if (cProvider.stateDropdownList.length ==
-                                      index) {
-                                    return SizedBox(
-                                      width: context.width - 60,
-                                      height: 64,
-                                      child: Center(
-                                        child: Text(
-                                          LocalKeys.noResultFound,
-                                          style: textStyle,
-                                        ),
+                                  },
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(
+                                        height: 8,
+                                        child: Center(child: Divider()),
                                       ),
-                                    );
-                                  }
-                                  final element =
-                                      cProvider.stateDropdownList[index];
-                                  return InkWell(
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      if (element == selectedValue) {
-                                        return;
-                                      }
-                                      stateNotifier.value = element;
-                                      if (onChanged == null) {
-                                        return;
-                                      }
-                                      onChanged(element);
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 14),
-                                      child: Text(
-                                        element?.state ?? '',
-                                        style: textStyle,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(
-                                      height: 8,
-                                      child: Center(child: Divider()),
-                                    ),
-                                itemCount: cProvider.stateLoading == true ||
-                                        cProvider.stateDropdownList.isEmpty
-                                    ? 1
-                                    : cProvider.stateDropdownList.length +
-                                        (cProvider.nextPage != null &&
-                                                !cProvider.nexLoadingFailed
-                                            ? 1
-                                            : 0)),
+                                  itemCount: filteredList.length +
+                                      (cProvider.nextPage != null && !cProvider.nexLoadingFailed ? 1 : 0));
+                            }),
                           )
                         ],
                       );

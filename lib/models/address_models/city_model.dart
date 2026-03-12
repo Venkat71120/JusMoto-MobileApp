@@ -17,9 +17,9 @@ class CityModel {
   Pagination? pagination;
 
   factory CityModel.fromJson(Map json) => CityModel(
-        cities: json["states"] == null
+        cities: json["data"] == null
             ? []
-            : List<City?>.from(json["states"]!.map((x) => City.fromJson(x))),
+            : List<City?>.from(json["data"]!.map((x) => City.fromJson(x))),
         pagination: json["pagination"] == null
             ? null
             : Pagination.fromJson(json["pagination"]),

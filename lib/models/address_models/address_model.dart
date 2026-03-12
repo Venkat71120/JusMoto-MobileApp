@@ -18,17 +18,17 @@ class AddressListModel {
   });
 
   factory AddressListModel.fromJson(json) => AddressListModel(
-        allLocations: json["all_locations"] == null
+        allLocations: json["data"] == null
             ? []
             : List<Address>.from(
-                json["all_locations"]!.map((x) => Address.fromJson(x))),
+                json["data"]!.map((x) => Address.fromJson(x))),
         pagination: json["pagination"] == null
             ? null
             : Pagination.fromJson(json["pagination"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "all_locations": [],
+        "data": List<dynamic>.from(allLocations.map((x) => x.toJson())),
       };
 }
 
@@ -45,6 +45,12 @@ class Address {
   final String? address;
   final double? latitude;
   final double? longitude;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final String? name;
+  final String? zipCode;
+  final String? state;
+  final String? city;
 
   Address({
     this.id,
@@ -59,6 +65,12 @@ class Address {
     this.address,
     this.latitude,
     this.longitude,
+    this.createdAt,
+    this.updatedAt,
+    this.name,
+    this.zipCode,
+    this.state,
+    this.city,
   });
 
   factory Address.fromJson(Map<String, dynamic> json) => Address(
@@ -74,6 +86,12 @@ class Address {
         type: json["type"]?.toString(),
         latitude: num.tryParse(json["latitude"].toString())?.toDouble(),
         longitude: num.tryParse(json["longitude"].toString())?.toDouble(),
+        createdAt: DateTime.tryParse(json["created_at"].toString()),
+        updatedAt: DateTime.tryParse(json["updated_at"].toString()),
+        name: json["name"],
+        zipCode: json["zip_code"],
+        state: json["state"],
+        city: json["city"],
       );
 
   Map<String, dynamic> toJson() => {

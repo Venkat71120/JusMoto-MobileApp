@@ -43,8 +43,9 @@ class RefundDetailsBasicInfo extends StatelessWidget {
           ),
           InfoTile(
             title: LocalKeys.status0,
-            value: refundDetails.status.getRefundStatus,
-            valueColor: refundDetails.status.getRefundPrimaryStatusColor,
+            value: (refundDetails.status ?? "pending").getRefundStatus,
+            valueColor: (refundDetails.status ?? "pending")
+                .getRefundPrimaryStatusColor,
           ),
         ],
       ),

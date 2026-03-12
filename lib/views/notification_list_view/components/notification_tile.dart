@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../services/notification_services/notification_list_service.dart';
+import '../../../services/notification_services/notification_manage_service.dart';
 import '../../../services/support_services/ticket_conversation_service.dart';
 import '../../order_details_view/order_details_view.dart';
 import '../../ticket_conversation_view/ticket_conversation_view.dart';
@@ -21,13 +23,18 @@ class NotificationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        debugPrint(notification.type.toString());
+        NotificationManageService().tryMarkingRead(id: notification.id);
+        Provider.of<NotificationListService>(context, listen: false)
+            .markAsReadLocally(notification.id);
         final id =
             notification.data?['order_id'] ??
             notification.data?['ticket_id'] ??
             notification.identity;
         switch (notification.type) {
           case "order":
+          case "order_cancelled":
+          case "order_canceled":
+          case "refund":
             if (id != null) {
               context.toPage(OrderDetailsView(orderId: id));
             }
@@ -53,7 +60,7 @@ class NotificationTile extends StatelessWidget {
             children: [
               badges.Badge(
                 position: badges.BadgePosition.custom(end: 2),
-                showBadge: notification.isRead,
+                showBadge: !notification.isRead,
                 badgeStyle: badges.BadgeStyle(
                   badgeColor: context.color.primaryWarningColor,
                 ),

@@ -38,34 +38,27 @@ class _AddressListViewState extends State<AddressListView> {
           });
         },
         child: Consumer<AddressListService>(builder: (context, al, child) {
-          return Expanded(
-              child: FutureBuilder(
-                  future: al.shouldAutoFetch ? al.fetchAddressList() : null,
-                  builder: (_, snap) {
-                    if (snap.connectionState == ConnectionState.waiting) {
-                      return const Column(
-                        children: [
-                          CustomPreloader(),
-                        ],
+          return FutureBuilder(
+              future: al.shouldAutoFetch ? al.fetchAddressList() : null,
+              builder: (_, snap) {
+                if (snap.connectionState == ConnectionState.waiting) {
+                  return const CustomPreloader();
+                }
+                return (al.addressListModel.allLocations.isEmpty)
+                    ? EmptyWidget(title: LocalKeys.address)
+                    : Scrollbar(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(24),
+                          itemBuilder: (context, index) {
+                            final address =
+                                (al.addressListModel.allLocations)[index];
+                            return AddressTile(address: address);
+                          },
+                          separatorBuilder: (context, index) => 12.toHeight,
+                          itemCount: (al.addressListModel.allLocations).length,
+                        ),
                       );
-                    }
-                    return (al.addressListModel.allLocations.isEmpty ?? true)
-                        ? EmptyWidget(title: LocalKeys.address)
-                        : Scrollbar(
-                            child: ListView.separated(
-                              itemBuilder: (context, index) {
-                                final address =
-                                    (al.addressListModel.allLocations ??
-                                        [])[index];
-                                return AddressTile(address: address);
-                              },
-                              separatorBuilder: (context, index) => 12.toHeight,
-                              itemCount:
-                                  (al.addressListModel.allLocations ?? [])
-                                      .length,
-                            ),
-                          );
-                  }));
+              });
         }),
       ),
       bottomNavigationBar: Container(

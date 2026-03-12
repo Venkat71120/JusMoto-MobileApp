@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:car_service/helper/extension/context_extension.dart';
-import 'package:car_service/services/home_services/home_category_service.dart';
+
 import 'package:car_service/services/home_services/home_popular_services_service.dart';
 import 'package:car_service/services/home_services/home_slider_service.dart';
 import 'package:car_service/services/home_services/unread_count_service.dart';
@@ -17,10 +17,10 @@ import 'package:provider/provider.dart';
 
 import '../../services/home_services/home_featured_services_service.dart';
 import '../../services/home_services/home_popular_products_service.dart';
-import '../../services/home_services/home_product_category_service.dart';
+
 import '../../services/home_services/landing_offer_service.dart';
 import 'components/home_app_bar.dart';
-import 'components/home_categories.dart';
+
 import 'components/home_featured_services.dart';
 import 'components/home_product_categories.dart';
 import 'components/home_view_header.dart';
@@ -56,14 +56,14 @@ class HomeView extends StatelessWidget {
           listen: false,
         ).fetchHomeSlider();
         UnreadCountService.instance.fetchUnreadCounts();
-        await Provider.of<HomeCategoryService>(
-          context,
-          listen: false,
-        ).fetchCategories();
-        await Provider.of<HomeProductCategoryService>(
-          context,
-          listen: false,
-        ).fetchCategories();
+        // await Provider.of<HomeCategoryService>(
+        //   context,
+        //   listen: false,
+        // ).fetchCategories();
+        // await Provider.of<HomeProductCategoryService>(
+        //   context,
+        //   listen: false,
+        // ).fetchCategories();
       },
       child: Column(
         children: [
@@ -90,7 +90,6 @@ class HomeView extends StatelessWidget {
                       
                       SliverList(
                         delegate: SliverChildListDelegate([
-                          const HomeCategories(),
                           const HomeRecentOrders(),
                            const HomeSlider(),
                           const HomeFeaturedServices(),

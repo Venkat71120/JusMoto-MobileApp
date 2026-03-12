@@ -38,7 +38,6 @@ class AreaDropdown extends StatelessWidget {
       this.isRequired = false});
 
   final ScrollController controller = ScrollController();
-  Timer? scheduleTimeout;
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +52,12 @@ class AreaDropdown extends StatelessWidget {
             InkWell(
               onTap: () {
                 if (s == null) {
-                  LocalKeys.selectAState.showToast();
+                  LocalKeys.selectACity.showToast();
                   return;
                 }
                 Provider.of<AreaService>(context, listen: false)
                     .resetList(s.id);
+                Timer? scheduleTimeout;
                 showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,
@@ -104,78 +104,86 @@ class AreaDropdown extends StatelessWidget {
                                   onChanged: (value) {
                                     scheduleTimeout?.cancel();
                                     scheduleTimeout =
-                                        Timer(const Duration(seconds: 1), () {
+                                        Timer(const Duration(milliseconds: 400), () {
                                       cProvider.setAreaSearchValue(value);
                                       cProvider.getArea();
                                     });
                                   }),
                             ),
                             Expanded(
-                              child: ListView.separated(
-                                  controller: controller,
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.only(
-                                      right: 20, left: 20, bottom: 20),
-                                  itemBuilder: (context, index) {
-                                    if (cProvider.areaLoading ||
-                                        (cProvider.areaList.length == index &&
-                                            cProvider.nextPage != null)) {
-                                      return const SizedBox(
-                                          height: 50,
-                                          width: double.infinity,
-                                          child:
-                                              Center(child: CustomPreloader()));
-                                    }
-                                    if (cProvider.areaList.isEmpty) {
-                                      return SizedBox(
-                                        width: context.width - 60,
-                                        child: Center(
+                              child: Consumer<AreaService>(builder: (context, cProvider, child) {
+                                // Local filtering for instant "live search" feel
+                                final filteredList = cProvider.areaList.where((element) {
+                                  if (cProvider.areaSearchText.isEmpty) return true;
+                                  return (element.area ?? "")
+                                      .toLowerCase()
+                                      .contains(cProvider.areaSearchText.toLowerCase());
+                                }).toList();
+
+                                if (cProvider.areaLoading && filteredList.isEmpty) {
+                                  return const Center(child: CustomPreloader());
+                                }
+
+                                if (filteredList.isEmpty && !cProvider.areaLoading) {
+                                  return SizedBox(
+                                    width: context.width - 60,
+                                    height: 64,
+                                    child: Center(
+                                      child: Text(
+                                        LocalKeys.noResultFound,
+                                        style: textStyle,
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return ListView.separated(
+                                    controller: controller,
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.only(
+                                        right: 20, left: 20, bottom: 20),
+                                    itemBuilder: (context, index) {
+                                      if (index == filteredList.length) {
+                                        if (cProvider.nextPage != null && !cProvider.nexLoadingFailed) {
+                                          return const SizedBox(
+                                              height: 50,
+                                              width: double.infinity,
+                                              child: Center(child: CustomPreloader()));
+                                        }
+                                        return const SizedBox();
+                                      }
+
+                                      final element = filteredList[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          if (element == c) {
+                                            return;
+                                          }
+                                          areaNotifier.value = element;
+                                          if (onChanged == null) {
+                                            return;
+                                          }
+                                          onChanged(element);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 14),
                                           child: Text(
-                                            LocalKeys.noResultFound,
+                                            element.area ?? "",
                                             style: textStyle,
                                           ),
                                         ),
                                       );
-                                    }
-                                    if (cProvider.areaList.length == index) {
-                                      return const SizedBox();
-                                    }
-                                    final element = cProvider.areaList[index];
-                                    return InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        if (element == c) {
-                                          return;
-                                        }
-                                        areaNotifier.value = element;
-                                        if (onChanged == null) {
-                                          return;
-                                        }
-                                        onChanged(element);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 14),
-                                        child: Text(
-                                          element.area ?? "",
-                                          style: textStyle,
+                                    },
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(
+                                          height: 8,
+                                          child: Center(child: Divider()),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(
-                                        height: 8,
-                                        child: Center(child: Divider()),
-                                      ),
-                                  itemCount: cProvider.areaLoading == true ||
-                                          cProvider.areaList.isEmpty
-                                      ? 1
-                                      : cProvider.areaList.length +
-                                          (cProvider.nextPage != null &&
-                                                  !cProvider.nexLoadingFailed
-                                              ? 1
-                                              : 0)),
+                                    itemCount: filteredList.length +
+                                        (cProvider.nextPage != null && !cProvider.nexLoadingFailed ? 1 : 0));
+                              }),
                             )
                           ],
                         );

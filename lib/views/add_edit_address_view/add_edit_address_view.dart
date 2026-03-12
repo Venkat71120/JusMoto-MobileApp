@@ -11,6 +11,7 @@ import 'package:car_service/view_models/add_edit_address_view_model/add_edit_add
 import 'package:car_service/views/add_edit_address_view/components/address_type_buttons.dart';
 import 'package:car_service/views/add_edit_address_view/components/map_choose_block.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../utils/components/custom_button.dart';
 
@@ -128,11 +129,16 @@ class AddEditAddressView extends StatelessWidget {
                             controller: aea.phoneController,
                             hintText: LocalKeys.enterPhone,
                             keyboardType: TextInputType.number,
+                            prefixText: "+91 ",
+                            maxLength: 10,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             validator: (value) {
                               if ((value ?? "").isEmpty) {
                                 return null;
                               }
-                              if (value.toString().validatePhone) {
+                              if (value.toString().length == 10) {
                                 return null;
                               }
                               return LocalKeys.enterAValidPhoneNumber;
@@ -143,11 +149,16 @@ class AddEditAddressView extends StatelessWidget {
                             hintText: LocalKeys.enterPhone,
                             label: LocalKeys.emergencyPhoneNumber,
                             keyboardType: TextInputType.number,
+                            prefixText: "+91 ",
+                            maxLength: 10,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             validator: (value) {
                               if ((value ?? "").isEmpty) {
                                 return null;
                               }
-                              if (value.toString().validatePhone) {
+                              if (value.toString().length == 10) {
                                 return null;
                               }
                               return LocalKeys.enterAValidPhoneNumber;

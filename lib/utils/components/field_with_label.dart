@@ -29,6 +29,9 @@ class FieldWithLabel extends StatelessWidget {
   final int? maxLines;
   final double? bottomSpace;
   final Widget? prefixIcon;
+  final String? prefixText;
+  final List<dynamic>? inputFormatters;
+  final int? maxLength;
   final void Function(PointerDownEvent)? onTapOutside;
   final TextCapitalization textCapitalization; // Add this parameter
   
@@ -49,6 +52,9 @@ class FieldWithLabel extends StatelessWidget {
     this.errorText,
     this.successText,
     this.prefixIcon,
+    this.prefixText,
+    this.inputFormatters,
+    this.maxLength,
     this.autofillHints,
     this.bottomSpace,
     this.maxLines,
@@ -95,6 +101,8 @@ class FieldWithLabel extends StatelessWidget {
                       child: prefixIcon ?? svgPrefix!.toSVG,
                     )
                   : null,
+              prefixText: prefixText,
+              prefixStyle: context.titleSmall,
               suffixIcon: errorNotifier == null
                   ? null
                   : ValueListenableBuilder(
@@ -128,6 +136,8 @@ class FieldWithLabel extends StatelessWidget {
                       })),
           onChanged: onChanged,
           validator: validator,
+          inputFormatters: inputFormatters?.cast() ?? [],
+          maxLength: maxLength,
           onFieldSubmitted: onFieldSubmitted,
           onTapOutside: (event) {
             if (onTapOutside != null) {

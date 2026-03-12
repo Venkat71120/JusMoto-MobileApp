@@ -20,17 +20,22 @@ if (glProvider.geoLoc?.postCode != null) {
 }
 
     final data = {
-      'state_id': aea.selectedState.value?.id?.toString() ?? "",
-      'city_id': aea.selectedCity.value?.id?.toString() ?? "",
-      'area_id': aea.selectedArea.value?.id?.toString() ?? "",
+      if (!aea.selectedFromMap.value) ...{
+        'state_id': aea.selectedState.value?.id,
+        'city_id': aea.selectedCity.value?.id,
+        'area_id': aea.selectedArea.value?.id,
+      },
       'phone': aea.phoneController.text,
       'emergency_phone': aea.emergencyPhoneController.text,
       'post_code': aea.zipCodeController.text,
+      'zip_code': aea.zipCodeController.text,
       'address': aea.addressController.text,
       'latitude': glProvider.geoLoc?.lat?.toString() ?? "",
       'longitude': glProvider.geoLoc?.lng?.toString() ?? "",
-      'type': aea.selectedType.value == AddressType.home ? "0" : "1",
+      'type': aea.selectedType.value == AddressType.home ? 0 : 1,
+      'is_default': 0,
       'title': aea.titlePassController.text,
+      'name': aea.titlePassController.text,
     };
 
     final responseData = await NetworkApiServices().postApi(
@@ -49,17 +54,22 @@ if (glProvider.geoLoc?.postCode != null) {
     final glProvider =
         Provider.of<GoogleLocationSearch>(context, listen: false);
     final data = {
-      'state_id': aea.selectedState.value?.id?.toString() ?? "",
-   'city_id': aea.selectedCity.value?.id?.toString() ?? "", // Fixed: was using selectedState
-      'area_id': aea.selectedArea.value?.id?.toString() ?? "", // Fixed: was using selectedState
+      if (!aea.selectedFromMap.value) ...{
+        'state_id': aea.selectedState.value?.id,
+        'city_id': aea.selectedCity.value?.id,
+        'area_id': aea.selectedArea.value?.id,
+      },
       'phone': aea.phoneController.text,
       'emergency_phone': aea.emergencyPhoneController.text,
       'post_code': aea.zipCodeController.text,
+      'zip_code': aea.zipCodeController.text,
       'address': aea.addressController.text,
       'latitude': glProvider.geoLoc?.lat?.toString() ?? "",
       'longitude': glProvider.geoLoc?.lng?.toString() ?? "",
-      'type': aea.selectedType.value == AddressType.home ? "0" : "1",
+      'type': aea.selectedType.value == AddressType.home ? 0 : 1,
+      'is_default': 0,
       'title': aea.titlePassController.text,
+      'name': aea.titlePassController.text,
     };
 
     final responseData = await NetworkApiServices().postApi(

@@ -41,21 +41,21 @@ class RefundListView extends StatelessWidget {
                 : null,
             shimmer: const CustomPreloader(),
             child: Consumer<RefundListService>(builder: (context, nl, child) {
-              return (nl.notificationListModel.clientAllRefundList ?? [])
+              return (nl.refundListModel.clientAllRefundList ?? [])
                       .isEmpty
-                  ? EmptyWidget(title: LocalKeys.na)
+                  ? EmptyWidget(title: LocalKeys.noResultFound)
                   : CustomScrollView(
                       controller: rlm.scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         SliverList.separated(
                           itemBuilder: (context, index) {
-                            final refundModel = nl.notificationListModel
+                            final refundModel = nl.refundListModel
                                 .clientAllRefundList![index];
                             return RefundListTile(refundModel: refundModel);
                           },
                           separatorBuilder: (context, index) => 12.toHeight,
-                          itemCount: nl.notificationListModel
+                          itemCount: nl.refundListModel
                               .clientAllRefundList!.length,
                         ),
                         16.toHeight.toSliver,

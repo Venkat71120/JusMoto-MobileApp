@@ -19,8 +19,8 @@ import 'empty_spacer_helper.dart';
 class CityDropdown extends StatelessWidget {
   final String? hintText;
   final String? textFieldHint;
-  ValueNotifier<States?> stateNotifier;
-  ValueNotifier<City?> cityNotifier;
+  final ValueNotifier<States?> stateNotifier;
+  final ValueNotifier<City?> cityNotifier;
   final onChanged;
   final iconColor;
   final textStyle;
@@ -41,7 +41,6 @@ class CityDropdown extends StatelessWidget {
 
   final ScrollController controller = ScrollController();
 
-  Timer? scheduleTimeout;
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -64,6 +63,7 @@ class CityDropdown extends StatelessWidget {
                 }
                 Provider.of<CityService>(context, listen: false)
                     .resetList(c.id);
+                Timer? scheduleTimeout;
                 showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,
@@ -110,79 +110,86 @@ class CityDropdown extends StatelessWidget {
                                   onChanged: (value) {
                                     scheduleTimeout?.cancel();
                                     scheduleTimeout =
-                                        Timer(const Duration(seconds: 1), () {
+                                        Timer(const Duration(milliseconds: 400), () {
                                       cProvider.setCitySearchValue(value);
                                       cProvider.getCity();
                                     });
                                   }),
                             ),
                             Expanded(
-                              child: ListView.separated(
-                                  controller: controller,
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.only(
-                                      right: 20, left: 20, bottom: 20),
-                                  itemBuilder: (context, index) {
-                                    if (cProvider.cityLoading ||
-                                        (cProvider.cityList.length == index &&
-                                            cProvider.nextPage != null)) {
-                                      return const SizedBox(
-                                          height: 50,
-                                          width: double.infinity,
-                                          child:
-                                              Center(child: CustomPreloader()));
-                                    }
-                                    if (cProvider.cityList.isEmpty) {
-                                      return SizedBox(
-                                        width: context.width - 60,
-                                        height: 64,
-                                        child: Center(
+                              child: Consumer<CityService>(builder: (context, cProvider, child) {
+                                // Local filtering for instant "live search" feel
+                                final filteredList = cProvider.cityList.where((element) {
+                                  if (cProvider.citySearchText.isEmpty) return true;
+                                  return (element?.city ?? "")
+                                      .toLowerCase()
+                                      .contains(cProvider.citySearchText.toLowerCase());
+                                }).toList();
+
+                                if (cProvider.cityLoading && filteredList.isEmpty) {
+                                  return const Center(child: CustomPreloader());
+                                }
+
+                                if (filteredList.isEmpty && !cProvider.cityLoading) {
+                                  return SizedBox(
+                                    width: context.width - 60,
+                                    height: 64,
+                                    child: Center(
+                                      child: Text(
+                                        LocalKeys.noResultFound,
+                                        style: textStyle,
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return ListView.separated(
+                                    controller: controller,
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.only(
+                                        right: 20, left: 20, bottom: 20),
+                                    itemBuilder: (context, index) {
+                                      if (index == filteredList.length) {
+                                        if (cProvider.nextPage != null && !cProvider.nexLoadingFailed) {
+                                          return const SizedBox(
+                                              height: 50,
+                                              width: double.infinity,
+                                              child: Center(child: CustomPreloader()));
+                                        }
+                                        return const SizedBox();
+                                      }
+
+                                      final element = filteredList[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          if (element == s) {
+                                            return;
+                                          }
+                                          cityNotifier.value = element;
+                                          if (onChanged == null) {
+                                            return;
+                                          }
+                                          onChanged(element);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 14),
                                           child: Text(
-                                            LocalKeys.noResultFound,
+                                            element?.city ?? '',
                                             style: textStyle,
                                           ),
                                         ),
                                       );
-                                    }
-                                    if (cProvider.cityList.length == index) {
-                                      return const SizedBox();
-                                    }
-                                    final element = cProvider.cityList[index];
-                                    return InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        if (element == s) {
-                                          return;
-                                        }
-                                        cityNotifier.value = element;
-                                        if (onChanged == null) {
-                                          return;
-                                        }
-                                        onChanged(element);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 14),
-                                        child: Text(
-                                          element?.city ?? '',
-                                          style: textStyle,
+                                    },
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(
+                                          height: 8,
+                                          child: Center(child: Divider()),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(
-                                        height: 8,
-                                        child: Center(child: Divider()),
-                                      ),
-                                  itemCount: cProvider.cityLoading == true ||
-                                          cProvider.cityList.isEmpty
-                                      ? 1
-                                      : cProvider.cityList.length +
-                                          (cProvider.nextPage != null &&
-                                                  !cProvider.nexLoadingFailed
-                                              ? 1
-                                              : 0)),
+                                    itemCount: filteredList.length +
+                                        (cProvider.nextPage != null && !cProvider.nexLoadingFailed ? 1 : 0));
+                              }),
                             )
                           ],
                         );

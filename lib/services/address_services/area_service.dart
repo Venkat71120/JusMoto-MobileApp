@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
-import '../../helper/constant_helper.dart';
 import '../../helper/local_keys.g.dart';
 import '../../models/address_models/area_model.dart';
 
@@ -24,6 +23,7 @@ class AreaService with ChangeNotifier {
       return;
     }
     areaSearchText = value;
+    notifyListeners();
   }
 
   resetList(sId) {
@@ -41,9 +41,9 @@ class AreaService with ChangeNotifier {
     nextPage = null;
     notifyListeners();
     final url =
-        "${AppUrls.areaUrl}?city_id=$cityId${areaSearchText.trim().isEmpty ? "" : '&q=$areaSearchText'}";
+        "${AppUrls.areaUrl}?city_id=$cityId&search=$areaSearchText";
     final responseData = await NetworkApiServices()
-        .getApi(url, LocalKeys.area, headers: commonAuthHeader);
+        .getApi(url, LocalKeys.area);
 
     if (responseData != null) {
       final tempData = AreaModel.fromJson(responseData);

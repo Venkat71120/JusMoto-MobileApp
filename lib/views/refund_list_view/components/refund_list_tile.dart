@@ -44,7 +44,7 @@ class RefundListTile extends StatelessWidget {
                                 style: context.bodySmall?.bold6,
                               ),
                               TextSpan(
-                                text: refundModel.id.toString(),
+                                text: "${refundModel.refundNumber ?? refundModel.id}: ",
                                 style: context.bodySmall?.bold
                                     .copyWith(
                                         color:
@@ -57,19 +57,29 @@ class RefundListTile extends StatelessWidget {
                         SquircleContainer(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
-                            color: (refundModel.status)
+                            color: (refundModel.status ?? "pending")
                                 .toString()
                                 .getRefundMutedStatusColor,
                             radius: 4,
                             child: Text(
-                              (refundModel.status).toString().getRefundStatus,
+                              (refundModel.status ?? "pending").toString().getRefundStatus,
                               style: context.bodySmall?.copyWith(
-                                  color: (refundModel.status)
+                                  color: (refundModel.status ?? "pending")
                                       .toString()
                                       .getRefundPrimaryStatusColor),
                             ))
                       ],
                     ),
+                    if (refundModel.cancelReason != null) ...[
+                      4.toHeight,
+                      Text(
+                        refundModel.cancelReason!,
+                        style: context.bodySmall?.copyWith(
+                            color: context.color.secondaryContrastColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                     8.toHeight,
                     RichText(
                       text: TextSpan(
@@ -80,7 +90,7 @@ class RefundListTile extends StatelessWidget {
                                 color: context.color.secondaryContrastColor),
                           ),
                           TextSpan(
-                            text: "${refundModel.orderId} . ",
+                            text: "${refundModel.order?.invoiceNumber ?? refundModel.orderId} . ",
                             style: context.bodySmall?.bold
                                 .copyWith(
                                     color: context.color.primaryContrastColor)
@@ -95,6 +105,7 @@ class RefundListTile extends StatelessWidget {
                         ],
                       ),
                     ),
+
                   ],
                 ),
               ),

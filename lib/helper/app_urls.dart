@@ -1,11 +1,11 @@
 import '/customization.dart';
 
 class AppUrls {
-  static String get statesUrl => '$baseEndPoint/states';
-  static String get areaUrl => '$baseEndPoint/areas';
+  static String get statesUrl => '$baseEndPoint/general/states';
+  static String get areaUrl => '$baseEndPoint/general/areas';
   static String get translationUrl => '$baseEndPoint/translate-string-slug';
   static String get defaultTranslationUrl => '$baseEndPoint/translate-string';
-  static String get cityUrl => '$baseEndPoint/cities';
+  static String get cityUrl => '$baseEndPoint/general/cities';
   static String get fcmTokenUrl => '$baseEndPoint/auth/firebase-token';
   static String get currencyLanguageUrl => '$baseEndPoint/currency';
   static String get languageListUrl => '$baseEndPoint/language';
@@ -23,10 +23,8 @@ class AppUrls {
   static String get carModelsListUrl => '$baseEndPoint/cars';
   static String get carVariantsListUrl => '$baseEndPoint/cars'; // :id/variants
   static String get userCarsUrl => '$baseEndPoint/user/cars';
-  static String get myRefundListUrl =>
-      '$baseEndPoint/client/orders/all-refund-list';
-  static String get myRefundDetailsUrl =>
-      '$baseEndPoint/client/orders/refund-details';
+  static String get myRefundListUrl => '$baseEndPoint/refunds';
+  static String get myRefundDetailsUrl => '$baseEndPoint/refunds';
   static String get refundPaymentMethodsUrl =>
       '$baseEndPoint/client/refund/all';
   static String get updateRefundPaymentInfoUrl =>
@@ -84,10 +82,10 @@ class AppUrls {
   static String get submitReviewsUrl => '$baseEndPoint/user/review-add';
   static String get jobListUrl => '$baseEndPoint/client/job/lists';
   static String get postJobUrl => '$baseEndPoint/client/job/add';
-  static String get addressListUrl => '$baseEndPoint/client/location/all';
-  static String get addAddressUrl => '$baseEndPoint/client/location/create';
-  static String get editAddressUrl => '$baseEndPoint/client/location/edit/';
-  static String get deleteAddressUrl => '$baseEndPoint/client/location/delete/';
+  static String get addressListUrl => '$baseEndPoint/user/addresses';
+  static String get addAddressUrl => '$baseEndPoint/user/addresses';
+  static String get editAddressUrl => '$baseEndPoint/user/addresses/update/';
+  static String get deleteAddressUrl => '$baseEndPoint/user/addresses/delete/';
   static String get acceptOrderCompeteRequestUrl =>
       '$baseEndPoint/client/orders/complete-request/status-approve';
   static String get declineOrderCompeteRequestUrl =>

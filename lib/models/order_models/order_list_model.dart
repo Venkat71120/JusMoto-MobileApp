@@ -327,6 +327,16 @@ class Pagination {
         hasPrevPage: json["hasPrevPage"] ?? false,
       );
 
+  Map<String, dynamic> toJson() => {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "totalPages": totalPages,
+        "hasNextPage": hasNextPage,
+        "hasPrevPage": hasPrevPage,
+      };
+
+
   // ✅ HELPER: Build next page URL for the service layer
   String? nextPageUrl(String baseUrl) {
     if (!hasNextPage) return null;

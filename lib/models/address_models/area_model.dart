@@ -17,9 +17,9 @@ class AreaModel {
   });
 
   factory AreaModel.fromJson(json) => AreaModel(
-        areas: json["states"] == null || json["states"] is! List
+        areas: json["data"] == null || json["data"] is! List
             ? []
-            : List<Area>.from(json["states"]!.map((x) => Area.fromJson(x))),
+            : List<Area>.from(json["data"]!.map((x) => Area.fromJson(x))),
         pagination: json["pagination"] == null
             ? null
             : Pagination.fromJson(json["pagination"]),
