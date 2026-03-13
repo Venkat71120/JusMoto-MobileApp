@@ -44,16 +44,35 @@ class TacPpView extends StatelessWidget {
   }
 
   Future<String> getData() async {
-    debugPrint(url);
-    final response = await http.get(Uri.parse(url));
-    String content = "";
+    debugPrint("TacPpView URL: $url");
     try {
-      debugPrint(response.body.toString());
-      final tempBody = jsonDecode(response.body);
-      content = (tempBody["terms_and_conditions"] ??
-          tempBody["contact_page"] ??
-          tempBody["privacy_policy"])["page_content"];
-    } catch (e) {}
-    return content;
+      final response = await http.get(Uri.parse(url));
+      debugPrint("TacPpView Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final tempBody = jsonDecode(response.body);
+        if (tempBody["success"] == true && tempBody["data"] != null) {
+          final data = tempBody["data"];
+          // Handle new structure: {"success":true,"data":{"content":"..."}}
+          if (data is Map && data.containsKey("content")) {
+            return data["content"]?.toString() ?? "";
+          }
+          // Fallback to old structures if data is the map containing page_content
+          if (data is Map && data.containsKey("page_content")) {
+            return data["page_content"]?.toString() ?? "";
+          }
+        }
+        
+        // Final fallback for legacy formats
+        final legacyContent = (tempBody["terms_and_conditions"] ??
+            tempBody["contact_page"] ??
+            tempBody["privacy_policy"]);
+        if (legacyContent != null && legacyContent is Map) {
+          return legacyContent["page_content"]?.toString() ?? "";
+        }
+      }
+    } catch (e) {
+      debugPrint("TacPpView Error: $e");
+    }
+    return "";
   }
 }

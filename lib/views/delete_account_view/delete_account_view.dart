@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../utils/components/custom_button.dart';
 import '../../utils/components/custom_dropdown.dart';
-import '../../utils/components/custom_future_widget.dart';
-import '../../utils/components/custom_preloader.dart';
 import '../../utils/components/custom_squircle_widget.dart';
 import './../../helper/local_keys.g.dart';
 import './../../services/profile_services/delete_account_service.dart';
@@ -45,26 +43,27 @@ class DeleteAccountView extends StatelessWidget {
                   isRequired: true,
                 ),
                 Consumer<DeleteAccountService>(builder: (context, da, child) {
-                  return CustomFutureWidget(
-                    function: da.shouldAutoFetch ? da.fetchDepartments() : null,
-                    shimmer: const CustomPreloader(),
-                    child: ValueListenableBuilder(
-                      valueListenable: dam.selectedReason,
-                      builder: (context, value, child) {
-                        return CustomDropdown(
-                          LocalKeys.selectAReason,
-                          (da.reasonsListModel.reasons
-                              .map((e) => e.title ?? "")
-                              .toList()),
-                          (value) {
-                            dam.selectedReason.value =
-                                da.reasonsListModel.reasons.firstWhere(
-                                    (element) => element.title == value);
-                          },
-                          value: value?.title,
-                        );
-                      },
-                    ),
+                  if (da.shouldAutoFetch) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      da.fetchDepartments();
+                    });
+                  }
+                  return ValueListenableBuilder(
+                    valueListenable: dam.selectedReason,
+                    builder: (context, value, child) {
+                      return CustomDropdown(
+                        LocalKeys.selectAReason,
+                        (da.reasonsListModel.reasons
+                            .map((e) => e.title ?? "")
+                            .toList()),
+                        (value) {
+                          dam.selectedReason.value =
+                              da.reasonsListModel.reasons.firstWhere(
+                                  (element) => element.title == value);
+                        },
+                        value: value?.title,
+                      );
+                    },
                   );
                 }),
                 16.toHeight,

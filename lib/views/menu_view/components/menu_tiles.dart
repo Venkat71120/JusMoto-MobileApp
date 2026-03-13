@@ -25,6 +25,7 @@ import '../../../utils/components/alerts.dart';
 import '../../../view_models/delete_account_view_model/delete_account_view_model.dart';
 import '../../change_language_view/change_language_view.dart';
 import '../../refund_list_view/refund_list_view.dart';
+import '../../contact_view/contact_view.dart';
 
 class MenuTiles extends StatelessWidget {
   final bool signedIn;
@@ -143,9 +144,7 @@ class MenuTiles extends StatelessWidget {
                 title: LocalKeys.contact,
                 svg: SvgAssets.contact,
                 onPress: () {
-                  context.toPage(
-                    TacPpView(title: LocalKeys.contact, url: AppUrls.contact),
-                  );
+                  context.toPage(const ContactView());
                 },
                 haveDivider: false,
               ),

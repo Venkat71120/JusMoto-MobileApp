@@ -41,9 +41,9 @@ class AppUrls {
   static String get homeSliderListUrl => '$baseEndPoint/general/sliders';
 
   static String get homeProvidersListUrl => '$baseEndPoint/provider-lists';
-  static String termsAndConditions = '$baseEndPoint/terms-and-conditions';
-  static String privacyPolicy = '$baseEndPoint/privacy-policy';
-  static String contact = '$baseEndPoint/contact';
+  static String termsAndConditions = '$baseEndPoint/general/terms-and-conditions';
+  static String privacyPolicy = '$baseEndPoint/general/privacy-policy';
+  static String contact = '$baseEndPoint/general/contact';
   static String get paymentGatewayUrl => '$baseEndPoint/payment-gateway-list';
   static String get conversationUrl => '$baseEndPoint/client/chat/fetch-record';
   static String get messageSendUrl => '$baseEndPoint/client/chat/message-send';

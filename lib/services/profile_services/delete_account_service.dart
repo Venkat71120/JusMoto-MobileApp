@@ -9,17 +9,23 @@ import '../../helper/local_keys.g.dart';
 import '../../models/address_models/states_model.dart';
 
 class DeleteAccountService with ChangeNotifier {
-  ReasonsListModel? _reasonsListModel;
-  ReasonsListModel get reasonsListModel =>
-      _reasonsListModel ?? ReasonsListModel(reasons: []);
+  ReasonsListModel _reasonsListModel = ReasonsListModel(reasons: [
+    Reason(id: 1, title: "Privacy concerns"),
+    Reason(id: 2, title: "No longer need the service"),
+    Reason(id: 3, title: "Found a better alternative"),
+    Reason(id: 4, title: "Too many notifications"),
+    Reason(id: 5, title: "Other"),
+  ]);
+  ReasonsListModel get reasonsListModel => _reasonsListModel;
+
+  bool _hasFetched = false;
+  bool get shouldAutoFetch => !_hasFetched;
 
   var nextPage;
 
   bool nextPageLoading = false;
 
   bool nexLoadingFailed = false;
-
-  bool get shouldAutoFetch => _reasonsListModel == null;
 
   tryDeletingAccount() async {
     final dam = DeleteAccountViewModel.instance;
@@ -52,16 +58,22 @@ class DeleteAccountService with ChangeNotifier {
   }
 
   fetchDepartments() async {
+    if (_hasFetched) return;
+    _hasFetched = true;
+
     final responseData = await NetworkApiServices().getApi(
       AppUrls.reasonListUrl,
       LocalKeys.reason,
       headers: commonAuthHeader,
     );
 
-    if (responseData != null) {
+    if (responseData != null &&
+        responseData["reasons"] != null &&
+        responseData["reasons"] is List &&
+        responseData["reasons"].isNotEmpty) {
       _reasonsListModel = ReasonsListModel.fromJson(responseData);
-    } else {}
-    notifyListeners();
+      notifyListeners();
+    }
   }
 }
 
