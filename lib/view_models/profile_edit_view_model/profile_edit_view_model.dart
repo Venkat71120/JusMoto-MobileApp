@@ -36,7 +36,7 @@ class ProfileEditViewModel {
   void selectProfileImage() async {
     try {
       FilePickerResult? file = await FilePicker.platform.pickFiles(
-          type: FileType.custom, allowedExtensions: ["jpg", "png", "jpeg"]);
+          type: FileType.image);
       if (file?.files.firstOrNull?.path == null) {
         return;
       }
@@ -76,6 +76,7 @@ class ProfileEditViewModel {
       if (v != true) return;
       Provider.of<ProfileInfoService>(context, listen: false)
           .fetchProfileInfo();
+      Navigator.pop(context);
     });
     isLoading.value = false;
   }

@@ -283,7 +283,7 @@ extension OrderStatusExtension on String {
       case "1":
         return color.primarySuccessColor;
       case "3":
-        return primaryColor;
+        return color.primarySuccessColor;
       case "2":
         return color.primarySuccessColor;
       case "4":
@@ -304,7 +304,7 @@ extension OrderStatusExtension on String {
       case "1":
         return color.mutedSuccessColor;
       case "3":
-        return mutedPrimaryColor;
+        return color.mutedSuccessColor;
       case "2":
         return color.mutedSuccessColor;
       case "4":
@@ -344,9 +344,9 @@ extension OrderStatusExtension on String {
       case "6":
         return color.primaryPendingColor;
       case "1":
-        return primaryColor;
+        return color.primaryPendingColor;
       case "3":
-        return primaryColor;
+        return color.primarySuccessColor;
       case "2":
         return color.primarySuccessColor;
       case "4":
@@ -365,9 +365,9 @@ extension OrderStatusExtension on String {
       case "6":
         return color.mutedPendingColor;
       case "1":
-        return mutedPrimaryColor;
+        return color.mutedPendingColor;
       case "3":
-        return mutedPrimaryColor;
+        return color.mutedSuccessColor;
       case "2":
         return color.mutedSuccessColor;
       case "4":

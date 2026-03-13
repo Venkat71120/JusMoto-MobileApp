@@ -18,6 +18,7 @@ import '../../helper/local_keys.g.dart';
 import '../../helper/svg_assets.dart';
 import '../../models/outlet_model.dart';
 import '../../services/theme_service.dart';
+import '../../customizations/colors.dart';
 import '../../utils/components/custom_preloader.dart';
 import '../../utils/components/custom_squircle_widget.dart';
 
@@ -44,7 +45,7 @@ class OutletMapView extends StatelessWidget {
         continue;
       }
       final markerId = MarkerId(e.id.toString());
-      final latLng = LatLng(e.latitude ?? 0.0, e.longitude ?? 0.0);
+      final latLng = LatLng(e.latitude!, e.longitude!);
       _markers.putIfAbsent(
           markerId,
           () => Marker(
@@ -61,40 +62,47 @@ class OutletMapView extends StatelessWidget {
                         alignment: Alignment.center,
                         children: [
                           Positioned(
-                            bottom: (context.height / 2.3) + 50,
+                            bottom: (context.height / 2.3) + 70,
                             child: Material(
                               color: Colors.transparent,
                               child: GestureDetector(
                                 onTap: () {
                                   ServiceBookingViewModel
                                       .instance.selectedOutlet.value = e;
-                                  context.pop;
-                                  context.pop;
+                                  Navigator.pop(context); // Close dialog
+                                  Navigator.pop(context); // Go back to booking page
                                 },
                                 child: SquircleContainer(
-                                  radius: 8,
+                                  radius: 12,
                                   color: context.color.accentContrastColor,
-                                  padding: EdgeInsets.all(16),
+                                  padding: const EdgeInsets.all(16),
                                   child: Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         e.outletName ?? "--",
-                                        style: context.titleSmall?.copyWith(
-                                            color: (e.outletName == null
-                                                ? context.color
-                                                    .secondaryContrastColor
-                                                : null),
-                                            fontWeight: FontWeight.w600),
+                                        style: context.titleSmall?.bold,
                                       ),
                                       if (e.address != null) ...[
                                         4.toHeight,
-                                        Text(
-                                          e.address!,
-                                          style: context.bodySmall,
+                                        SizedBox(
+                                          width: 200,
+                                          child: Text(
+                                            e.address!,
+                                            style: context.bodySmall,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ]
+                                      ],
+                                      8.toHeight,
+                                      Text(
+                                        "Click to Select",
+                                        style: context.labelSmall?.copyWith(
+                                            color: primaryColor),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -108,8 +116,8 @@ class OutletMapView extends StatelessWidget {
                 },
               ));
       firstLocation ??= latLng;
-      await Future.delayed(300.milliseconds);
-      mark.value = markers;
+      mark.value = Map.from(_markers);
+      await Future.delayed(50.milliseconds);
     }
   }
 

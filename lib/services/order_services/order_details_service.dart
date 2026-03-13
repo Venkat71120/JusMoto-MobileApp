@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import '../../data/network/network_api_services.dart';
@@ -37,21 +35,11 @@ class OrderDetailsService with ChangeNotifier {
     notifyListeners();
   }
 
-  tryCancelOrder() async {
+  tryCancelOrder({required String orderId, required String reason}) async {
     var url = AppUrls.orderCancelUrl;
-    final odm = OrderDetailsViewModel.instance;
-    final gatewayFields = odm.selectedGateway.value?.field ?? [];
-    final fieldValues = {};
-    for (var i = 0; i < gatewayFields.length; i++) {
-      fieldValues.putIfAbsent(
-        gatewayFields[i].toLowerCase().replaceAll(" ", "_"),
-        () => odm.inputFieldControllers[i].text,
-      );
-    }
     var data = {
-      'gateway_id': odm.selectedGateway.value?.id.toString() ?? "",
-      'gateway_fields': jsonEncode(fieldValues),
-      "order_id": orderDetailsModel.orderDetails?.id?.toString() ?? "",
+      "order_id": orderId,
+      "reason": reason,
     };
 
     final responseData = await NetworkApiServices().postApi(
@@ -63,7 +51,7 @@ class OrderDetailsService with ChangeNotifier {
 
     if (responseData != null) {
       LocalKeys.orderCancelledSuccessfully.showToast();
-      odm.refreshKey.currentState?.show();
+      OrderDetailsViewModel.instance.refreshKey.currentState?.show();
       notifyListeners();
       return true;
     }

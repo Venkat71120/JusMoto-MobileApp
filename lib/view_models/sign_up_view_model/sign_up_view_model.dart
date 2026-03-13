@@ -135,8 +135,7 @@ class SignUpViewModel {
   void selectProfileImage() async {
     try {
       FilePickerResult? file = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ["jpg", "png", "jpeg"],
+        type: FileType.image,
       );
       if (file?.files.firstOrNull?.path == null) {
         return;

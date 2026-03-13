@@ -453,6 +453,7 @@ abstract class LocalKeys {
   static const String _searchService = "Search Service";
   static const String _couponAppliedSuccessfully =
       "Coupon applied successfully";
+  static const String _couponIsExpired = "Coupon is expired";
   static const String _chatList = "Chat list";
   static const String _noConversationFound = "No conversation found.";
   static const String _attachFile = "Attach file";
@@ -704,6 +705,7 @@ abstract class LocalKeys {
   static String get chatList => _chatList.tr();
   static String get couponAppliedSuccessfully =>
       _couponAppliedSuccessfully.tr();
+  static String get couponIsExpired => _couponIsExpired.tr();
   static String get searchService => _searchService.tr();
   static String get popularServices => _popularServices.tr();
   static String get featuredServices => _featuredServices.tr();
@@ -1412,6 +1414,7 @@ abstract class LocalKeys {
     _popularServices: _popularServices,
     _searchService: _searchService,
     _couponAppliedSuccessfully: _couponAppliedSuccessfully,
+    _couponIsExpired: _couponIsExpired,
     _chatList: _chatList,
     _noConversationFound: _noConversationFound,
     _attachFile: _attachFile,

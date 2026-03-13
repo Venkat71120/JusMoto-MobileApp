@@ -61,6 +61,7 @@ class OrderListView extends StatelessWidget {
                                         ol.myOrdersModel.orders[index];
                                     return OrderListTile(
                                       order: order,
+                                      index: index,
                                     );
                                   },
                                   separatorBuilder: (context, index) =>

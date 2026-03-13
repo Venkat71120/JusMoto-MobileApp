@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:car_service/helper/app_urls.dart';
 import 'package:car_service/helper/constant_helper.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
@@ -9,18 +10,49 @@ import '../../view_models/service_booking_view_model/service_booking_view_model.
 class CouponInfoService {
   fetchCouponInfo() async {
     final sbm = ServiceBookingViewModel.instance;
-    var url = "${AppUrls.couponInfoUrl}/${sbm.couponController.text}";
-
-    final responseData = await NetworkApiServices()
-        .getApi(url, LocalKeys.applyCoupon, headers: acceptJsonAuthHeader);
-
-    if (responseData != null) {
-      sbm.couponDiscount.value = CouponInfoModel.fromJson(responseData);
-      if (sbm.couponDiscount.value != null) {
-        LocalKeys.couponAppliedSuccessfully.showToast();
-      }
-      return true;
+    final couponCode = sbm.couponController.text.trim();
+    if (couponCode.isEmpty) {
+      LocalKeys.enterCode.showToast();
+      return false;
     }
+    var url = "${AppUrls.couponInfoUrl}/$couponCode";
+
+    try {
+      final responseData = await NetworkApiServices()
+          .getApi(url, LocalKeys.applyCoupon, headers: acceptJsonAuthHeader);
+
+      if (responseData != null) {
+        final model = CouponInfoModel.fromJson(responseData);
+        final coupon = model.coupon;
+
+        if (coupon != null) {
+          // Expiry Check
+          if (coupon.expireDate != null) {
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+            final expiryDate = DateTime(
+                coupon.expireDate!.year, coupon.expireDate!.month, coupon.expireDate!.day);
+
+            if (expiryDate.isBefore(today)) {
+              LocalKeys.couponIsExpired.showToast();
+              sbm.couponDiscount.value = null;
+              return false;
+            }
+          }
+
+          sbm.couponDiscount.value = model;
+          LocalKeys.couponAppliedSuccessfully.showToast();
+          return true;
+        } else {
+          "Invalid Coupon".showToast();
+          return false;
+        }
+      }
+    } catch (e) {
+      debugPrint("fetchCouponInfo error: $e");
+      "Error applying coupon".showToast();
+    }
+    return false;
   }
 }
 
@@ -31,9 +63,19 @@ class CouponInfoModel {
     this.coupon,
   });
 
-  factory CouponInfoModel.fromJson(Map json) => CouponInfoModel(
-        coupon: json["coupon"] == null ? null : Coupon.fromJson(json["coupon"]),
-      );
+  factory CouponInfoModel.fromJson(Map json) {
+    // 1. Try to find the data container
+    final data = json["data"] is Map ? json["data"] : (json.containsKey("code") || json.containsKey("discount") ? json : null);
+    
+    // 2. Try to find the coupon object inside data or data itself
+    final couponMap = (data is Map && data.containsKey("coupon") && data["coupon"] is Map) 
+        ? data["coupon"] 
+        : (data is Map && (data.containsKey("code") || data.containsKey("discount")) ? data : null);
+    
+    return CouponInfoModel(
+      coupon: couponMap == null ? null : Coupon.fromJson(Map<String, dynamic>.from(couponMap)),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "coupon": coupon?.toJson(),
@@ -63,9 +105,11 @@ class Coupon {
         id: json["id"],
         title: json["title"],
         code: json["code"],
-        discount: json["discount"].toString().tryToParse,
+        discount: (json["discount"] ?? 0).toString().tryToParse,
         discountType: json["discount_type"],
-        expireDate: DateTime.tryParse(json["expire_date"].toString()),
+        expireDate: json["expire_date"] == null || json["expire_date"].toString().isEmpty
+            ? null
+            : DateTime.tryParse(json["expire_date"].toString()),
         status: json["status"],
       );
 

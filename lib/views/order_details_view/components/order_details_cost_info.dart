@@ -38,6 +38,9 @@ class OrderDetailsCostInfo extends StatelessWidget {
               InfoTile(
                 title: LocalKeys.discount,
                 value: "- ${orderDetails.couponAmount.cur}",
+                valueColor: orderDetails.couponAmount > 0
+                    ? context.color.primarySuccessColor
+                    : null,
               ),
               12.toHeight,
               InfoTile(title: LocalKeys.vat, value: orderDetails.tax.cur),

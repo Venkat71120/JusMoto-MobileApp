@@ -113,11 +113,25 @@ class BookingPaymentChooseView extends StatelessWidget {
                                                 value: csProvider.subTotal.cur,
                                               ),
                                               12.toHeight,
-                                              InfoTile(
-                                                title: LocalKeys.discount,
-                                                value:
-                                                    "- ${sbm.getCouponAmount(context).cur}",
-                                              ),
+                                               InfoTile(
+                                                 title: LocalKeys.discount,
+                                                 value:
+                                                     "- ${sbm.getCouponAmount(context).cur}",
+                                                 valueColor: sbm.getCouponAmount(context) > 0 
+                                                     ? context.color.primarySuccessColor 
+                                                     : null,
+                                               ),
+                                               if (sbm.getCouponAmount(context) > 0)
+                                                 Padding(
+                                                   padding: const EdgeInsets.only(bottom: 8.0, top: 4.0),
+                                                   child: Text(
+                                                     "Awesome! You saved ${sbm.getCouponAmount(context).cur}",
+                                                     style: context.labelSmall?.copyWith(
+                                                       color: context.color.primarySuccessColor,
+                                                       fontWeight: FontWeight.bold,
+                                                     ),
+                                                   ),
+                                                 ),
                                               12.toHeight,
                                               CustomFutureWidget(
                                                 function:

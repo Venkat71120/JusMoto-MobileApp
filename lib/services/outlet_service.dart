@@ -41,7 +41,7 @@ class OutletService with ChangeNotifier {
   }
 
   fetchOutlets({autoFetching = false}) async {
-    var url = "${AppUrls.outletListUrl}?title=$outletSearchText";
+    var url = "${AppUrls.outletListUrl}?search=$outletSearchText";
 
     if (!autoFetching) {
       outletLoading = true;

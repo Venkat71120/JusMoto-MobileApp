@@ -14,6 +14,7 @@ import '../../services/push_notification_service.dart';
 
 class SocialSignInViewModel {
   final googleSignIn = GoogleSignIn(
+    serverClientId: '423970134410-mdc81pgqk39aue1m1sv2126l62r7amue.apps.googleusercontent.com',
     scopes: [
       'email',
       'profile',

@@ -197,11 +197,13 @@ class OutletDropdown extends StatelessWidget {
                                   : null),
                               fontWeight: FontWeight.w600),
                         ),
-                        if (c != null) ...[
+                        if (c?.address != null) ...[
                           4.toHeight,
                           Text(
-                            c.address ?? LocalKeys.selectOutlet,
+                            c!.address!,
                             style: context.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ]
                       ],

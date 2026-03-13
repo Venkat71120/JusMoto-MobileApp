@@ -19,7 +19,9 @@ class AppUrls {
   static String get primaryOfferUrl => '$baseEndPoint/general/primary-offer';
 
   static String get myBrandsListUrl => '$baseEndPoint/brands';
-  static String get outletListUrl => '$baseEndPoint/all-outlet';
+  static String get uploadAvatarUrl => '$baseEndPoint/upload/avatar';
+  static String get outletListUrl => '$baseEndPoint/general/outlets';
+  static String get outletDetailsUrl => '$baseEndPoint/general/outlets'; // :id
   static String get carModelsListUrl => '$baseEndPoint/cars';
   static String get carVariantsListUrl => '$baseEndPoint/cars'; // :id/variants
   static String get userCarsUrl => '$baseEndPoint/user/cars';
@@ -69,7 +71,7 @@ class AppUrls {
       '$baseEndPoint/order/cancel-policy-details';
   static String get taxInfoUrl =>
       '$baseEndPoint/client/tax-delivery-charge-info';
-  static String get couponInfoUrl => '$baseEndPoint/client/coupon-info';
+  static String get couponInfoUrl => '$baseEndPoint/coupon-info';
   static String get jobOfferDetailsUrl =>
       '$baseEndPoint/client/job/offers/details';
   static String get offerRejectUrl => '$baseEndPoint/client/job/offers/reject';

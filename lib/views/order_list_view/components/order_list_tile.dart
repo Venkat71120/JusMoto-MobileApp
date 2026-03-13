@@ -14,9 +14,11 @@ import '../../order_details_view/order_details_view.dart';
 
 class OrderListTile extends StatelessWidget {
   final Order order;
+  final int index;
   const OrderListTile({
     super.key,
     required this.order,
+    required this.index,
   });
 
   @override
@@ -46,15 +48,14 @@ class OrderListTile extends StatelessWidget {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: "${LocalKeys.id}: ",
+                          text: "#${index + 1} | ${LocalKeys.id}: ",
                           style: context.bodySmall?.bold6,
                         ),
                         TextSpan(
                           text: order.id.toString(),
                           style: context.bodySmall?.bold
                               .copyWith(
-                                  color: context.color.primaryContrastColor)
-                              .bold,
+                                  color: context.color.primaryContrastColor),
                         ),
                       ],
                     ),
@@ -81,11 +82,11 @@ class OrderListTile extends StatelessWidget {
                 Text(order.total.cur,
                     style:
                         context.titleSmall?.bold.copyWith(color: primaryColor)),
-                // ✅ UPDATED: paymentStatus is now int? — convert to String for the chip
-                OrderPaymentStatusChip(
-                    status: (order.paymentStatus ?? 0).toString(),
-                    isCOD: ["cod", "cash_on_delivery"]
-                        .contains(order.paymentGateway)),
+                if (!["4", "5"].contains(statusStr))
+                  OrderPaymentStatusChip(
+                      status: (order.paymentStatus ?? 0).toString(),
+                      isCOD: ["cod", "cash_on_delivery"]
+                          .contains(order.paymentGateway)),
               ],
             ),
             8.toHeight,

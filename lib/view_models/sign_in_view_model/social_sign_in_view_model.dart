@@ -16,7 +16,10 @@ import '../../services/push_notification_service.dart';
 /// Social login API: POST /auth/social/login
 /// Required params: provider, email, firstName, lastName, socialId
 class SocialSignInViewModel {
-  final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+  final googleSignIn = GoogleSignIn(
+    serverClientId: '423970134410-mdc81pgqk39aue1m1sv2126l62r7amue.apps.googleusercontent.com',
+    scopes: ['email', 'profile'],
+  );
 
   String type = "";
   String fName = "";

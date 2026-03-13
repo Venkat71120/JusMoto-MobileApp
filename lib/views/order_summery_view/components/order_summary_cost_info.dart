@@ -44,9 +44,13 @@ class OrderSummaryCostInfo extends StatelessWidget {
                     title: LocalKeys.deliveryCharge,
                     value: orderDetails.deliveryCharge.cur),
                 12.toHeight,
-                InfoTile(
-                    title: LocalKeys.discount,
-                    value: "- ${orderDetails.couponAmount.cur}"),
+                 InfoTile(
+                     title: LocalKeys.discount,
+                     value: "- ${orderDetails.couponAmount.cur}",
+                     valueColor: orderDetails.couponAmount > 0
+                         ? context.color.primarySuccessColor
+                         : null,
+                 ),
                 Divider(
                   color: context.color.primaryBorderColor,
                   height: 32,
@@ -76,10 +80,11 @@ class OrderSummaryCostInfo extends StatelessWidget {
                           .capitalize ??
                       "---",
                 ),
-                InfoTile(
-                  title: LocalKeys.paymentStatus,
-                  value: orderDetails.paymentStatus.toString().getPaymentStatus,
-                ),
+                if (!["4", "5"].contains(orderDetails.status.toString()))
+                  InfoTile(
+                    title: LocalKeys.paymentStatus,
+                    value: orderDetails.paymentStatus.toString().getPaymentStatus,
+                  ),
                 InfoTile(
                   title: LocalKeys.orderStatus,
                   value: orderDetails.status.toString().getOrderStatus,

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../../services/profile_services/profile_info_service.dart';
 import '../../../services/theme_service.dart';
 import '../../../view_models/home_view_model/home_view_model.dart';
+import '../../personal_information_view/personal_information_view.dart';
 import 'app_bar_cart.dart';
 
 class HomeAppBar extends StatelessWidget {
@@ -37,10 +38,12 @@ class HomeAppBar extends StatelessWidget {
                   return AppBar(
                     centerTitle: false,
 
-                    leading:
-                        pi.profileInfoModel.userDetails == null
-                            ? SizedBox()
-                            : Container(
+                    leading: pi.profileInfoModel.userDetails == null
+                        ? const SizedBox()
+                        : InkWell(
+                            onTap: () =>
+                                context.toPage(const PersonalInformationView()),
+                            child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border:
@@ -48,10 +51,10 @@ class HomeAppBar extends StatelessWidget {
                                             null
                                         ? null
                                         : Border.all(
-                                          color:
-                                              context.color.accentContrastColor,
-                                        ),
-                              ),
+                                            color: context
+                                                .color.accentContrastColor,
+                                          ),
+                               ),
                               child: CustomNetworkImage(
                                 height: 40,
                                 width: 40,
@@ -60,53 +63,54 @@ class HomeAppBar extends StatelessWidget {
                                 imageUrl:
                                     pi.profileInfoModel.userDetails?.image,
                                 fit: BoxFit.cover,
-                                name:
-                                    pi.profileInfoModel.userDetails?.firstName,
+                                name: pi.profileInfoModel.userDetails?.firstName,
                               ),
                             ),
+                          ),
                     systemOverlayStyle:
                         value < 200
                             ? SystemUiOverlayStyle.light
                             : SystemUiOverlayStyle.dark,
                     backgroundColor: Colors.transparent,
                     surfaceTintColor: Colors.transparent,
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        pi.profileInfoModel.userDetails == null
-                            ? SizedBox()
-                            : Text(
-                              LocalKeys.welcomeBack,
-                              style: context.bodyMedium?.copyWith(
-                                color: color.withOpacity(.7),
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                        4.toHeight,
-                        RichText(
-                          text: TextSpan(
-                            text: null,
-                            style: context.titleLarge?.bold.copyWith(
-                              color: color,
-                            ),
-                            children: [
-                              if (pi.profileInfoModel.userDetails?.firstName !=
-                                  null)
-                                TextSpan(
-                                  text:
-                                      pi
-                                                  .profileInfoModel
-                                                  .userDetails
-                                                  ?.firstName ==
-                                              null
-                                          ? null
-                                          : "${pi.profileInfoModel.userDetails?.firstName} ${pi.profileInfoModel.userDetails?.lastName} !",
+                    title: InkWell(
+                      onTap: () =>
+                          context.toPage(const PersonalInformationView()),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          pi.profileInfoModel.userDetails == null
+                              ? const SizedBox()
+                              : Text(
+                                  LocalKeys.welcomeBack,
+                                  style: context.bodyMedium?.copyWith(
+                                    color: color.withOpacity(.7),
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
-                            ],
+                          4.toHeight,
+                          RichText(
+                            text: TextSpan(
+                              text: null,
+                              style: context.titleLarge?.bold.copyWith(
+                                color: color,
+                              ),
+                              children: [
+                                if (pi.profileInfoModel.userDetails?.firstName !=
+                                    null)
+                                  TextSpan(
+                                    text: pi.profileInfoModel.userDetails
+                                                ?.firstName ==
+                                            null
+                                        ? null
+                                        : "${pi.profileInfoModel.userDetails?.firstName} ${pi.profileInfoModel.userDetails?.lastName} !",
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     actions: [
                       Notifications(

@@ -66,11 +66,20 @@ class HomeRecentOrders extends StatelessWidget {
                         // Display only first 2 orders
                         ...ol.myOrdersModel.orders
                             .take(2)
-                            .map((order) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: OrderListTile(order: order),
-                                ))
-                            .toList(),
+                            .toList()
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          final index = entry.key;
+                          final order = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: OrderListTile(
+                              order: order,
+                              index: index,
+                            ),
+                          );
+                        }).toList(),
                       ],
                     ),
             );

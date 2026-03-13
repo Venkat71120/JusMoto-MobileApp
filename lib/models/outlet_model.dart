@@ -16,15 +16,21 @@ class OutletModel {
     this.pagination,
   });
 
-  factory OutletModel.fromJson(Map json) => OutletModel(
-        allOutlets: json["all_outlets"] == null
-            ? []
-            : List<Outlet>.from(
-                json["all_outlets"]!.map((x) => Outlet.fromJson(x))),
-        pagination: json["pagination"] == null
-            ? null
-            : Pagination.fromJson(json["pagination"]),
-      );
+  factory OutletModel.fromJson(Map json) {
+    final rawList = json["all_outlets"] ?? json["data"];
+    return OutletModel(
+      allOutlets: rawList == null
+          ? []
+          : rawList is List
+              ? List<Outlet>.from(rawList.map((x) => Outlet.fromJson(x)))
+              : rawList is Map && rawList.containsKey("data") && rawList["data"] is List
+                  ? List<Outlet>.from(rawList["data"].map((x) => Outlet.fromJson(x)))
+                  : [],
+      pagination: json["pagination"] == null
+          ? null
+          : Pagination.fromJson(json["pagination"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "all_outlets": allOutlets == null
@@ -50,7 +56,7 @@ class Outlet {
 
   factory Outlet.fromJson(Map<String, dynamic> json) => Outlet(
         id: json["id"],
-        outletName: json["outlet_name"],
+        outletName: (json["outlet_name"] ?? json["name"])?.toString(),
         address: json["address"],
         latitude: double.tryParse(json["latitude"].toString()),
         longitude: double.tryParse(json["longitude"].toString()),
@@ -59,6 +65,7 @@ class Outlet {
   Map<String, dynamic> toJson() => {
         "id": id,
         "outlet_name": outletName,
+        "name": outletName,
         "address": address,
         "latitude": latitude,
         "longitude": longitude,

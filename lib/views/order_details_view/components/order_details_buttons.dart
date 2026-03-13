@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../helper/local_keys.g.dart';
-import '../../../utils/components/alerts.dart';
+import '../../cancel_order_view/cancel_order_view.dart';
 
 class OrderDetailsButtons extends StatelessWidget {
   const OrderDetailsButtons({super.key});
@@ -47,21 +47,7 @@ class OrderDetailsButtons extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () async {
-                    Alerts().confirmationAlert(
-                      context: context,
-                      title: LocalKeys.areYouSure,
-                      description: cs.cancellationData.value["description"],
-                      onConfirm: () async {
-                        final result =
-                            await Provider.of<OrderDetailsService>(
-                              context,
-                              listen: false,
-                            ).tryCancelOrder();
-                        if (result) {
-                          context.pop;
-                        }
-                      },
-                    );
+                    context.toPage(const CancelOrderView());
                   },
                   label: Text(LocalKeys.cancelOrder),
                 ),

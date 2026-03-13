@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart' as p;
 
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
@@ -79,70 +81,73 @@ class SignUpService with ChangeNotifier {
     // Safety net — re-set token if global token was cleared somehow
     if (token.isNotEmpty && getToken.isEmpty) {
       setToken(token);
-      debugPrint('🔁 Token re-set before profile update');
     }
 
-    debugPrint('🔑 Auth header token present: ${getToken.isNotEmpty}');
-    debugPrint(
-      '📤 Sending profile update: '
-      '${sum.fNameController.text.trim()} ${sum.lNameController.text.trim()}',
-    );
-
-    final Map<String, String> fields = {
-      'update_type': 'after_login',
-      'first_name': sum.fNameController.text.trim(),
-      'last_name': sum.lNameController.text.trim(),
-    };
-
     try {
-      // Always use MultipartRequest — endpoint is multipart/form-data.
-      final request = http.MultipartRequest(
+      // 1. Upload Avatar if present
+      if (sum.profileImage.value != null) {
+        debugPrint('🖼️ Uploading avatar...');
+        final avatarRequest = http.MultipartRequest(
+          'POST',
+          Uri.parse(AppUrls.uploadAvatarUrl),
+        );
+        avatarRequest.headers.addAll(acceptJsonAuthHeader);
+        
+        final ext = p.extension(sum.profileImage.value!.path).toLowerCase().replaceAll('.', '');
+        final mimeType = ext == 'jpg' || ext == 'jpeg' ? 'jpeg' : ext;
+        
+        avatarRequest.files.add(
+          await http.MultipartFile.fromPath(
+            'avatar',
+            sum.profileImage.value!.path,
+            contentType: MediaType('image', mimeType),
+          ),
+        );
+
+        final avatarResponse = await NetworkApiServices().postWithFileApi(
+          avatarRequest,
+          LocalKeys.profileSetup,
+        );
+
+        debugPrint('📥 Avatar upload response: $avatarResponse');
+        if (avatarResponse == null || (avatarResponse.containsKey('success') && avatarResponse['success'] != true) || avatarResponse.containsKey('error')) {
+          final error = avatarResponse?['error'] ?? avatarResponse?['message'] ?? 'Avatar upload failed';
+          error.toString().showToast();
+          return null;
+        }
+      }
+
+      // 2. Update Profile Info (Name)
+      debugPrint('📤 Updating profile names...');
+      final Map<String, String> fields = {
+        'firstName': sum.fNameController.text.trim(),
+        'lastName': sum.lNameController.text.trim(),
+      };
+
+      final profileRequest = http.MultipartRequest(
         'POST',
         Uri.parse(AppUrls.profileInfoUpdateUrl),
       );
+      profileRequest.fields.addAll(fields);
+      profileRequest.headers.addAll(acceptJsonAuthHeader);
 
-      request.fields.addAll(fields);
-      request.headers.addAll(acceptJsonAuthHeader);
-
-      debugPrint('🔑 Request headers: ${request.headers}');
-      debugPrint('📦 Request fields: ${request.fields}');
-
-      // Attach profile image only when the user selected one
-      if (sum.profileImage.value != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'image',
-            sum.profileImage.value!.path,
-          ),
-        );
-        debugPrint('🖼️ Profile image attached');
-      }
-
-      final responseData = await NetworkApiServices().postWithFileApi(
-        request,
+      final profileResponse = await NetworkApiServices().postWithFileApi(
+        profileRequest,
         LocalKeys.profileSetup,
       );
 
-      debugPrint('📥 Profile update response: $responseData');
+      debugPrint('📥 Profile update response: $profileResponse');
 
-      if (responseData != null && responseData.isNotEmpty) {
-        final message = responseData['message']?.toString() ?? '';
-
+      if (profileResponse != null && profileResponse.isNotEmpty) {
+        final message = profileResponse['message']?.toString() ?? '';
         if (message.toLowerCase().contains('success') ||
-            responseData.containsKey('user') ||
-            responseData.containsKey('data')) {
+            profileResponse.containsKey('user') ||
+            profileResponse.containsKey('data')) {
           LocalKeys.profileSetupComplete.showToast();
           return true;
         } else if (message.isNotEmpty) {
           message.showToast();
         }
-      } else {
-        // Empty {} response means the server returned HTML (not JSON).
-        // This happens when the Authorization header is missing/wrong,
-        // causing the request to hit the web frontend instead of the API.
-        debugPrint(
-          '❌ Empty response — auth header missing or URL not found on server',
-        );
       }
     } catch (e) {
       debugPrint('❌ Profile Update Error: $e');
