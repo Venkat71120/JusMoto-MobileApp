@@ -95,8 +95,9 @@ class _MyCarViewState extends State<MyCarView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header row: brand + car name, default badge
+                  // Header row: brand + car name, default badge + delete
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Column(
@@ -116,20 +117,63 @@ class _MyCarViewState extends State<MyCarView> {
                           ],
                         ),
                       ),
-                      if (isDefault)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: primaryColor,
-                            borderRadius: BorderRadius.circular(20),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (isDefault)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                "Default",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 11),
+                              ),
+                            ),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Delete Car"),
+                                  content: const Text(
+                                      "Are you sure you want to delete this car from your profile?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        final success =
+                                            await ucs.deleteUserCar(id: car.id);
+                                        if (success) {
+                                          "Car deleted successfully"
+                                              .showToast();
+                                        }
+                                      },
+                                      child: const Text(
+                                        "Delete",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.delete_outline,
+                                color: Colors.red, size: 22),
+                            tooltip: "Delete Car",
                           ),
-                          child: const Text(
-                            "Default",
-                            style: TextStyle(
-                                color: Colors.white, fontSize: 11),
-                          ),
-                        ),
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -162,9 +206,12 @@ class _MyCarViewState extends State<MyCarView> {
                       TextButton.icon(
                         onPressed: () {
                           SelectCarViewModel.dispose;
-                          context.toPage(SelectCarView());
+                          final scm = SelectCarViewModel.instance;
+                          scm.setEditingCar(car);
+                          context.toPage(const SelectCarView());
                         },
-                        icon: SvgAssets.edit.toSVGSized(16, color: primaryColor),
+                        icon:
+                            SvgAssets.edit.toSVGSized(16, color: primaryColor),
                         label: Text(LocalKeys.changeCar),
                       ),
                     ],

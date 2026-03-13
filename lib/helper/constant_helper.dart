@@ -51,6 +51,6 @@ final customCacheManager = CacheManager(
   Config(
     'customCacheKey',
     stalePeriod: const Duration(days: 7),
-    maxNrOfCacheObjects: 100,
+    maxNrOfCacheObjects: 500,
   ),
 );

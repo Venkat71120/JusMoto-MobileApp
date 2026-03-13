@@ -24,6 +24,9 @@ class SelectCarViewModel {
   final PageController pageController = PageController(initialPage: 0);
   final ValueNotifier<List<ModelVariant>> variantsList = ValueNotifier([]);
   final TextEditingController regNoController = TextEditingController();
+  
+  dynamic editingCarId;
+  bool get isEditing => editingCarId != null;
 
   SelectCarViewModel._init();
   static SelectCarViewModel? _instance;
@@ -72,16 +75,33 @@ class SelectCarViewModel {
         }
 
         // Save to backend garage
-        bool success = await Provider.of<UserCarsService>(context, listen: false).addUserCar(
-          brandId: selectedBrand.value?.id,
-          carId: selectedCar.value?.id,
-          variantId: selectedVariant.value?.id,
-          registrationNumber: regNoController.text.trim().isEmpty ? null : regNoController.text.trim(),
-          isDefault: true,
-        );
+        bool success;
+        if (isEditing) {
+          success = await Provider.of<UserCarsService>(context, listen: false).updateUserCar(
+            id: editingCarId,
+            brandId: selectedBrand.value?.id,
+            carId: selectedCar.value?.id,
+            variantId: selectedVariant.value?.id,
+            registrationNumber: regNoController.text.trim().isEmpty ? null : regNoController.text.trim(),
+            isDefault: true,
+          );
+        } else {
+          success = await Provider.of<UserCarsService>(context, listen: false).addUserCar(
+            brandId: selectedBrand.value?.id,
+            carId: selectedCar.value?.id,
+            variantId: selectedVariant.value?.id,
+            registrationNumber: regNoController.text.trim().isEmpty ? null : regNoController.text.trim(),
+            isDefault: true,
+          );
+        }
 
         if (!success) {
-          "Failed to save car to your profile".showToast();
+          if (isEditing) {
+            "Failed to update car details".showToast();
+          } else {
+            "Failed to save car to your profile".showToast();
+          }
+          return;
         }
         
         final tempCar = CarModel.fromJson(selectedCar.value?.toJson() ?? {});
@@ -111,5 +131,21 @@ class SelectCarViewModel {
       curve: Curves.easeIn,
     );
     pageIndex.value = pageController.page?.toInt() ?? 0;
+  }
+
+  void setEditingCar(UserSelectedCarModel car) {
+    editingCarId = car.id;
+    regNoController.text = car.registrationNumber ?? "";
+    
+    // Note: We can only set IDs here. 
+    // The lists for models and variants are normally fetched when brand/car are selected.
+    // For a better UX, one might want to pre-fetch these, 
+    // but typically the user will select brand -> model -> variant anyway.
+    // We'll at least set the initial selections if we had the full models, 
+    // but UserSelectedCarModel only has names and IDs.
+    
+    selectedBrand.value = BrandModel(id: car.brandId, name: car.brandName);
+    selectedCar.value = CarModel(id: car.carId, name: car.carName);
+    selectedVariant.value = ModelVariant(id: car.variantId);
   }
 }

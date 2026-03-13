@@ -111,9 +111,6 @@ class UserCarsService with ChangeNotifier {
     dynamic brandId,
     dynamic carId,
     dynamic variantId,
-    String? brandName,
-    String? carName,
-    String? variantName,
     String? registrationNumber,
     bool isDefault = true,
   }) async {
@@ -122,22 +119,71 @@ class UserCarsService with ChangeNotifier {
 
     final url = AppUrls.userCarsUrl;
     
-   Map<String, dynamic> data = {};
-    if (brandId != null) data["brand_id"] = brandId.toString();  // ✅
-    if (carId != null) data["car_id"] = carId.toString();         // ✅
-    if (variantId != null) data["variant_id"] = variantId.toString(); // ✅
-    if (brandName != null) data["brand_name"] = brandName;
-    if (carName != null) data["car_name"] = carName;
-    if (variantName != null) data["variant_name"] = variantName;
+    Map<String, dynamic> data = {
+      "brand_id": brandId.toString(),
+      "car_id": carId.toString(),
+      "variant_id": variantId.toString(),
+      "is_default": isDefault ? "1" : "0",
+    };
+    
     if (registrationNumber != null && registrationNumber.isNotEmpty) {
       data["registration_number"] = registrationNumber.toString();
     }
-    data["is_default"] = isDefault ? "1" : "0"; 
+
     final responseData = await NetworkApiServices()
         .postApi(data, url, "Add User Car", headers: commonAuthHeader);
 
-    if (responseData != null) {
-      // Re-fetch cars to update list
+    if (responseData != null && responseData['success'] == true) {
+      fetchUserCars();
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> updateUserCar({
+    required dynamic id,
+    dynamic brandId,
+    dynamic carId,
+    dynamic variantId,
+    String? registrationNumber,
+    bool isDefault = true,
+  }) async {
+    token = getToken;
+    if (token.isInvalid) return false;
+
+    final url = "${AppUrls.userCarsUrl}/$id";
+    
+    Map<String, dynamic> data = {
+      "brand_id": brandId.toString(),
+      "car_id": carId.toString(),
+      "variant_id": variantId.toString(),
+      "is_default": isDefault ? "1" : "0",
+    };
+    
+    if (registrationNumber != null && registrationNumber.isNotEmpty) {
+      data["registration_number"] = registrationNumber.toString();
+    }
+
+    final responseData = await NetworkApiServices()
+        .putApi(data, url, "Update User Car", headers: commonAuthHeader);
+
+    if (responseData != null && responseData['success'] == true) {
+      fetchUserCars();
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> deleteUserCar({required dynamic id}) async {
+    token = getToken;
+    if (token.isInvalid) return false;
+
+    final url = "${AppUrls.userCarsUrl}/$id";
+    
+    final responseData = await NetworkApiServices()
+        .deleteApi(url, "Delete User Car", headers: commonAuthHeader);
+
+    if (responseData != null && responseData['success'] == true) {
       fetchUserCars();
       return true;
     }

@@ -33,7 +33,7 @@ class SelectCarView extends StatelessWidget {
               scm.goBack(context);
             },
           ),
-          title: Text(LocalKeys.selectYourCar),
+          title: Text(scm.isEditing ? "Update Your Car" : LocalKeys.selectYourCar),
         ),
         body: PageView.builder(
             physics: NeverScrollableScrollPhysics(),

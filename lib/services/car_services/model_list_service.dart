@@ -1,11 +1,13 @@
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/models/car_models/car_model_list_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
 import '../../helper/local_keys.g.dart';
+import '../../main.dart';
 
 class ModelListService with ChangeNotifier {
   CarModelListModel? _carModelsModel;
@@ -42,7 +44,21 @@ class ModelListService with ChangeNotifier {
     
     print("Parsed model count: ${_carModelsModel?.allCarModels?.length}");
     
+    preCacheImages();
     notifyListeners();
+  }
+
+  preCacheImages() {
+    if (_carModelsModel?.allCarModels == null) return;
+    
+    for (var car in _carModelsModel!.allCarModels!) {
+      if (car.image != null && car.image!.isNotEmpty) {
+        precacheImage(
+          CachedNetworkImageProvider(car.image!, cacheManager: customCacheManager),
+          navigatorKey.currentContext!,
+        );
+      }
+    }
   }
 
   fetchNextPage() async {
