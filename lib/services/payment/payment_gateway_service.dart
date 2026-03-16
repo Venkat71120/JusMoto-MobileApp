@@ -5,6 +5,7 @@ import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
 import '../../helper/local_keys.g.dart';
 import '../../models/payment_gateway_model.dart';
+import '../../view_models/service_booking_view_model/service_booking_view_model.dart';
 
 class PaymentGatewayService with ChangeNotifier {
   List<Gateway> gatewayList = [];
@@ -64,6 +65,22 @@ class PaymentGatewayService with ChangeNotifier {
       if (responseData != null) {
         final tempData = PaymentGatewayModel.fromJson(responseData);
         gatewayList = tempData.gateways;
+
+        // Auto-select COD if available or if there's only one gateway
+        if (gatewayList.isNotEmpty) {
+          final sbm = ServiceBookingViewModel.instance;
+          
+          // Look for COD specifically
+          final codGateway = gatewayList.firstWhere(
+            (g) => ["cash_on_delivery", "cod"].contains(g.name?.toLowerCase()),
+            orElse: () => gatewayList.length == 1 ? gatewayList.first : Gateway(testMode: false),
+          );
+
+          if (codGateway.name != null) {
+            selectedGateway = codGateway;
+            sbm.selectedGateway.value = codGateway;
+          }
+        }
       }
       notifyListeners();
     } catch (err) {

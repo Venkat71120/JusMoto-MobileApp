@@ -53,10 +53,12 @@ class PlaceOrderService with ChangeNotifier {
     // ✅ FIXED: Build address object (renamed from "location"), not JSON string
     Map<String, dynamic>? addressData;
     if (sbm.serviceMethod.value != DeliveryOption.OUTLET) {
+      final profile = Provider.of<ProfileInfoService>(context, listen: false);
+      final selectedAddress = sbm.selectedAddress.value;
       addressData = {
         "address": sbm.addressController.text,
-        "phone": sbm.selectedAddress.value?.phone,
-        "emergency_phone": sbm.selectedAddress.value?.emergencyPhone,
+        "phone": selectedAddress?.phone ?? profile.profileInfoModel.userDetails?.phone ?? "",
+        "emergency_phone": selectedAddress?.emergencyPhone,
         "latitude": sbm.selectedLatLng.value?.latitude,
         "longitude": sbm.selectedLatLng.value?.longitude,
         "type": 0,

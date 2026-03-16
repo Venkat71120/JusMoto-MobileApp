@@ -78,14 +78,7 @@ class RazorpayPayment extends StatelessWidget {
                 ..setJavaScriptMode(JavaScriptMode.unrestricted)
                 ..setNavigationDelegate(NavigationDelegate(
                   onProgress: (int progress) {},
-                  onPageStarted: (String url) async {
-                    final uri = Uri.parse(url);
-                    final response = await http.get(uri);
-                    bool paySuccess = response.body.contains('status":"paid');
-                    if (paySuccess) {
-                      onSuccess();
-                    }
-                  },
+                  onPageStarted: (String url) async {},
                   onPageFinished: (String url) async {},
                   onWebResourceError: (WebResourceError error) {},
                   onNavigationRequest: (request) {

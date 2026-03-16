@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../order_details_view/order_details_view.dart';
+import '../../../utils/components/custom_network_image.dart';
 
 class OrderListTile extends StatelessWidget {
   final Order order;
@@ -37,91 +38,104 @@ class OrderListTile extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         radius: 8,
         color: context.color.accentContrastColor,
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "#${index + 1} | ${LocalKeys.id}: ",
-                          style: context.bodySmall?.bold6,
-                        ),
-                        TextSpan(
-                          text: order.id.toString(),
-                          style: context.bodySmall?.bold
-                              .copyWith(
-                                  color: context.color.primaryContrastColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SquircleContainer(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    // ✅ UPDATED: Use pre-converted statusStr
-                    color: statusStr.getOrderMutedStatusColor,
-                    radius: 4,
-                    child: Text(
-                      statusStr.getOrderStatus,
-                      style: context.bodySmall?.copyWith(
-                          color: statusStr.getOrderPrimaryStatusColor),
-                    ))
-              ],
+            CustomNetworkImage(
+              imageUrl: order.firstServiceImage,
+              height: 70,
+              width: 70,
+              radius: 8,
             ),
-            4.toHeight,
-            Wrap(
-              spacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(order.total.cur,
-                    style:
-                        context.titleSmall?.bold.copyWith(color: primaryColor)),
-                if (!["4", "5"].contains(statusStr))
-                  OrderPaymentStatusChip(
-                      status: (order.paymentStatus ?? 0).toString(),
-                      isCOD: ["cod", "cash_on_delivery"]
-                          .contains(order.paymentGateway)),
-              ],
-            ),
-            8.toHeight,
-            Wrap(
-              children: [
-                // ✅ UPDATED: `time` is removed from API — show `schedule` instead
-                FittedBox(
-                  child: Row(
+            12.toWidth,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      SvgAssets.clock.toSVGSized(16, color: primaryColor),
-                      4.toWidth,
-                      Text(
-                        order.schedule?.capitalize ?? "---",
-                        style: context.bodySmall?.bold,
+                      Expanded(
+                        flex: 1,
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "#${index + 1} | ${LocalKeys.id}: ",
+                                style: context.bodySmall?.bold6,
+                              ),
+                              TextSpan(
+                                text: order.id.toString(),
+                                style: context.bodySmall?.bold.copyWith(
+                                    color: context.color.primaryContrastColor),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SquircleContainer(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          // ✅ UPDATED: Use pre-converted statusStr
+                          color: statusStr.getOrderMutedStatusColor,
+                          radius: 4,
+                          child: Text(
+                            statusStr.getOrderStatus,
+                            style: context.bodySmall?.copyWith(
+                                color: statusStr.getOrderPrimaryStatusColor),
+                          ))
+                    ],
+                  ),
+                  4.toHeight,
+                  Wrap(
+                    spacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(order.total.cur,
+                          style: context.titleSmall?.bold
+                              .copyWith(color: primaryColor)),
+                      if (!["4", "5"].contains(statusStr))
+                        OrderPaymentStatusChip(
+                            status: (order.paymentStatus ?? 0).toString(),
+                            isCOD: ["cod", "cash_on_delivery"]
+                                .contains(order.paymentGateway)),
+                    ],
+                  ),
+                  8.toHeight,
+                  Wrap(
+                    children: [
+                      // ✅ UPDATED: `time` is removed from API — show `schedule` instead
+                      FittedBox(
+                        child: Row(
+                          children: [
+                            SvgAssets.clock.toSVGSized(16, color: primaryColor),
+                            4.toWidth,
+                            Text(
+                              order.schedule?.capitalize ?? "---",
+                              style: context.bodySmall?.bold,
+                            ),
+                          ],
+                        ),
+                      ),
+                      8.toWidth,
+                      FittedBox(
+                        child: Row(
+                          children: [
+                            SvgAssets.calendar.toSVGSized(16, color: primaryColor),
+                            4.toWidth,
+                            Text(
+                              order.date == null
+                                  ? "---"
+                                  : DateFormat("EEE, dd MMM yyyy")
+                                      .format(order.date ?? DateTime.now()),
+                              style: context.bodySmall?.bold,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                ),
-                8.toWidth,
-                FittedBox(
-                  child: Row(
-                    children: [
-                      SvgAssets.calendar.toSVGSized(16, color: primaryColor),
-                      4.toWidth,
-                      Text(
-                        order.date == null
-                            ? "---"
-                            : DateFormat("EEE, dd MMM yyyy")
-                                .format(order.date ?? DateTime.now()),
-                        style: context.bodySmall?.bold,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
