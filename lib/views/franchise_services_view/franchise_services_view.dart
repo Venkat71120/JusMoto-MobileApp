@@ -94,13 +94,20 @@ class _FranchiseServicesViewState extends State<FranchiseServicesView> {
 
                   // ── List body ────────────────────────────────────────
                   if (ts.isLoadingList && ts.shouldAutoFetch)
-                    const SliverFillRemaining(child: _TicketListSkeleton())
+                    const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _TicketListSkeleton(),
+                    )
                   else if (ts.hasListError && filtered.isEmpty)
                     SliverFillRemaining(
+                      hasScrollBody: false,
                       child: _ErrorState(onRetry: () => ts.fetchAll()),
                     )
                   else if (filtered.isEmpty)
-                    SliverFillRemaining(child: _EmptyState())
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _EmptyState(),
+                    )
                   else ...[
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -131,9 +138,13 @@ class _FranchiseServicesViewState extends State<FranchiseServicesView> {
 
   List<FranchiseTicketItem> _applyFilter(List<FranchiseTicketItem> all) {
     if (_filter == 'all') return all;
-    return all
-        .where((t) => t.status.toLowerCase() == _filter)
-        .toList();
+    // Map 'closed' filter to match API value 'closed' OR 'close'
+    final f = _filter == 'closed' ? 'closed' : _filter;
+    return all.where((t) {
+      final status = t.status.toLowerCase();
+      final target = f.toLowerCase();
+      return status == target || (target == 'closed' && status == 'close');
+    }).toList();
   }
 
   void _openDetail(BuildContext context, int ticketId) {
@@ -204,30 +215,16 @@ class _StatsHeader extends StatelessWidget {
                     ),
                     SizedBoxExtension(10).toWidth,
                     _StatPill(
+                      label: 'In Progress',
+                      value: stats.inProgress,
+                      color: Colors.orangeAccent,
+                    ),
+                    SizedBoxExtension(10).toWidth,
+                    _StatPill(
                       label: 'Closed',
                       value: stats.closed,
                       color: Colors.white54,
                     ),
-                    const Spacer(),
-                    if (stats.urgent > 0)
-                      _PriorityDot(
-                          label: 'Urgent',
-                          count: stats.urgent,
-                          color: Colors.red),
-                    if (stats.high > 0) ...[
-                      SizedBoxExtension(8).toWidth,
-                      _PriorityDot(
-                          label: 'High',
-                          count: stats.high,
-                          color: Colors.orange),
-                    ],
-                    if (stats.normal > 0) ...[
-                      SizedBoxExtension(8).toWidth,
-                      _PriorityDot(
-                          label: 'Normal',
-                          count: stats.normal,
-                          color: Colors.blue[200]!),
-                    ],
                   ],
                 ),
               ],
@@ -272,35 +269,6 @@ class _StatPill extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _PriorityDot extends StatelessWidget {
-  final String label;
-  final int count;
-  final Color color;
-
-  const _PriorityDot(
-      {required this.label, required this.count, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          count.toString(),
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white60, fontSize: 10),
-        ),
-      ],
     );
   }
 }
@@ -371,26 +339,37 @@ class _FilterBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: context.color.backgroundColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          _FilterChip(
-              label: 'All (${stats.total})',
-              selected: filter == 'all',
-              onTap: () => onChanged('all')),
-          SizedBoxExtension(10).toWidth,
-          _FilterChip(
-              label: 'Open (${stats.open})',
-              selected: filter == 'open',
-              onTap: () => onChanged('open')),
-          SizedBoxExtension(10).toWidth,
-          _FilterChip(
-              label: 'Closed (${stats.closed})',
-              selected: filter == 'close',
-              onTap: () => onChanged('close')),
-        ],
+    return SizedBox(
+      height: 54,
+      child: Container(
+        color: context.color.backgroundColor,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _FilterChip(
+                  label: 'All (${stats.total})',
+                  selected: filter == 'all',
+                  onTap: () => onChanged('all')),
+              SizedBoxExtension(10).toWidth,
+              _FilterChip(
+                  label: 'Open (${stats.open})',
+                  selected: filter == 'open',
+                  onTap: () => onChanged('open')),
+              SizedBoxExtension(10).toWidth,
+              _FilterChip(
+                  label: 'Progress (${stats.inProgress})',
+                  selected: filter == 'in_progress',
+                  onTap: () => onChanged('in_progress')),
+              SizedBoxExtension(10).toWidth,
+              _FilterChip(
+                  label: 'Closed (${stats.closed})',
+                  selected: filter == 'closed',
+                  onTap: () => onChanged('closed')),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -451,8 +430,9 @@ class _TicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pColor = _priorityColor(ticket.priority);
-    final isOpen = ticket.status.toLowerCase() == 'open';
+    final statusSafe = ticket.status.toString();
+    final pColor = _priorityColor(ticket.priority.toString());
+    final isOpen = statusSafe.toLowerCase() == 'open' || statusSafe == '1';
 
     return GestureDetector(
       onTap: onTap,
@@ -723,15 +703,20 @@ class _TicketListSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      itemCount: 5,
-      separatorBuilder: (_, __) => 10.toHeight,
-      itemBuilder: (_, __) => Container(
-        height: 110,
-        decoration: BoxDecoration(
-          color: context.color.mutedContrastColor,
-          borderRadius: BorderRadius.circular(14),
+      child: Column(
+        children: List.generate(
+          5,
+          (index) => Container(
+            height: 110,
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: context.color.mutedContrastColor,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
         ),
       ),
     );

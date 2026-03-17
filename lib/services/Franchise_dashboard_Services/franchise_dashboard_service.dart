@@ -42,7 +42,7 @@ class FranchiseDashboardService with ChangeNotifier {
       _earnings == null &&
       _recentActivity == null;
 
-  // ── Fetch all 4 endpoints in parallel ─────────────────────────────────────
+  // ── Fetch consolidated dashboard data ────────────────────────────────────
   Future<void> fetchDashboard() async {
     if (_isLoading) return;
 
@@ -51,14 +51,60 @@ class FranchiseDashboardService with ChangeNotifier {
     notifyListeners();
 
     try {
+      // ── Concurrent fetching ────────────────────────────────────────────────
       final results = await Future.wait([
-        _fetchStatistics(),
-        _fetchOrderCounts(),
-        _fetchEarnings(),
+        NetworkApiServices().getApi(
+          AppUrls.franchiseDashboardUrl,
+          null,
+          headers: acceptJsonAuthHeader,
+          timeoutSeconds: 20,
+        ),
+        _fetchEarningsPeriodic(),
         _fetchRecentActivity(),
       ]);
 
-      _hasError = results.contains(false);
+      final dashboardResponse = results[0] as Map<String, dynamic>?;
+      // results[1] is result of _fetchEarningsPeriodic (bool)
+      // results[2] is result of _fetchRecentActivity (bool)
+
+      if (dashboardResponse != null && dashboardResponse['success'] == true) {
+        final data = dashboardResponse['data'] as Map<String, dynamic>;
+        debugPrint('📊 FranchiseDashboardService.fetchDashboard data: $data');
+
+        // 1. Map to Statistics (Orders, Tickets, Earnings - initially from consolidated)
+        _statistics = FranchiseDashboardStatisticsModel.fromJson(data);
+
+        // 2. Map to Order Counts (for breakdown section)
+        _orderCounts = FranchiseOrderCountsModel.fromJson(data);
+
+        // 3. Map to Earnings model (consolidated)
+        _earnings = FranchiseEarningsModel.fromJson(data);
+
+        // 4. Overwrite periodic earnings stats if fetchEarningsPeriodic succeeded
+        if (_tempEarningStats != null) {
+          _statistics = FranchiseDashboardStatisticsModel(
+            orders: _statistics!.orders,
+            tickets: _statistics!.tickets,
+            earnings: _tempEarningStats!,
+          );
+          
+          // Also update the detailed earnings model if needed
+          _earnings = FranchiseEarningsModel(
+            period: 'all',
+            totalEarnings: _tempEarningStats!.total,
+            totalTax: 0,
+            netEarnings: _tempEarningStats!.netTotal,
+            orderCount: _statistics!.orders.total,
+            averageOrderValue: _statistics!.orders.total > 0
+                ? _tempEarningStats!.total / _statistics!.orders.total
+                : 0,
+          );
+        }
+
+        _hasError = false;
+      } else {
+        _hasError = true;
+      }
     } catch (e) {
       debugPrint('❌ FranchiseDashboardService.fetchDashboard error: $e');
       _hasError = true;
@@ -67,6 +113,29 @@ class FranchiseDashboardService with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  EarningStats? _tempEarningStats;
+
+  Future<bool> _fetchEarningsPeriodic() async {
+    try {
+      final response = await NetworkApiServices().getApi(
+        AppUrls.franchiseDashboardEarningsUrl,
+        null,
+        headers: acceptJsonAuthHeader,
+        timeoutSeconds: 20,
+      );
+      if (response != null && response['success'] == true) {
+        _tempEarningStats = EarningStats.fromJson(
+          Map<String, dynamic>.from(response['data']),
+        );
+        return true;
+      }
+    } catch (e) {
+      debugPrint('❌ _fetchEarningsPeriodic: $e');
+    }
+    return false;
+  }
+
 
   /// Pull-to-refresh — forces a re-fetch even if data exists
   Future<void> refresh() async {
@@ -77,69 +146,7 @@ class FranchiseDashboardService with ChangeNotifier {
     await fetchDashboard();
   }
 
-  // ── Private per-endpoint fetchers ──────────────────────────────────────────
-  Future<bool> _fetchStatistics() async {
-    try {
-      final response = await NetworkApiServices().getApi(
-        AppUrls.franchiseDashboardStatisticsUrl,
-        null,
-        headers: acceptJsonAuthHeader,
-        timeoutSeconds: 20,
-      );
-      if (response != null) {
-        _statistics = FranchiseDashboardStatisticsModel.fromJson(
-          Map<String, dynamic>.from(response),
-        );
-        return true;
-      }
-    } catch (e) {
-      debugPrint('❌ _fetchStatistics: $e');
-    }
-    _statistics = FranchiseDashboardStatisticsModel.empty();
-    return false;
-  }
 
-  Future<bool> _fetchOrderCounts() async {
-    try {
-      final response = await NetworkApiServices().getApi(
-        AppUrls.franchiseDashboardOrderCountsUrl,
-        null,
-        headers: acceptJsonAuthHeader,
-        timeoutSeconds: 20,
-      );
-      if (response != null) {
-        _orderCounts = FranchiseOrderCountsModel.fromJson(
-          Map<String, dynamic>.from(response),
-        );
-        return true;
-      }
-    } catch (e) {
-      debugPrint('❌ _fetchOrderCounts: $e');
-    }
-    _orderCounts = FranchiseOrderCountsModel.empty();
-    return false;
-  }
-
-  Future<bool> _fetchEarnings() async {
-    try {
-      final response = await NetworkApiServices().getApi(
-        AppUrls.franchiseDashboardEarningsUrl,
-        null,
-        headers: acceptJsonAuthHeader,
-        timeoutSeconds: 20,
-      );
-      if (response != null) {
-        _earnings = FranchiseEarningsModel.fromJson(
-          Map<String, dynamic>.from(response),
-        );
-        return true;
-      }
-    } catch (e) {
-      debugPrint('❌ _fetchEarnings: $e');
-    }
-    _earnings = FranchiseEarningsModel.empty();
-    return false;
-  }
 
   Future<bool> _fetchRecentActivity() async {
     try {
@@ -150,6 +157,7 @@ class FranchiseDashboardService with ChangeNotifier {
         timeoutSeconds: 20,
       );
       if (response != null) {
+        debugPrint('📊 FranchiseDashboardService._fetchRecentActivity response: $response');
         _recentActivity = FranchiseRecentActivityModel.fromJson(
           Map<String, dynamic>.from(response),
         );

@@ -66,7 +66,8 @@ class NetworkApiServices extends BaseApiServices {
   }
 
   @override
-  Future<Map?> postApi(var data, String url, requestName, {headers}) async {
+  Future<Map?> postApi(var data, String url, requestName,
+      {Map<String, String>? headers, int? timeoutSeconds}) async {
     if (kDebugMode) {
       debugPrint(url);
       debugPrint(data.toString());
@@ -88,19 +89,18 @@ class NetworkApiServices extends BaseApiServices {
       // ✅ FIX: If data contains any non-String value (nested List, Map, int,
       // bool, null…), send as JSON. Otherwise use the original form-encoded
       // path so all existing callers (Map<String,String>) are unaffected.
-      final bool needsJson = data is Map &&
-          data.values.any((v) => v is! String);
+      final bool needsJson = data is Map && data.values.any((v) => v is! String);
 
       if (needsJson) {
         h['Content-Type'] = 'application/json';
         response = await http
             .post(Uri.parse(url), body: jsonEncode(data), headers: h)
-            .timeout(const Duration(seconds: 10));
+            .timeout(Duration(seconds: timeoutSeconds ?? 10));
       } else {
         // Original behaviour — form-encoded, works for Map<String,String>
         response = await http
             .post(Uri.parse(url), body: data, headers: h)
-            .timeout(const Duration(seconds: 10));
+            .timeout(Duration(seconds: timeoutSeconds ?? 10));
       }
 
       if (kDebugMode) {
@@ -122,7 +122,8 @@ class NetworkApiServices extends BaseApiServices {
   }
 
   @override
-  Future<Map?> putApi(var data, String url, requestName, {headers}) async {
+  Future<Map?> putApi(var data, String url, requestName,
+      {Map<String, String>? headers, int? timeoutSeconds}) async {
     if (kDebugMode) {
       debugPrint(url);
       debugPrint(data.toString());
@@ -139,7 +140,7 @@ class NetworkApiServices extends BaseApiServices {
     try {
       final response = await http
           .put(Uri.parse(url), body: data, headers: h)
-          .timeout(const Duration(seconds: 10));
+          .timeout(Duration(seconds: timeoutSeconds ?? 10));
       if (kDebugMode) {
         debugPrint(response.body.toString());
         debugPrint(response.statusCode.toString());
@@ -159,7 +160,8 @@ class NetworkApiServices extends BaseApiServices {
   }
 
   @override
-  Future<Map?> deleteApi(String url, requestName, {headers}) async {
+  Future<Map?> deleteApi(String url, requestName,
+      {Map<String, String>? headers, int? timeoutSeconds}) async {
     if (kDebugMode) {
       debugPrint(url);
     }
@@ -175,7 +177,7 @@ class NetworkApiServices extends BaseApiServices {
     try {
       final response = await http
           .delete(Uri.parse(url), headers: h)
-          .timeout(const Duration(seconds: 10));
+          .timeout(Duration(seconds: timeoutSeconds ?? 10));
       if (kDebugMode) {
         debugPrint(response.body.toString());
         debugPrint(response.statusCode.toString());
@@ -197,7 +199,8 @@ class NetworkApiServices extends BaseApiServices {
   Future<Map?> postWithFileApi(
     http.MultipartRequest request,
     requestName, {
-    headers,
+    Map<String, String>? headers,
+    int? timeoutSeconds,
   }) async {
     if (kDebugMode) {
       debugPrint(request.url.toString());
@@ -212,7 +215,8 @@ class NetworkApiServices extends BaseApiServices {
 
     Map? responseJson;
     try {
-      final responseStream = await request.send();
+      final responseStream = await request.send()
+          .timeout(Duration(seconds: timeoutSeconds ?? 60)); // Default 60 for files
       final data = await responseStream.stream.toBytes();
       http.Response response = http.Response.bytes(
         data,

@@ -48,9 +48,16 @@ class FranchiseOrdersView extends StatelessWidget {
               SizedBoxExtension(12).toWidth,
             ],
           ),
-          body: CustomRefreshIndicator(
-            onRefresh: () => os.refreshOrders(),
-            child: _buildBody(context, os),
+          body: Column(
+            children: [
+              _FilterSection(os: os),
+              Expanded(
+                child: CustomRefreshIndicator(
+                  onRefresh: () => os.refreshOrders(),
+                  child: _buildBody(context, os),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -128,7 +135,7 @@ class _OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = _statusColor(order.statusCode);
-    final isPaid = order.paymentStatus.toLowerCase() == 'paid';
+    final isPaid = order.paymentStatusCode == 1;
 
     return GestureDetector(
       onTap: onTap,
@@ -199,42 +206,53 @@ class _OrderCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
               child: Row(
                 children: [
-                  // Date + time
-                  Icon(Icons.calendar_today_outlined,
-                      size: 12, color: Colors.grey[500]),
-                  SizedBoxExtension(4).toWidth,
-                  Text(
-                    '${order.date}  ${order.schedule}',
-                    style: context.bodySmall?.copyWith(
-                      color: Colors.grey[500],
-                      fontSize: 11,
+                  // Metadata group (Date, schedule, count)
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.calendar_today_outlined,
+                            size: 11, color: Colors.grey[500]),
+                        4.toWidth,
+                        Flexible(
+                          child: Text(
+                            '${order.date}  ${order.schedule}',
+                            style: context.bodySmall?.copyWith(
+                              color: Colors.grey[500],
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        6.toWidth,
+                        // Items count chip
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '${order.itemsCount} item${order.itemsCount == 1 ? '' : 's'}',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBoxExtension(6).toWidth,
-                  // Items count chip
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '${order.itemsCount} item${order.itemsCount == 1 ? '' : 's'}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
+                  8.toWidth,
                   // Status badge
                   _Badge(
                     label: order.status,
                     color: statusColor,
                   ),
-                  SizedBoxExtension(6).toWidth,
+                  4.toWidth,
                   // Payment badge
                   _Badge(
                     label: order.paymentStatus,
@@ -390,8 +408,151 @@ class _SkeletonCard extends StatelessWidget {
   }
 }
 
-// ── Width helper (mirrors int_extension) ─────────────────────────────────────
 
-extension _WidthExt on int {
-  Widget get toWidth => SizedBox(width: toDouble());
+// ── Filter Section ────────────────────────────────────────────────────────────
+
+class _FilterSection extends StatelessWidget {
+  final FranchiseOrdersService os;
+
+  const _FilterSection({required this.os});
+
+  Future<void> _selectDate(BuildContext context, bool isFrom) async {
+    final initialDate = DateTime.now();
+    final firstDate = DateTime(2020);
+    final lastDate = DateTime(2100);
+
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (selectedDate != null) {
+      final formattedDate =
+          "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+      if (isFrom) {
+        os.setFilters(from: formattedDate, to: os.dateTo);
+      } else {
+        os.setFilters(from: os.dateFrom, to: formattedDate);
+      }
+      os.refreshOrders();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasFilters = os.dateFrom != null || os.dateTo != null;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      decoration: BoxDecoration(
+        color: context.color.backgroundColor,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _FilterItem(
+              label: os.dateFrom ?? 'From Date',
+              icon: Icons.calendar_today_rounded,
+              isActive: os.dateFrom != null,
+              onTap: () => _selectDate(context, true),
+            ),
+          ),
+          8.toWidth,
+          Expanded(
+            child: _FilterItem(
+              label: os.dateTo ?? 'To Date',
+              icon: Icons.calendar_today_rounded,
+              isActive: os.dateTo != null,
+              onTap: () => _selectDate(context, false),
+            ),
+          ),
+          if (hasFilters) ...[
+            8.toWidth,
+            IconButton.filled(
+              onPressed: () {
+                os.clearFilters();
+                os.refreshOrders();
+              },
+              icon: const Icon(Icons.close_rounded, size: 20),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.red.withOpacity(0.1),
+                foregroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }
+
+class _FilterItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _FilterItem({
+    required this.label,
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isActive
+              ? primaryColor.withOpacity(0.05)
+              : context.color.mutedContrastColor.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isActive ? primaryColor.withOpacity(0.3) : Colors.transparent,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 14, color: isActive ? primaryColor : Colors.grey),
+            8.toWidth,
+            Expanded(
+              child: Text(
+                label,
+                style: context.bodySmall?.copyWith(
+                  color: isActive ? primaryColor : Colors.grey[600],
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

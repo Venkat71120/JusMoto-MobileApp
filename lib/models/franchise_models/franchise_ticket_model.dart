@@ -9,39 +9,31 @@ class FranchiseTicketStatisticsModel {
   final int total;
   final int open;
   final int closed;
-  final int low;
-  final int normal;
-  final int high;
-  final int urgent;
+  final int inProgress;
 
   FranchiseTicketStatisticsModel({
     required this.total,
     required this.open,
     required this.closed,
-    required this.low,
-    required this.normal,
-    required this.high,
-    required this.urgent,
+    required this.inProgress,
   });
 
   factory FranchiseTicketStatisticsModel.fromJson(Map<String, dynamic> json) {
-    final stats = json['statistics'] as Map<String, dynamic>? ?? json;
-    final byPriority = stats['by_priority'] as Map<String, dynamic>? ?? {};
+    final stats = json['data'] as Map<String, dynamic>? ?? json;
     return FranchiseTicketStatisticsModel(
       total: stats['total'] ?? 0,
       open: stats['open'] ?? 0,
       closed: stats['closed'] ?? 0,
-      low: byPriority['low'] ?? 0,
-      normal: byPriority['normal'] ?? 0,
-      high: byPriority['high'] ?? 0,
-      urgent: byPriority['urgent'] ?? 0,
+      inProgress: stats['in_progress'] ?? 0,
     );
   }
 
   factory FranchiseTicketStatisticsModel.empty() =>
       FranchiseTicketStatisticsModel(
-        total: 0, open: 0, closed: 0,
-        low: 0, normal: 0, high: 0, urgent: 0,
+        total: 0,
+        open: 0,
+        closed: 0,
+        inProgress: 0,
       );
 }
 
@@ -58,7 +50,7 @@ class FranchiseTicketListModel {
 
   factory FranchiseTicketListModel.fromJson(Map<String, dynamic> json) =>
       FranchiseTicketListModel(
-        tickets: (json['tickets'] as List? ?? [])
+        tickets: (json['data'] as List? ?? [])
             .map((t) =>
                 FranchiseTicketItem.fromJson(t as Map<String, dynamic>))
             .toList(),
@@ -79,8 +71,8 @@ class FranchiseTicketPagination {
   final int perPage;
   final int currentPage;
   final int lastPage;
-  final String? nextPageUrl;
-  final String? prevPageUrl;
+  final bool hasNextPage;
+  final bool hasPrevPage;
 
   FranchiseTicketPagination({
     required this.total,
@@ -88,27 +80,28 @@ class FranchiseTicketPagination {
     required this.perPage,
     required this.currentPage,
     required this.lastPage,
-    this.nextPageUrl,
-    this.prevPageUrl,
+    this.hasNextPage = false,
+    this.hasPrevPage = false,
   });
 
   factory FranchiseTicketPagination.fromJson(Map<String, dynamic> json) =>
       FranchiseTicketPagination(
         total: json['total'] ?? 0,
         count: json['count'] ?? 0,
-        perPage: json['per_page'] ?? 10,
-        currentPage: json['current_page'] ?? 1,
-        lastPage: json['last_page'] ?? 1,
-        nextPageUrl: json['next_page_url'],
-        prevPageUrl: json['prev_page_url'],
+        perPage: json['limit'] ?? 15,
+        currentPage: json['page'] ?? 1,
+        lastPage: json['totalPages'] ?? 1,
+        hasNextPage: json['hasNextPage'] ?? false,
+        hasPrevPage: json['hasPrevPage'] ?? false,
       );
 
   factory FranchiseTicketPagination.empty() => FranchiseTicketPagination(
-        total: 0, count: 0, perPage: 10,
-        currentPage: 1, lastPage: 1,
+        total: 0,
+        count: 0,
+        perPage: 15,
+        currentPage: 1,
+        lastPage: 1,
       );
-
-  bool get hasNextPage => nextPageUrl != null;
 }
 
 class FranchiseTicketItem {
@@ -140,19 +133,19 @@ class FranchiseTicketItem {
 
   factory FranchiseTicketItem.fromJson(Map<String, dynamic> json) =>
       FranchiseTicketItem(
-        id: json['id'] ?? 0,
-        orderId: json['order_id'],
-        title: json['title'] ?? '',
-        priority: json['priority'] ?? 'normal',
-        status: json['status'] ?? 'open',
-        department: json['department'] ?? '',
+        id: (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+        orderId: json['order_id'] != null ? (json['order_id'] is int ? json['order_id'] : int.tryParse(json['order_id'].toString())) : null,
+        title: json['title']?.toString() ?? json['subject']?.toString() ?? '',
+        priority: json['priority']?.toString() ?? 'normal',
+        status: json['status']?.toString() ?? 'open',
+        department: json['department_id']?.toString() ?? '',
         customer: FranchiseTicketCustomer.fromJson(
-          json['customer'] as Map<String, dynamic>? ?? {},
+          json['user'] as Map<String, dynamic>? ?? {},
         ),
-        lastMessage: json['last_message'],
-        lastMessageType: json['last_message_type'],
-        createdAt: json['created_at'] ?? '',
-        updatedAt: json['updated_at'] ?? '',
+        lastMessage: json['description']?.toString(),
+        lastMessageType: json['via']?.toString(),
+        createdAt: json['created_at']?.toString() ?? '',
+        updatedAt: json['updated_at']?.toString() ?? '',
       );
 }
 
@@ -171,23 +164,23 @@ class FranchiseTicketDetailModel {
     required this.messagePagination,
   });
 
-  factory FranchiseTicketDetailModel.fromJson(Map<String, dynamic> json) =>
-      FranchiseTicketDetailModel(
-        ticket: FranchiseTicketDetail.fromJson(
-          json['ticket'] as Map<String, dynamic>? ?? {},
-        ),
-        serviceRequest: json['service_request'] != null
-            ? FranchiseTicketServiceRequest.fromJson(
-                json['service_request'] as Map<String, dynamic>)
-            : null,
-        messages: (json['messages'] as List? ?? [])
-            .map((m) => FranchiseTicketMessage.fromJson(
-                m as Map<String, dynamic>))
-            .toList(),
-        messagePagination: FranchiseTicketPagination.fromJson(
-          json['message_pagination'] as Map<String, dynamic>? ?? {},
-        ),
-      );
+  factory FranchiseTicketDetailModel.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] as Map<String, dynamic>? ?? json;
+    return FranchiseTicketDetailModel(
+      ticket: FranchiseTicketDetail.fromJson(data),
+      serviceRequest: data['order'] != null
+          ? FranchiseTicketServiceRequest.fromJson(
+              data['order'] as Map<String, dynamic>)
+          : null,
+      messages: (data['ticketMessages'] as List? ?? [])
+          .map((m) =>
+              FranchiseTicketMessage.fromJson(m as Map<String, dynamic>))
+          .toList(),
+      messagePagination: FranchiseTicketPagination.fromJson(
+        data['pagination'] as Map<String, dynamic>? ?? {},
+      ),
+    );
+  }
 }
 
 class FranchiseTicketDetail {
@@ -217,25 +210,31 @@ class FranchiseTicketDetail {
     required this.updatedAt,
   });
 
-  factory FranchiseTicketDetail.fromJson(Map<String, dynamic> json) =>
-      FranchiseTicketDetail(
-        id: json['id'] ?? 0,
-        orderId: json['order_id'],
-        title: json['title'] ?? '',
-        subject: json['subject'],
-        description: json['description'],
-        priority: json['priority'] ?? 'normal',
-        status: json['status'] ?? 'open',
-        department: json['department'] != null
-            ? FranchiseTicketDepartment.fromJson(
-                json['department'] as Map<String, dynamic>)
-            : null,
-        customer: FranchiseTicketCustomerDetail.fromJson(
-          json['customer'] as Map<String, dynamic>? ?? {},
-        ),
-        createdAt: json['created_at'] ?? '',
-        updatedAt: json['updated_at'] ?? '',
-      );
+  factory FranchiseTicketDetail.fromJson(Map<String, dynamic> json) {
+    // Some APIs return status as int, we need it as String for the UI
+    final statusRaw = json['status'];
+    final priorityRaw = json['priority'];
+    
+    return FranchiseTicketDetail(
+      id: (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      orderId: json['order_id'] != null ? (json['order_id'] is int ? json['order_id'] : int.tryParse(json['order_id'].toString())) : null,
+      title: json['title']?.toString() ?? json['subject']?.toString() ?? '',
+      subject: json['subject']?.toString(),
+      description: json['description']?.toString(),
+      priority: priorityRaw?.toString() ?? 'normal',
+      status: statusRaw?.toString() ?? 'open',
+      department: json['department_id'] != null
+          ? FranchiseTicketDepartment(
+              id: (json['department_id'] is int) ? json['department_id'] : int.tryParse(json['department_id']?.toString() ?? '0') ?? 0,
+              name: json['department']?['name'] ?? json['department_name'] ?? '')
+          : null,
+      customer: FranchiseTicketCustomerDetail.fromJson(
+        json['user'] as Map<String, dynamic>? ?? json['customer'] as Map<String, dynamic>? ?? {},
+      ),
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
+    );
+  }
 }
 
 class FranchiseTicketDepartment {
@@ -296,36 +295,41 @@ class FranchiseTicketServiceRequest {
     required this.createdAt,
   });
 
-  factory FranchiseTicketServiceRequest.fromJson(Map<String, dynamic> json) =>
-      FranchiseTicketServiceRequest(
-        id: json['id'] ?? 0,
-        invoiceNumber: json['invoice_number'] ?? '',
-        date: json['date'] ?? '',
-        schedule: json['schedule'] ?? '',
-        status: json['status'] ?? '',
-        statusCode: json['status_code'] ?? 0,
-        paymentStatus: json['payment_status'] ?? '',
-        paymentGateway: json['payment_gateway'] ?? '',
-        subTotal: json['sub_total'] ?? 0,
-        tax: json['tax'] ?? 0,
-        deliveryCharge: json['delivery_charge'] ?? 0,
-        couponAmount: json['coupon_amount'] ?? 0,
-        total: json['total'] ?? 0,
-        orderNote: json['order_note'],
-        customer: FranchiseTicketCustomer.fromJson(
-          json['customer'] as Map<String, dynamic>? ?? {},
-        ),
-        outlet: json['outlet'] != null
-            ? FranchiseTicketOutlet.fromJson(
-                json['outlet'] as Map<String, dynamic>)
-            : null,
-        staff: json['staff'],
-        items: (json['items'] as List? ?? [])
-            .map((i) => FranchiseTicketOrderItem.fromJson(
-                i as Map<String, dynamic>))
-            .toList(),
-        createdAt: json['created_at'] ?? '',
-      );
+  factory FranchiseTicketServiceRequest.fromJson(Map<String, dynamic> json) {
+    final statusRaw = json['status'];
+    // Handle both { id, invoice_number } and flatter structures
+    return FranchiseTicketServiceRequest(
+      id: (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      invoiceNumber: json['invoice_number'] ?? json['invoice'] ?? '',
+      date: json['date']?.toString() ?? '',
+      schedule: json['schedule']?.toString() ?? '',
+      status: statusRaw?.toString() ?? '',
+      statusCode: (statusRaw is int) ? statusRaw : int.tryParse(statusRaw?.toString() ?? '0') ?? 0,
+      paymentStatus: json['payment_status']?.toString() ?? '',
+      paymentGateway: json['payment_gateway']?.toString() ?? '',
+      subTotal: _toNum(json['total'] ?? json['sub_total']),
+      tax: _toNum(json['tax']),
+      deliveryCharge: _toNum(json['delivery_charge']),
+      couponAmount: _toNum(json['coupon_amount']),
+      total: _toNum(json['total']),
+      orderNote: json['order_note']?.toString(),
+      customer: FranchiseTicketCustomer.fromJson(
+        json['user'] as Map<String, dynamic>? ?? json['customer'] as Map<String, dynamic>? ?? {},
+      ),
+      outlet: json['outlet'] != null ? FranchiseTicketOutlet.fromJson(json['outlet'] as Map<String, dynamic>) : null,
+      staff: json['staff'],
+      createdAt: json['created_at']?.toString() ?? '',
+      items: (json['items'] as List? ?? [])
+          .map((i) => FranchiseTicketOrderItem.fromJson(i as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  static num _toNum(dynamic val) {
+    if (val == null) return 0;
+    if (val is num) return val;
+    return num.tryParse(val.toString()) ?? 0;
+  }
 }
 
 class FranchiseTicketOutlet {
@@ -388,13 +392,19 @@ class FranchiseTicketCustomer {
   FranchiseTicketCustomer(
       {required this.id, required this.name, this.email, this.phone});
 
-  factory FranchiseTicketCustomer.fromJson(Map<String, dynamic> json) =>
-      FranchiseTicketCustomer(
-        id: json['id'] ?? 0,
-        name: json['name'] ?? '',
-        email: json['email'],
-        phone: json['phone'],
-      );
+  factory FranchiseTicketCustomer.fromJson(Map<String, dynamic> json) {
+    final firstName = json['first_name']?.toString() ?? '';
+    final lastName = json['last_name']?.toString() ?? '';
+    final name = json['name']?.toString() ?? 
+                (firstName.isEmpty && lastName.isEmpty ? '' : '$firstName $lastName'.trim());
+
+    return FranchiseTicketCustomer(
+      id: json['id'] ?? 0,
+      name: name,
+      email: json['email']?.toString(),
+      phone: json['phone']?.toString(),
+    );
+  }
 }
 
 class FranchiseTicketCustomerDetail {
@@ -412,14 +422,20 @@ class FranchiseTicketCustomerDetail {
     this.image,
   });
 
-  factory FranchiseTicketCustomerDetail.fromJson(Map<String, dynamic> json) =>
-      FranchiseTicketCustomerDetail(
-        id: json['id'] ?? 0,
-        name: json['name'] ?? '',
-        email: json['email'],
-        phone: json['phone'],
-        image: json['image'],
-      );
+  factory FranchiseTicketCustomerDetail.fromJson(Map<String, dynamic> json) {
+    final firstName = json['first_name']?.toString() ?? '';
+    final lastName = json['last_name']?.toString() ?? '';
+    final name = json['name']?.toString() ?? 
+                (firstName.isEmpty && lastName.isEmpty ? '' : '$firstName $lastName'.trim());
+
+    return FranchiseTicketCustomerDetail(
+      id: json['id'] ?? 0,
+      name: name,
+      email: json['email']?.toString(),
+      phone: json['phone']?.toString(),
+      image: json['image'],
+    );
+  }
 }
 
 // ── Message ───────────────────────────────────────────────────────────────────
@@ -439,12 +455,16 @@ class FranchiseTicketMessage {
     required this.createdAt,
   });
 
-  factory FranchiseTicketMessage.fromJson(Map<String, dynamic> json) =>
-      FranchiseTicketMessage(
-        id: json['id'] ?? 0,
-        message: json['message'] ?? '',
-        type: json['type'] ?? 'user',
-        attachment: json['attachment'],
-        createdAt: json['created_at'] ?? '',
-      );
+  factory FranchiseTicketMessage.fromJson(Map<String, dynamic> json) {
+    final admin = json['admin'] as Map<String, dynamic>?;
+    final type = admin != null ? 'admin' : 'user';
+
+    return FranchiseTicketMessage(
+      id: json['id'] ?? 0,
+      message: json['message'] ?? '',
+      type: type,
+      attachment: json['attachment'],
+      createdAt: json['created_at'] ?? '',
+    );
+  }
 }

@@ -8,6 +8,9 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/models/franchise_models/franchise_order_model.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_orders_service.dart';
+import 'package:car_service/helper/extension/string_extension.dart';
+import 'package:car_service/utils/components/image_view.dart';
+import '../../utils/components/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -513,24 +516,21 @@ class _LineItemRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          // Type icon
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: isProduct
-                  ? Colors.purple.withOpacity(0.1)
-                  : primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              isProduct
-                  ? Icons.inventory_2_outlined
-                  : Icons.build_circle_outlined,
-              size: 18,
-              color: isProduct ? Colors.purple : primaryColor,
-            ),
-          ),
+          // Item Image / Type icon
+          item.image != null && item.image.toString().isNotEmpty
+              ? GestureDetector(
+                  onTap: () =>
+                      context.toPage(ImageView(item.image.toString().toImageUrl)),
+                  child: CustomNetworkImage(
+                    width: 42,
+                    height: 42,
+                    imageUrl: item.image.toString().toImageUrl,
+                    radius: 8,
+                    fit: BoxFit.cover,
+                    errorWidget: _buildTypeIcon(isProduct),
+                  ),
+                )
+              : _buildTypeIcon(isProduct),
           SizedBoxExtension(12).toWidth,
           Expanded(
             child: Column(
@@ -596,6 +596,24 @@ class _LineItemRow extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTypeIcon(bool isProduct) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: isProduct
+            ? Colors.purple.withOpacity(0.1)
+            : primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(
+        isProduct ? Icons.inventory_2_outlined : Icons.build_circle_outlined,
+        size: 18,
+        color: isProduct ? Colors.purple : primaryColor,
       ),
     );
   }

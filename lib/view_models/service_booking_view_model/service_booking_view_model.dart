@@ -299,64 +299,74 @@ class ServiceBookingViewModel {
       );
     }
 
-    // Handle wallet payment success - no external payment needed
-    if (result == true && useWallet.value) {
-      // Refresh wallet balance after payment
-      ws.refresh();
-      context.toPage(const OrderSummeryView());
-    } else if (result == true &&
-        ["manual_payment", "cash_on_delivery", "cod"].contains(paymentGateway)) {
-      context.toPage(const OrderSummeryView());
-    } else if (result == true) {
-      final po = Provider.of<PlaceOrderService>(context, listen: false);
-      final piProvider =
-          Provider.of<ProfileInfoService>(context, listen: false);
-      startPayment(
-        context,
-        selectedGateway: selectedGateway.value!,
-        authNetCard: aCardController.text,
-        authcCode: aCardController.text,
-        zUsername: zUsernameController.text,
-        authNetED: authNetExpireDate.value,
-        orderId: po.orderResponseModel.orderDetails?.id,
-        amount: po.orderResponseModel.orderDetails?.total,
-        userEmail: piProvider.profileInfoModel.userDetails?.email,
-        userPhone: piProvider.profileInfoModel.userDetails?.phone,
-        userName: piProvider.profileInfoModel.userDetails?.firstName,
-        onSuccess: () {
-          context.toPage(OrderSummeryView(
-            updateFunction: (cxt) async {
-              try {
-                paymentLoading.value = true;
-                final result =
-                    await Provider.of<PlaceOrderService>(cxt, listen: false)
-                        .updatePayment(cxt);
-                if (result != true) {
-                  cxt.snackBar(
-                    LocalKeys.paymentUpdateFailed,
-                    buttonText: LocalKeys.retry,
-                    onTap: () async {
-                      paymentLoading.value = true;
+    // Handle success
+    if (result == true) {
+      final orderId = po.orderResponseModel.orderDetails?.id;
+      if (orderId == null) {
+        LocalKeys.orderNotFound.showToast();
+        isLoading.value = false;
+        return;
+      }
 
-                      await Provider.of<PlaceOrderService>(cxt, listen: false)
-                          .updatePayment(cxt);
-
-                      paymentLoading.value = false;
-                    },
-                  );
-                }
-              } catch (e) {
-                debugPrint(e.toString());
-              } finally {
-                paymentLoading.value = false;
-              }
-            },
-          ));
-        },
-        onFailed: () {
+      // Step 2: Initiate Payment
+      final paymentResult = await po.initiatePayment(orderId, paymentGateway);
+      
+      if (paymentResult != null) {
+        if (useWallet.value || ["manual_payment", "cash_on_delivery", "cod"].contains(paymentGateway)) {
+          // Wallet or offline methods - navigate to summary
+          if (useWallet.value) ws.refresh();
           context.toPage(const OrderSummeryView());
-        },
-      );
+        } else {
+          // External payment methods - start payment flow
+          final piProvider = Provider.of<ProfileInfoService>(context, listen: false);
+          
+          startPayment(
+            context,
+            selectedGateway: selectedGateway.value!,
+            authNetCard: aCardController.text,
+            authcCode: aCardController.text,
+            zUsername: zUsernameController.text,
+            authNetED: authNetExpireDate.value,
+            orderId: orderId,
+            amount: po.orderResponseModel.orderDetails?.total,
+            userEmail: piProvider.profileInfoModel.userDetails?.email,
+            userPhone: piProvider.profileInfoModel.userDetails?.phone,
+            userName: piProvider.profileInfoModel.userDetails?.firstName,
+            onSuccess: () {
+              context.toPage(OrderSummeryView(
+                updateFunction: (cxt) async {
+                  try {
+                    paymentLoading.value = true;
+                    // Reference orderId from the scope
+                    final refId = orderId;
+                    final result = await Provider.of<PlaceOrderService>(cxt, listen: false)
+                        .updatePayment(cxt, id: refId);
+                    if (result != true) {
+                      cxt.snackBar(
+                        LocalKeys.paymentUpdateFailed,
+                        buttonText: LocalKeys.retry,
+                        onTap: () async {
+                          paymentLoading.value = true;
+                          await Provider.of<PlaceOrderService>(cxt, listen: false)
+                              .updatePayment(cxt, id: refId);
+                          paymentLoading.value = false;
+                        },
+                      );
+                    }
+                  } catch (e) {
+                    debugPrint(e.toString());
+                  } finally {
+                    paymentLoading.value = false;
+                  }
+                },
+              ));
+            },
+            onFailed: () {
+              context.toPage(const OrderSummeryView());
+            },
+          );
+        }
+      }
     }
 
     if (orderFromCart && result == true) {

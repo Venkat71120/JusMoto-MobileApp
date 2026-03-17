@@ -8,7 +8,9 @@ import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
+import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/helper/extension/context_extension.dart';
 import '/helper/extension/string_extension.dart';
@@ -49,16 +51,21 @@ class FranchiseLandingNavBar extends StatelessWidget {
               1,
               fvm,
             ),
-            // ✅ CHANGED: Reports → Services (ticket/support icon)
-            _navBarItem(
-              context,
-              'Services',
-              SvgAssets.store,     // swap to support/ticket icon if you have one
-              SvgAssets.storeBold,
-              2,
-              fvm,
-              // You can pass a badgeCount here once you have unread ticket count:
-              // badgeCount: ticketOpenCount,
+            Consumer<FranchiseTicketsService>(
+              builder: (context, ts, _) {
+                if (ts.shouldAutoFetch) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) => ts.fetchAll());
+                }
+                return _navBarItem(
+                  context,
+                  'Services',
+                  SvgAssets.store,
+                  SvgAssets.storeBold,
+                  2,
+                  fvm,
+                  badgeCount: ts.statistics.open,
+                );
+              },
             ),
             _navBarItem(
               context,

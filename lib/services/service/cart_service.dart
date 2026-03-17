@@ -77,10 +77,22 @@ class CartService with ChangeNotifier {
     final services = [];
     cartList.values.toList().forEach((item) {
       try {
-        services.add({
-          "id": item["service"]?["id"],
-          "qty": item["quantity"].toString().tryToParse,
-        });
+        final Map<String, dynamic> serviceMap = {
+          "service_id": item["service"]?["id"].toString().tryToParse,
+          "quantity": item["quantity"].toString().tryToParse,
+          "addons": (item["addons"] ?? []),
+        };
+
+        final car = item["service"]?["service_car"];
+        if (car != null) {
+          if (car["id"] != null) {
+            serviceMap["car_id"] = car["id"].toString().tryToParse;
+          }
+          if (car["variant"]?["id"] != null) {
+            serviceMap["variant_id"] = car["variant"]["id"].toString().tryToParse;
+          }
+        }
+        services.add(serviceMap);
       } catch (e) {
         debugPrint(item.toString());
       }

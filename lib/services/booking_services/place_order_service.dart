@@ -29,20 +29,14 @@ class PlaceOrderService with ChangeNotifier {
     var url = AppUrls.placeOrderUrl;
     final sbm = ServiceBookingViewModel.instance;
 
-    // ✅ FIXED: Build items as a proper List, not a JSON string
-    // Also move variant_id inside each item, not at top level
-    final variantId = sPref?.getString("vId");
-    final List itemsWithVariant = (services as List).map((item) {
-      final Map<String, dynamic> mapped = {
-        "id": item["id"] ?? item["service_id"],
-        "qty": item["qty"] ?? item["quantity"] ?? 1,
+    final List itemsForNewApi = (services as List).map((item) {
+      return {
+        "service_id": (item["service_id"] ?? item["id"]).toString().tryToParse,
+        "car_id": item["car_id"]?.toString().tryToParse,
+        "variant_id": item["variant_id"]?.toString().tryToParse,
+        "quantity": (item["quantity"] ?? item["qty"] ?? 1).toString().tryToParse,
+        "addons": item["addons"] ?? [],
       };
-      if (variantId != null && variantId.isNotEmpty) {
-        mapped["variant_id"] = int.tryParse(variantId);
-      }
-      if (item["car_id"] != null) mapped["car_id"] = item["car_id"];
-      if (item["addons"] != null) mapped["addons"] = item["addons"];
-      return mapped;
     }).toList();
 
     // ✅ FIXED: delivery_mode — API only accepts "home" or "pickup", not "walkin"
@@ -50,20 +44,19 @@ class PlaceOrderService with ChangeNotifier {
         ? 'pickup'
         : 'home';
 
-    // ✅ FIXED: Build address object (renamed from "location"), not JSON string
-    Map<String, dynamic>? addressData;
-    if (sbm.serviceMethod.value != DeliveryOption.OUTLET) {
-      final profile = Provider.of<ProfileInfoService>(context, listen: false);
-      final selectedAddress = sbm.selectedAddress.value;
-      addressData = {
-        "address": sbm.addressController.text,
-        "phone": selectedAddress?.phone ?? profile.profileInfoModel.userDetails?.phone ?? "",
-        "emergency_phone": selectedAddress?.emergencyPhone,
-        "latitude": sbm.selectedLatLng.value?.latitude,
-        "longitude": sbm.selectedLatLng.value?.longitude,
-        "type": 0,
-      };
-    }
+    final profile = Provider.of<ProfileInfoService>(context, listen: false);
+    final selectedAddress = sbm.selectedAddress.value;
+    
+    final Map<String, dynamic> addressData = {
+      "name": selectedAddress?.name ?? profile.profileInfoModel.userDetails?.fullName ?? "",
+      "phone": selectedAddress?.phone ?? profile.profileInfoModel.userDetails?.phone ?? "",
+      "email": profile.profileInfoModel.userDetails?.email ?? "",
+      "address": sbm.addressController.text,
+      "city": selectedAddress?.city ?? "",
+      "state": selectedAddress?.state ?? "",
+      "zip_code": selectedAddress?.zipCode ?? (selectedAddress?.postCode?.toString()) ?? "",
+      "country": "India", // Defaulting to India as per example
+    };
 
     final bool isManualWithFile =
         gateway == "manual_payment" && file != null;
@@ -72,25 +65,17 @@ class PlaceOrderService with ChangeNotifier {
       // ── Multipart path (only when attaching a payment screenshot) ──────────
       // Multipart fields must all be strings, so we JSON-encode nested objects
       final Map<String, String> fields = {
-        'items': jsonEncode(itemsWithVariant),   // encoded once, intentionally
+        'items': jsonEncode(itemsForNewApi),
         'date': DateFormat("yyyy-MM-dd").format(sbm.selectedDate.value!),
-        'time': sbm.selectedTime.value!.format(context),
+        'schedule': sbm.selectedTime.value!.format(context),
         'order_note': sbm.descriptionController.text,
         'delivery_mode': deliveryMode,
-        'selected_payment_gateway': gateway.toString(),
         'coupon_code': coupon.toString(),
+        'address': jsonEncode(addressData),
       };
 
-      if (sbm.serviceMethod.value == DeliveryOption.OUTLET) {
-        fields['outlet_id'] =
-            sbm.selectedOutlet.value?.id?.toString() ?? "";
-      }
-      if (sbm.selectedStaff.value != null) {
-        fields['staff_id'] =
-            sbm.selectedStaff.value?.id?.toString() ?? "";
-      }
-      if (addressData != null) {
-        fields['address'] = jsonEncode(addressData); // encoded once
+      if (sbm.selectedOutlet.value?.id != null) {
+        fields['outlet_id'] = sbm.selectedOutlet.value!.id.toString();
       }
 
       log('Multipart fields: ${jsonEncode(fields)}');
@@ -103,34 +88,29 @@ class PlaceOrderService with ChangeNotifier {
         'Authorization': 'Bearer $getToken',
       });
 
-      final responseData = await NetworkApiServices()
-          .postWithFileApi(request, LocalKeys.payAndConfirmOrder);
+      final responseData = await NetworkApiServices().postWithFileApi(
+        request,
+        LocalKeys.payAndConfirmOrder,
+        timeoutSeconds: 60,
+      );
       if (responseData != null) {
         _orderResponseModel = OrderResponseModel.fromJson(responseData);
         return true;
       }
     } else {
       // ── JSON POST path (all other gateways) ─────────────────────────────────
-      // ✅ FIXED: items is a real List here — no jsonEncode wrapping
       final Map<String, dynamic> body = {
-        'items': itemsWithVariant,
-        'date': DateFormat("yyyy-MM-dd").format(sbm.selectedDate.value!),
-        'time': sbm.selectedTime.value!.format(context),
-        'order_note': sbm.descriptionController.text,
+        'items': itemsForNewApi,
+        'address': addressData,
         'delivery_mode': deliveryMode,
-        'selected_payment_gateway': gateway.toString(),
         'coupon_code': coupon.toString(),
+        'date': DateFormat("yyyy-MM-dd").format(sbm.selectedDate.value!),
+        'schedule': sbm.selectedTime.value!.format(context), // "morning" or time slot
+        'order_note': sbm.descriptionController.text,
       };
 
-      if (sbm.serviceMethod.value == DeliveryOption.OUTLET) {
-        body['outlet_id'] = sbm.selectedOutlet.value?.id;
-      }
-      if (sbm.selectedStaff.value != null) {
-        body['staff_id'] = sbm.selectedStaff.value?.id;
-      }
-      if (addressData != null) {
-        // ✅ FIXED: key is "address", value is a Map object (not a string)
-        body['address'] = addressData;
+      if (sbm.selectedOutlet.value?.id != null) {
+        body['outlet_id'] = sbm.selectedOutlet.value!.id.toString().tryToParse;
       }
 
       log('JSON body: ${jsonEncode(body)}');
@@ -139,13 +119,36 @@ class PlaceOrderService with ChangeNotifier {
         body,
         url,
         LocalKeys.payAndConfirmOrder,
-        headers: commonAuthHeader,
+        headers: acceptJsonAuthHeader,
+        timeoutSeconds: 120,
       );
 
       if (responseData != null) {
         _orderResponseModel = OrderResponseModel.fromJson(responseData);
         return true;
       }
+    }
+  }
+
+  /// Step 2: Initiate Payment
+  initiatePayment(dynamic orderId, String gateway) async {
+    final url = AppUrls.initiatePaymentUrl;
+    final Map<String, dynamic> data = {
+      "order_id": orderId.toString().tryToParse,
+      "payment_method": gateway,
+    };
+
+    log('Initiate Payment payload: ${jsonEncode(data)}');
+
+    final responseData = await NetworkApiServices().postApi(
+      data,
+      url,
+      LocalKeys.paymentGateway,
+      headers: acceptJsonAuthHeader,
+    );
+
+    if (responseData != null) {
+      return responseData;
     }
   }
 

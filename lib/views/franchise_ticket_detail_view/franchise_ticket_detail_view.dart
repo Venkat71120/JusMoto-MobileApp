@@ -8,8 +8,13 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/models/franchise_models/franchise_ticket_model.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
+import 'package:car_service/helper/extension/string_extension.dart';
+import 'package:car_service/utils/components/image_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class FranchiseTicketDetailView extends StatefulWidget {
   final int ticketId;
@@ -138,10 +143,10 @@ class _DetailContent extends StatelessWidget {
                 ),
               ),
             ),
-            // ── Chat FAB placeholder in actions ──────────────────────
+            // ── Status update actions ──────────────────────────────
             actions: [
-              _ChatButton(ticketId: ticket.id),
-              SizedBoxExtension(12).toWidth,
+              _StatusPopup(ticket: ticket),
+              SizedBoxExtension(8).toWidth,
             ],
           ),
 
@@ -164,13 +169,13 @@ class _DetailContent extends StatelessWidget {
                       _MetaRow(
                         icon: Icons.calendar_today_outlined,
                         label: 'Created',
-                        value: ticket.createdAt,
+                        value: _formatDateTime(ticket.createdAt),
                       ),
                       8.toHeight,
                       _MetaRow(
                         icon: Icons.update_outlined,
                         label: 'Updated',
-                        value: ticket.updatedAt,
+                        value: _formatDateTime(ticket.updatedAt),
                       ),
                       if (ticket.orderId != null) ...[
                         8.toHeight,
@@ -274,11 +279,13 @@ class _DetailContent extends StatelessWidget {
                     16.toHeight,
                   ],
 
-                  // ── Chat stub ────────────────────────────────────
+                  // ── Conversation ─────────────────────────────────
                   _SectionHeader(title: 'Conversation'),
                   8.toHeight,
-                  _ChatStub(ticketId: ticket.id),
-                  32.toHeight,
+                  ...detail.messages.map((m) => _MessageBubble(message: m)),
+                  20.toHeight,
+                  _ReplyInput(ticketId: ticket.id),
+                  40.toHeight,
                 ],
               ),
             ),
@@ -362,15 +369,19 @@ class _LinkedOrderCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _MetaRow(
-                      icon: Icons.calendar_today_outlined,
-                      label: 'Date',
-                      value: sr.date),
-                  const Spacer(),
-                  _MetaRow(
-                      icon: Icons.access_time_outlined,
-                      label: 'Time',
-                      value: sr.schedule),
+                  Expanded(
+                    child: _MetaRow(
+                        icon: Icons.calendar_today_outlined,
+                        label: 'Date',
+                        value: _formatDateTime(sr.date)),
+                  ),
+                  SizedBoxExtension(12).toWidth,
+                  Expanded(
+                    child: _MetaRow(
+                        icon: Icons.access_time_outlined,
+                        label: 'Time',
+                        value: sr.schedule),
+                  ),
                 ],
               ),
               if (sr.outlet != null) ...[
@@ -384,55 +395,6 @@ class _LinkedOrderCard extends StatelessWidget {
                           : ''),
                 ),
               ],
-              12.toHeight,
-              Divider(height: 1, color: Colors.grey.withOpacity(0.12)),
-              12.toHeight,
-              // Items
-              ...sr.items.map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: (item.type == 'product'
-                                    ? Colors.purple
-                                    : primaryColor)
-                                .withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Icon(
-                            item.type == 'product'
-                                ? Icons.inventory_2_outlined
-                                : Icons.build_circle_outlined,
-                            size: 14,
-                            color: item.type == 'product'
-                                ? Colors.purple
-                                : primaryColor,
-                          ),
-                        ),
-                        SizedBoxExtension(10).toWidth,
-                        Expanded(
-                          child: Text(
-                            item.name,
-                            style: context.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          '₹${item.total}',
-                          style: context.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-              Divider(height: 1, color: Colors.grey.withOpacity(0.12)),
               12.toHeight,
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -457,131 +419,186 @@ class _LinkedOrderCard extends StatelessWidget {
   }
 }
 
-// ── Chat Stub ─────────────────────────────────────────────────────────────────
+// ── Message Bubble ────────────────────────────────────────────────────────────
 
-class _ChatStub extends StatelessWidget {
-  final int ticketId;
-  const _ChatStub({required this.ticketId});
+class _MessageBubble extends StatelessWidget {
+  final FranchiseTicketMessage message;
+  const _MessageBubble({required this.message});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.color.accentContrastColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: primaryColor.withOpacity(0.2),
-          style: BorderStyle.solid,
+    final isAdmin = message.type == 'admin';
+    return Align(
+      alignment: isAdmin ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isAdmin ? primaryColor : context.color.accentContrastColor,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(isAdmin ? 16 : 0),
+            bottomRight: Radius.circular(isAdmin ? 0 : 16),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.08),
-              shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(Icons.chat_bubble_outline_rounded,
-                color: primaryColor, size: 28),
-          ),
-          12.toHeight,
-          Text(
-            'Chat with Customer',
-            style: context.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: context.color.primaryContrastColor,
-            ),
-          ),
-          6.toHeight,
-          Text(
-            'Tap the button below to open the conversation\nfor ticket #$ticketId',
-            style: context.bodySmall
-                ?.copyWith(color: Colors.grey[400], height: 1.5),
-            textAlign: TextAlign.center,
-          ),
-          16.toHeight,
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Navigate to chat view — wire up later
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Chat coming soon'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.chat_rounded, size: 18),
-              label: const Text('Open Chat'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 0,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment:
+              isAdmin ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.message.trim(),
+              style: context.bodySmall?.copyWith(
+                color: isAdmin ? Colors.white : context.color.primaryContrastColor,
+                height: 1.4,
               ),
             ),
-          ),
-        ],
+            if (message.attachment != null && message.attachment!.isNotEmpty) ...[
+              10.toHeight,
+              GestureDetector(
+                onTap: () => context.toPage(ImageView(message.attachment!.toImageUrl)),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: message.attachment!.toImageUrl,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      height: 180,
+                      color: Colors.black12,
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      height: 180,
+                      color: Colors.black12,
+                      child: const Icon(Icons.broken_image_outlined, color: Colors.white24),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            4.toHeight,
+            Text(
+              _formatDateTime(message.createdAt),
+              style: TextStyle(
+                color: isAdmin ? Colors.white60 : Colors.grey[400],
+                fontSize: 9,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// ── Chat Button in AppBar ─────────────────────────────────────────────────────
+// ── Reply Input ───────────────────────────────────────────────────────────────
 
-class _ChatButton extends StatelessWidget {
+class _ReplyInput extends StatefulWidget {
   final int ticketId;
-  const _ChatButton({required this.ticketId});
+  const _ReplyInput({required this.ticketId});
+
+  @override
+  State<_ReplyInput> createState() => _ReplyInputState();
+}
+
+class _ReplyInputState extends State<_ReplyInput> {
+  final _controller = TextEditingController();
+  bool _isSending = false;
+
+  void _send() async {
+    final msg = _controller.text.trim();
+    if (msg.isEmpty) return;
+
+    setState(() => _isSending = true);
+    final success = await Provider.of<FranchiseTicketsService>(context, listen: false)
+        .sendServiceRequestReply(widget.ticketId, message: msg);
+    
+    if (mounted) {
+      if (success) _controller.clear();
+      setState(() => _isSending = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // TODO: Navigate to chat — wire up later
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Chat coming soon'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      },
-      child: Container(
+    return _SectionCard(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: 'Type your reply...',
+                  hintStyle: context.bodySmall?.copyWith(color: Colors.grey[400]),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                style: context.bodySmall,
+                maxLines: 4,
+                minLines: 1,
+              ),
+            ),
+            _isSending
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.send_rounded, color: primaryColor),
+                    onPressed: _send,
+                  ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ── Status Popup ─────────────────────────────────────────────────────────────
+
+class _StatusPopup extends StatelessWidget {
+  final FranchiseTicketDetail ticket;
+  const _StatusPopup({required this.ticket});
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      icon: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.4)),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.chat_bubble_outline_rounded,
-                size: 14, color: Colors.white),
-            SizedBoxExtension(6).toWidth,
-            const Text(
-              'Chat',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        child: const Text(
+          'Update Status',
+          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
         ),
       ),
+      onSelected: (val) {
+        Provider.of<FranchiseTicketsService>(context, listen: false)
+            .updateServiceRequestStatus(ticket.id, val);
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(value: 'open', child: Text('Open')),
+        const PopupMenuItem(value: 'in_progress', child: Text('In Progress')),
+        const PopupMenuItem(value: 'closed', child: Text('Closed')),
+      ],
     );
   }
 }
@@ -655,7 +672,7 @@ class _MetaRow extends StatelessWidget {
         SizedBoxExtension(6).toWidth,
         Expanded(
           child: Text(
-            value,
+            value.toString(),
             style: context.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.color.primaryContrastColor,
@@ -842,6 +859,25 @@ class _DetailError extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _formatDateTime(String? dateStr) {
+  if (dateStr == null || dateStr.isEmpty) return 'N/A';
+  try {
+    final date = DateTime.parse(dateStr).toLocal();
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays < 1) {
+      return timeago.format(date);
+    } else if (difference.inDays < 7) {
+      return DateFormat('EEEE, h:mm a').format(date);
+    } else {
+      return DateFormat('MMM dd, yyyy').format(date);
+    }
+  } catch (e) {
+    return dateStr;
   }
 }
 

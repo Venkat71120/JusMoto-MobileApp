@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // MODEL: franchise_order_model.dart
 // Location: lib/models/franchise_models/franchise_order_model.dart
@@ -16,7 +18,7 @@ class FranchiseOrderListModel {
 
   factory FranchiseOrderListModel.fromJson(Map<String, dynamic> json) {
     return FranchiseOrderListModel(
-      orders: (json['orders'] as List? ?? [])
+      orders: (json['data'] as List? ?? [])
           .map((o) => FranchiseOrderItem.fromJson(o as Map<String, dynamic>))
           .toList(),
       pagination: FranchiseOrderPagination.fromJson(
@@ -33,43 +35,41 @@ class FranchiseOrderListModel {
 
 class FranchiseOrderPagination {
   final int total;
-  final int count;
-  final int perPage;
   final int currentPage;
-  final int lastPage;
-  final String? nextPageUrl;
-  final String? prevPageUrl;
+  final int totalPages;
+  final int limit;
+  final bool hasNextPage;
+  final bool hasPrevPage;
 
   FranchiseOrderPagination({
     required this.total,
-    required this.count,
-    required this.perPage,
     required this.currentPage,
-    required this.lastPage,
-    this.nextPageUrl,
-    this.prevPageUrl,
+    required this.totalPages,
+    required this.limit,
+    required this.hasNextPage,
+    required this.hasPrevPage,
   });
 
   factory FranchiseOrderPagination.fromJson(Map<String, dynamic> json) =>
       FranchiseOrderPagination(
         total: json['total'] ?? 0,
-        count: json['count'] ?? 0,
-        perPage: json['per_page'] ?? 10,
-        currentPage: json['current_page'] ?? 1,
-        lastPage: json['last_page'] ?? 1,
-        nextPageUrl: json['next_page_url'],
-        prevPageUrl: json['prev_page_url'],
+        currentPage: json['page'] ?? 1,
+        totalPages: json['totalPages'] ?? 1,
+        limit: json['limit'] ?? 10,
+        hasNextPage: json['hasNextPage'] ?? false,
+        hasPrevPage: json['hasPrevPage'] ?? false,
       );
 
   factory FranchiseOrderPagination.empty() => FranchiseOrderPagination(
         total: 0,
-        count: 0,
-        perPage: 10,
         currentPage: 1,
-        lastPage: 1,
+        totalPages: 1,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false,
       );
 
-  bool get hasNextPage => nextPageUrl != null;
+
 }
 
 class FranchiseOrderItem {
@@ -109,21 +109,56 @@ class FranchiseOrderItem {
         invoiceNumber: json['invoice_number'] ?? '',
         date: json['date'] ?? '',
         schedule: json['schedule'] ?? '',
-        status: json['status'] ?? '',
-        statusCode: json['status_code'] ?? 0,
-        paymentStatus: json['payment_status'] ?? '',
-        paymentStatusCode: json['payment_status_code'] ?? 0,
-        total: json['total'] ?? 0,
+        status: _statusLabel(_toInt(json['status'])),
+        statusCode: _toInt(json['status']),
+        paymentStatus: _paymentStatusLabel(_toInt(json['payment_status'])),
+        paymentStatusCode: _toInt(json['payment_status']),
+        total: _toNum(json['total']),
         customer: FranchiseOrderCustomer.fromJson(
-          json['customer'] as Map<String, dynamic>? ?? {},
+          json['user'] as Map<String, dynamic>? ?? {},
         ),
         staff: json['staff'] != null
             ? FranchiseOrderStaff.fromJson(
                 json['staff'] as Map<String, dynamic>)
             : null,
-        itemsCount: json['items_count'] ?? 0,
+        itemsCount: (json['items'] as List?)?.length ?? 0,
         createdAt: json['created_at'] ?? '',
       );
+
+  static String _statusLabel(int code) {
+    switch (code) {
+      case 0:
+        return 'Pending';
+      case 1:
+        return 'Accepted';
+      case 2:
+        return 'In Progress';
+      case 3:
+        return 'Completed';
+      case 4:
+        return 'Cancelled';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  static String _paymentStatusLabel(int code) {
+    return code == 1 ? 'Paid' : 'Unpaid';
+  }
+
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  static num _toNum(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
+  }
 }
 
 // ── Order Detail ──────────────────────────────────────────────────────────────
@@ -186,45 +221,72 @@ class FranchiseOrderDetailModel {
   });
 
   factory FranchiseOrderDetailModel.fromJson(Map<String, dynamic> json) {
-    final order = json['order'] as Map<String, dynamic>? ?? json;
-    return FranchiseOrderDetailModel(
-      id: order['id'] ?? 0,
-      invoiceNumber: order['invoice_number'] ?? '',
-      date: order['date'] ?? '',
-      schedule: order['schedule'] ?? '',
-      status: order['status'] ?? '',
-      statusCode: order['status_code'] ?? 0,
-      paymentStatus: order['payment_status'] ?? '',
-      paymentStatusCode: order['payment_status_code'] ?? 0,
-      paymentGateway: order['payment_gateway'] ?? '',
-      transactionId: order['transaction_id'],
-      subTotal: order['sub_total'] ?? 0,
-      tax: order['tax'] ?? 0,
-      deliveryCharge: order['delivery_charge'] ?? 0,
-      couponCode: order['coupon_code'],
-      couponAmount: order['coupon_amount'] ?? 0,
-      total: order['total'] ?? 0,
-      orderNote: order['order_note'],
-      isRefunded: order['is_refunded'],
-      refundAmount: order['refund_amount'],
-      customer: FranchiseOrderCustomerDetail.fromJson(
-        order['customer'] as Map<String, dynamic>? ?? {},
-      ),
-      location: order['location'] != null
-          ? FranchiseOrderLocation.fromJson(
-              order['location'] as Map<String, dynamic>)
-          : null,
-      outlet: order['outlet'],
-      staff: order['staff'] != null
-          ? FranchiseOrderStaff.fromJson(order['staff'] as Map<String, dynamic>)
-          : null,
-      items: (order['items'] as List? ?? [])
-          .map((i) =>
-              FranchiseOrderLineItem.fromJson(i as Map<String, dynamic>))
-          .toList(),
-      createdAt: order['created_at'] ?? '',
-      updatedAt: order['updated_at'] ?? '',
-    );
+    try {
+      final order = _toMap(json['data']).isNotEmpty
+          ? _toMap(json['data'])
+          : _toMap(json['order']).isNotEmpty
+              ? _toMap(json['order'])
+              : json;
+
+      final statusInt = FranchiseOrderItem._toInt(order['status']);
+      final pStatusInt = FranchiseOrderItem._toInt(order['payment_status']);
+
+      return FranchiseOrderDetailModel(
+        id: FranchiseOrderItem._toInt(order['id']),
+        invoiceNumber: order['invoice_number']?.toString() ?? '',
+        date: order['date']?.toString() ?? '',
+        schedule: order['schedule']?.toString() ?? '',
+        status: FranchiseOrderItem._statusLabel(statusInt),
+        statusCode: statusInt,
+        paymentStatus: FranchiseOrderItem._paymentStatusLabel(pStatusInt),
+        paymentStatusCode: pStatusInt,
+        paymentGateway: order['payment_gateway']?.toString() ?? '',
+        transactionId: order['transaction_id']?.toString(),
+        subTotal: FranchiseOrderItem._toNum(order['sub_total']),
+        tax: FranchiseOrderItem._toNum(order['tax']),
+        deliveryCharge: FranchiseOrderItem._toNum(order['delivery_charge']),
+        couponCode: order['coupon_code']?.toString(),
+        couponAmount: FranchiseOrderItem._toNum(order['coupon_amount']),
+        total: FranchiseOrderItem._toNum(order['total']),
+        orderNote: order['order_note']?.toString(),
+        isRefunded: order['is_refunded'] == 1 || order['is_refunded'] == true,
+        refundAmount: FranchiseOrderItem._toNum(order['refund_amount']),
+        customer: FranchiseOrderCustomerDetail.fromJson(
+          _toMap(order['user']).isNotEmpty ? _toMap(order['user']) : _toMap(order['customer']),
+        ),
+        location: order['location'] != null
+            ? FranchiseOrderLocation.fromJson(_toMap(order['location']))
+            : null,
+        outlet: order['outlet'],
+        staff: order['staff'] != null
+            ? FranchiseOrderStaff.fromJson(_toMap(order['staff']))
+            : null,
+        items: ((order['items'] ?? order['order_details'] ?? order['invoice_items']) as List? ?? [])
+            .map((i) {
+              try {
+                if (i is! Map) return null;
+                return FranchiseOrderLineItem.fromJson(Map<String, dynamic>.from(i));
+              } catch (e) {
+                debugPrint('❌ Error parsing line item: $e');
+                return null;
+              }
+            })
+            .whereType<FranchiseOrderLineItem>()
+            .toList(),
+        createdAt: order['created_at']?.toString() ?? '',
+        updatedAt: order['updated_at']?.toString() ?? '',
+      );
+    } catch (e, stack) {
+      debugPrint('❌ FranchiseOrderDetailModel.fromJson Error: $e');
+      debugPrint(stack.toString());
+      // Return a minimal model to avoid crashing the UI, but this will likely trigger the null check in the view
+      rethrow; 
+    }
+  }
+
+  static Map<String, dynamic> _toMap(dynamic value) {
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return {};
   }
 }
 
@@ -244,7 +306,7 @@ class FranchiseOrderCustomer {
   factory FranchiseOrderCustomer.fromJson(Map<String, dynamic> json) =>
       FranchiseOrderCustomer(
         id: json['id'] ?? 0,
-        name: json['name'] ?? '',
+        name: '${json['first_name'] ?? ''} ${json['last_name'] ?? ''}'.trim(),
         phone: json['phone'],
       );
 }
@@ -264,14 +326,23 @@ class FranchiseOrderCustomerDetail {
     this.image,
   });
 
-  factory FranchiseOrderCustomerDetail.fromJson(Map<String, dynamic> json) =>
-      FranchiseOrderCustomerDetail(
-        id: json['id'] ?? 0,
-        name: json['name'] ?? '',
-        email: json['email'],
-        phone: json['phone'],
-        image: json['image'],
-      );
+  factory FranchiseOrderCustomerDetail.fromJson(Map<String, dynamic> json) {
+    String name = json['name']?.toString() ?? 
+                 json['full_name']?.toString() ?? 
+                 json['customer_name']?.toString() ?? 
+                 '';
+    if (name.isEmpty) {
+      name = '${json['first_name'] ?? ''} ${json['last_name'] ?? ''}'.trim();
+    }
+
+    return FranchiseOrderCustomerDetail(
+      id: FranchiseOrderItem._toInt(json['id']),
+      name: name,
+      email: json['email']?.toString(),
+      phone: json['phone']?.toString(),
+      image: json['image'],
+    );
+  }
 }
 
 class FranchiseOrderStaff {
@@ -336,15 +407,56 @@ class FranchiseOrderLineItem {
     required this.total,
   });
 
-  factory FranchiseOrderLineItem.fromJson(Map<String, dynamic> json) =>
-      FranchiseOrderLineItem(
-        id: json['id'] ?? 0,
-        serviceId: json['service_id'] ?? 0,
-        type: json['type'] ?? 'service',
-        name: json['name'] ?? '',
-        image: json['image'],
-        quantity: json['quantity'] ?? 1,
-        price: json['price'] ?? 0,
-        total: json['total'] ?? 0,
-      );
+  factory FranchiseOrderLineItem.fromJson(Map<String, dynamic> json) {
+    // Backend often nests the actual service/product info
+    final serviceGroup = json['service'] as Map<String, dynamic>?;
+    final productGroup = json['product'] as Map<String, dynamic>?;
+
+    // Try all common title/name keys at top level first
+    String name = json['name']?.toString() ?? 
+                 json['title']?.toString() ?? 
+                 json['item_title']?.toString() ?? 
+                 '';
+                 
+    dynamic image = json['image'] ?? 
+                    json['img'] ?? 
+                    serviceGroup?['image'] ?? 
+                    serviceGroup?['img'] ?? 
+                    productGroup?['image'] ?? 
+                    productGroup?['img'];
+
+    if (name.isEmpty) {
+      if (serviceGroup != null) {
+        name = serviceGroup['title']?.toString() ?? 
+               serviceGroup['name']?.toString() ?? 
+               '';
+        image ??= serviceGroup['image'];
+      } else if (productGroup != null) {
+        name = productGroup['title']?.toString() ?? 
+               productGroup['name']?.toString() ?? 
+               '';
+        image ??= productGroup['image'];
+      }
+    }
+
+    num price = FranchiseOrderItem._toNum(json['price']);
+    int quantity = FranchiseOrderItem._toInt(json['quantity'] ?? json['qty'] ?? 1);
+    num total = FranchiseOrderItem._toNum(json['total'] ?? json['subtotal'] ?? json['sub_total'] ?? json['amount']);
+
+    // Fallback: if total is 0 but we have price and quantity, calculate it
+    if (total == 0 && price > 0) {
+      total = price * quantity;
+    }
+
+    return FranchiseOrderLineItem(
+      id: FranchiseOrderItem._toInt(json['id']),
+      serviceId: FranchiseOrderItem._toInt(json['service_id']),
+      type: json['type']?.toString() ?? (productGroup != null ? 'product' : 'service'),
+      name: name,
+      image: image,
+      quantity: quantity,
+      price: price,
+      total: total,
+    );
+  }
 }

@@ -4,9 +4,9 @@ import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
 import 'package:car_service/utils/components/custom_button.dart';
+import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../helper/constant_helper.dart';
 import '../../services/profile_services/profile_info_service.dart';
 import '../landing_view/landing_view.dart';
@@ -285,33 +285,65 @@ class FranchiseDashboardView extends StatelessWidget {
 
             24.toHeight,
 
-            // Quick Stats Card (Optional - for future use)
+            // Quick Stats Card
             _buildInfoCard(
               context,
               title: LocalKeys.quickStats,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        context,
-                        icon: Icons.shopping_bag_outlined,
-                        label: LocalKeys.totalOrders,
-                        value: '0',
-                        color: Colors.blue,
-                      ),
-                    ),
-                    16.toWidth,
-                    Expanded(
-                      child: _buildStatCard(
-                        context,
-                        icon: Icons.pending_actions_outlined,
-                        label: LocalKeys.pending,
-                        value: '0',
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ],
+                Consumer<FranchiseTicketsService>(
+                  builder: (context, ts, _) {
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                context,
+                                icon: Icons.shopping_bag_outlined,
+                                label: 'Orders',
+                                value: '0', // TODO: Connect OrdersService
+                                color: Colors.blue,
+                              ),
+                            ),
+                            16.toWidth,
+                            Expanded(
+                              child: _buildStatCard(
+                                context,
+                                icon: Icons.pending_actions_outlined,
+                                label: 'Pending',
+                                value: '0',
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ],
+                        ),
+                        16.toHeight,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                context,
+                                icon: Icons.support_agent_outlined,
+                                label: 'Open Tickets',
+                                value: ts.statistics.open.toString(),
+                                color: Colors.green,
+                              ),
+                            ),
+                            16.toWidth,
+                            Expanded(
+                              child: _buildStatCard(
+                                context,
+                                icon: Icons.assignment_outlined,
+                                label: 'Total Tickets',
+                                value: ts.statistics.total.toString(),
+                                color: Colors.purple,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

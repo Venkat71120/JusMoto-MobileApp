@@ -85,7 +85,7 @@ class FranchiseTicketsService with ChangeNotifier {
         timeoutSeconds: 20,
       );
 
-      if (response != null) {
+      if (response != null && response['success'] == true) {
         _ticketDetail = FranchiseTicketDetailModel.fromJson(
           Map<String, dynamic>.from(response),
         );
@@ -101,6 +101,55 @@ class FranchiseTicketsService with ChangeNotifier {
     }
   }
 
+  // ── Update service request status ───────────────────────────────────────────
+  Future<bool> updateServiceRequestStatus(int id, String status) async {
+    try {
+      final url = '${AppUrls.franchiseTicketsUrl}/$id/status';
+      final response = await NetworkApiServices().putApi(
+        {'status': status},
+        url,
+        null,
+        headers: acceptJsonAuthHeader,
+      );
+
+      if (response != null && response['success'] == true) {
+        // Refresh detail if currently open
+        if (_ticketDetail?.ticket.id == id) {
+          await fetchTicketDetail(id);
+        }
+        return true;
+      }
+    } catch (e) {
+      debugPrint('❌ updateServiceRequestStatus: $e');
+    }
+    return false;
+  }
+
+  // ── Send service request reply ─────────────────────────────────────────────
+  Future<bool> sendServiceRequestReply(int id, {required String message, String? filePath}) async {
+    try {
+      final url = '${AppUrls.franchiseTicketsUrl}/$id/reply';
+      
+      // If there's a file, we might need a multipart post. 
+      // For now, simple text reply as per API example 5
+      final response = await NetworkApiServices().postApi(
+        {'message': message},
+        url,
+        null,
+        headers: acceptJsonAuthHeader,
+      );
+
+      if (response != null && response['success'] == true) {
+        // Refresh detail to show new message
+        await fetchTicketDetail(id);
+        return true;
+      }
+    } catch (e) {
+      debugPrint('❌ sendServiceRequestReply: $e');
+    }
+    return false;
+  }
+
   void clearDetail() {
     _ticketDetail = null;
     _hasDetailError = false;
@@ -111,12 +160,12 @@ class FranchiseTicketsService with ChangeNotifier {
   Future<void> _fetchStatistics() async {
     try {
       final response = await NetworkApiServices().getApi(
-        AppUrls.franchiseTicketStatisticsUrl,
+        AppUrls.franchiseServiceRequestCountsUrl,
         null,
         headers: acceptJsonAuthHeader,
         timeoutSeconds: 20,
       );
-      if (response != null) {
+      if (response != null && response['success'] == true) {
         _statistics = FranchiseTicketStatisticsModel.fromJson(
           Map<String, dynamic>.from(response),
         );
@@ -136,7 +185,7 @@ class FranchiseTicketsService with ChangeNotifier {
         headers: acceptJsonAuthHeader,
         timeoutSeconds: 20,
       );
-      if (response != null) {
+      if (response != null && response['success'] == true) {
         _ticketList = FranchiseTicketListModel.fromJson(
           Map<String, dynamic>.from(response),
         );

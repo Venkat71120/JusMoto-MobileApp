@@ -20,6 +20,9 @@ class FranchiseOrdersService with ChangeNotifier {
   bool _hasListError = false;
   bool _hasDetailError = false;
 
+  String? _dateFrom;
+  String? _dateTo;
+
   // ── Public Getters ─────────────────────────────────────────────────────────
   FranchiseOrderListModel get orderList =>
       _orderList ?? FranchiseOrderListModel.empty();
@@ -30,6 +33,21 @@ class FranchiseOrdersService with ChangeNotifier {
   bool get isLoadingDetail => _isLoadingDetail;
   bool get hasListError => _hasListError;
   bool get hasDetailError => _hasDetailError;
+
+  String? get dateFrom => _dateFrom;
+  String? get dateTo => _dateTo;
+
+  void setFilters({String? from, String? to}) {
+    _dateFrom = from;
+    _dateTo = to;
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    _dateFrom = null;
+    _dateTo = null;
+    notifyListeners();
+  }
 
   bool get shouldAutoFetch => _orderList == null;
 
@@ -42,7 +60,15 @@ class FranchiseOrdersService with ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = '${AppUrls.franchiseOrdersUrl}?page=$page';
+      String query = 'page=$page';
+      if (_dateFrom != null && _dateFrom!.isNotEmpty) {
+        query += '&date_from=$_dateFrom';
+      }
+      if (_dateTo != null && _dateTo!.isNotEmpty) {
+        query += '&date_to=$_dateTo';
+      }
+
+      final url = '${AppUrls.franchiseOrdersUrl}?$query';
       final response = await NetworkApiServices().getApi(
         url,
         null,
@@ -50,18 +76,31 @@ class FranchiseOrdersService with ChangeNotifier {
         timeoutSeconds: 20,
       );
 
-      if (response != null) {
-        _orderList = FranchiseOrderListModel.fromJson(
+      if (response != null && response['success'] == true) {
+        final newModel = FranchiseOrderListModel.fromJson(
           Map<String, dynamic>.from(response),
         );
+
+        if (page == 1) {
+          _orderList = newModel;
+        } else {
+          // Append to existing list
+          final currentOrders = _orderList?.orders ?? [];
+          final updatedOrders = [...currentOrders, ...newModel.orders];
+          _orderList = FranchiseOrderListModel(
+            orders: updatedOrders,
+            pagination: newModel.pagination,
+          );
+        }
+        _hasListError = false;
       } else {
         _hasListError = true;
-        _orderList = FranchiseOrderListModel.empty();
+        if (page == 1) _orderList = FranchiseOrderListModel.empty();
       }
     } catch (e) {
       debugPrint('❌ FranchiseOrdersService.fetchOrders: $e');
       _hasListError = true;
-      _orderList = FranchiseOrderListModel.empty();
+      if (page == 1) _orderList = FranchiseOrderListModel.empty();
     } finally {
       _isLoadingList = false;
       notifyListeners();

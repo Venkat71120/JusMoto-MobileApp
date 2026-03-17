@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:car_service/customizations/colors.dart';
+import 'package:car_service/customization.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -179,6 +180,21 @@ extension PasswordValidatorExtension on String {
     }
     debugPrint(value.toString());
     return value;
+  }
+}
+
+extension ImageUrlExtension on String {
+  String get toImageUrl {
+    if (isEmpty) return '';
+    if (startsWith('http')) return this;
+    
+    // Ensure siteLink doesn't have a trailing slash and the path doesn't have a leading slash
+    final base = siteLink.endsWith('/') 
+        ? siteLink.substring(0, siteLink.length - 1) 
+        : siteLink;
+    final path = startsWith('/') ? substring(1) : this;
+    
+    return '$base/$path';
   }
 }
 

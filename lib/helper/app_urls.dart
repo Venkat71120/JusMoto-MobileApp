@@ -106,8 +106,8 @@ class AppUrls {
   static String get staffListUrl => '$baseEndPoint/service/staff-lists';
   static String get providerScheduleListUrl =>
       '$baseEndPoint/service/schedule-lists';
-  static String get placeOrderUrl =>
-      '$baseEndPoint/client/service/order-create';
+  static String get placeOrderUrl => '$baseEndPoint/orders';
+  static String get initiatePaymentUrl => '$baseEndPoint/payments/initiate';
   static String get orderPaymentUpdateUrl =>
       '$baseEndPoint/client/service/order-payment-status-update';
   static String get ticketListListUrl => '$baseEndPoint/tickets';
@@ -159,6 +159,9 @@ class AppUrls {
       '$baseEndPoint/client/wallet/deposit/payment-update';
 
   // Franchise Dashboard URLs
+  static String get franchiseDashboardUrl =>
+      '$baseEndPoint/franchise/dashboard';
+
   static String get franchiseDashboardStatisticsUrl =>
       '$baseEndPoint/franchise/dashboard/statistics';
   static String get franchiseDashboardOrderCountsUrl =>
@@ -168,12 +171,14 @@ class AppUrls {
   static String get franchiseDashboardRecentActivityUrl =>
       '$baseEndPoint/franchise/dashboard/recent-activity';
 
-  static String get franchiseOrdersUrl => '$baseEndPoint/franchise/orders/all';
+  static String get franchiseOrdersUrl => '$baseEndPoint/franchise/orders';
   static String get franchiseOrderDetailUrl => '$baseEndPoint/franchise/orders';
   static String get franchiseTicketsUrl =>
-      '$baseEndPoint/franchise/support-ticket/all';
+      '$baseEndPoint/franchise/service-requests';
+  static String get franchiseServiceRequestCountsUrl =>
+      '$baseEndPoint/franchise/service-requests/counts';
   static String get franchiseTicketStatisticsUrl =>
-      '$baseEndPoint/franchise/support-ticket/statistics';
+      '$baseEndPoint/franchise/service-requests/counts';
   static String get franchiseTicketDetailUrl =>
-      '$baseEndPoint/franchise/support-ticket';
+      '$baseEndPoint/franchise/service-requests';
 }

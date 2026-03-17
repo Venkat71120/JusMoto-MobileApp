@@ -18,12 +18,54 @@ class FranchiseDashboardStatisticsModel {
 
   factory FranchiseDashboardStatisticsModel.fromJson(
       Map<String, dynamic> json) {
-    final stats = json['statistics'] as Map<String, dynamic>? ?? {};
+    // ── Handle both direct keys and nested "statistics" key ───────────────────
+    final data = json.containsKey('total_orders') ? json : (json['statistics'] as Map<String, dynamic>? ?? json);
+
     return FranchiseDashboardStatisticsModel(
-      orders: OrderStats.fromJson(stats['orders'] as Map<String, dynamic>? ?? {}),
-      tickets: TicketStats.fromJson(stats['tickets'] as Map<String, dynamic>? ?? {}),
-      earnings: EarningStats.fromJson(stats['earnings'] as Map<String, dynamic>? ?? {}),
+      orders: OrderStats(
+        total: _toInt(data['total_orders'] ?? data['orders']?['total']),
+        pending: _toInt(data['pending_orders'] ?? data['orders']?['pending']),
+        active: _toInt(data['active_orders'] ?? data['accepted_orders'] ?? data['orders']?['active'] ?? 0) +
+            _toInt(data['in_progress_orders'] ?? 0),
+        completed: _toInt(data['completed_orders'] ?? data['orders']?['completed']),
+        delivered: _toInt(data['delivered_orders'] ?? data['orders']?['delivered']),
+        cancelled: _toInt(data['cancelled_orders'] ?? data['orders']?['cancelled']),
+        today: _toInt(data['today_orders'] ?? data['orders']?['today']),
+        thisWeek: _toInt(data['this_week_orders'] ?? data['orders']?['this_week']),
+        thisMonth: _toInt(data['this_month_orders'] ?? data['orders']?['this_month']),
+      ),
+      tickets: TicketStats(
+        total: _toInt(data['total_tickets'] ?? data['open_tickets'] ?? data['tickets']?['total']),
+        open: _toInt(data['open_tickets'] ?? data['tickets']?['open']),
+        closed: _toInt(data['closed_tickets'] ?? data['tickets']?['closed']),
+        urgent: _toInt(data['urgent_tickets'] ?? data['tickets']?['by_priority']?['urgent']),
+        high: _toInt(data['high_tickets'] ?? data['tickets']?['by_priority']?['high']),
+        normal: _toInt(data['normal_tickets'] ?? data['tickets']?['by_priority']?['normal']),
+        low: _toInt(data['low_tickets'] ?? data['tickets']?['by_priority']?['low']),
+      ),
+      earnings: EarningStats(
+        total: _toNum(data['total_revenue'] ?? data['total_earnings'] ?? data['earnings']?['total']),
+        totalTax: _toNum(data['total_tax'] ?? data['earnings']?['total_tax']),
+        netTotal: _toNum(data['paid_revenue'] ?? data['net_earnings'] ?? data['earnings']?['net_total']),
+        today: _toNum(data['today_revenue'] ?? data['earnings']?['today']),
+        thisWeek: _toNum(data['week_revenue'] ?? data['earnings']?['this_week']),
+        thisMonth: _toNum(data['month_revenue'] ?? data['earnings']?['this_month']),
+      ),
     );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  static num _toNum(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
   }
 
   factory FranchiseDashboardStatisticsModel.empty() =>
@@ -130,14 +172,33 @@ class EarningStats {
     required this.thisMonth,
   });
 
-  factory EarningStats.fromJson(Map<String, dynamic> json) => EarningStats(
-        total: json['total'] ?? 0,
-        totalTax: json['total_tax'] ?? 0,
-        netTotal: json['net_total'] ?? 0,
-        today: json['today'] ?? 0,
-        thisWeek: json['this_week'] ?? 0,
-        thisMonth: json['this_month'] ?? 0,
+  factory EarningStats.fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('today') || json.containsKey('thisWeek')) {
+      return EarningStats(
+        total: _toNum(json['total']),
+        totalTax: 0,
+        netTotal: _toNum(json['total']),
+        today: _toNum(json['today']),
+        thisWeek: _toNum(json['thisWeek']),
+        thisMonth: _toNum(json['thisMonth']),
       );
+    }
+    return EarningStats(
+      total: json['total'] ?? 0,
+      totalTax: json['total_tax'] ?? 0,
+      netTotal: json['net_total'] ?? 0,
+      today: json['today'] ?? 0,
+      thisWeek: json['this_week'] ?? 0,
+      thisMonth: json['this_month'] ?? 0,
+    );
+  }
+
+  static num _toNum(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
+  }
 
   factory EarningStats.empty() => EarningStats(
         total: 0, totalTax: 0, netTotal: 0,
@@ -169,17 +230,27 @@ class FranchiseOrderCountsModel {
   });
 
   factory FranchiseOrderCountsModel.fromJson(Map<String, dynamic> json) {
-    final counts = json['order_counts'] as Map<String, dynamic>? ?? {};
+    // ── Handle both nested "order_counts" and direct keys ───────────────────
+    final data = json.containsKey('total_orders') ? json : (json['order_counts'] as Map<String, dynamic>? ?? json);
+
     return FranchiseOrderCountsModel(
-      total: counts['total'] ?? 0,
-      pending: counts['pending'] ?? 0,
-      active: counts['active'] ?? 0,
-      completed: counts['completed'] ?? 0,
-      delivered: counts['delivered'] ?? 0,
-      cancelled: counts['cancelled'] ?? 0,
-      paid: counts['paid'] ?? 0,
-      unpaid: counts['unpaid'] ?? 0,
+      total: _toInt(data['total_orders'] ?? data['total']),
+      pending: _toInt(data['pending_orders'] ?? data['pending']),
+      active: _toInt(data['active_orders'] ?? data['active'] ?? data['accepted_orders'] ?? 0) + 
+              _toInt(data['in_progress_orders'] ?? 0),
+      completed: _toInt(data['completed_orders'] ?? data['completed']),
+      delivered: _toInt(data['delivered_orders'] ?? data['delivered']),
+      cancelled: _toInt(data['cancelled_orders'] ?? data['cancelled']),
+      paid: _toInt(data['paid_orders'] ?? data['paid']),
+      unpaid: _toInt(data['unpaid_orders'] ?? data['unpaid']),
     );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 
   factory FranchiseOrderCountsModel.empty() => FranchiseOrderCountsModel(
@@ -208,15 +279,34 @@ class FranchiseEarningsModel {
   });
 
   factory FranchiseEarningsModel.fromJson(Map<String, dynamic> json) {
-    final e = json['earnings'] as Map<String, dynamic>? ?? {};
+    // ── Handle both nested "earnings" and direct keys ───────────────────────
+    final data = json.containsKey('total_revenue') ? json : (json['earnings'] as Map<String, dynamic>? ?? json);
+
+    final total = _toNum(data['total_revenue'] ?? data['total_earnings'] ?? data['total'] ?? 0);
+    final count = _toInt(data['total_orders'] ?? data['order_count'] ?? 0);
+
     return FranchiseEarningsModel(
-      period: e['period'] ?? 'all',
-      totalEarnings: e['total_earnings'] ?? 0,
-      totalTax: e['total_tax'] ?? 0,
-      netEarnings: e['net_earnings'] ?? 0,
-      orderCount: e['order_count'] ?? 0,
-      averageOrderValue: e['average_order_value'] ?? 0,
+      period: data['period']?.toString() ?? 'all',
+      totalEarnings: total,
+      totalTax: _toNum(data['total_tax'] ?? 0),
+      netEarnings: _toNum(data['paid_revenue'] ?? data['net_earnings'] ?? data['net_total'] ?? 0),
+      orderCount: count,
+      averageOrderValue: count > 0 ? total / count : 0,
     );
+  }
+
+  static num _toNum(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 
   factory FranchiseEarningsModel.empty() => FranchiseEarningsModel(
@@ -237,12 +327,18 @@ class FranchiseRecentActivityModel {
   });
 
   factory FranchiseRecentActivityModel.fromJson(Map<String, dynamic> json) {
-    final activity = json['recent_activity'] as Map<String, dynamic>? ?? {};
+    // ── Handle both {recent_activity: {orders...}} and {orders: [...]} structure ──
+    final data = json.containsKey('recent_activity') 
+        ? (json['recent_activity'] as Map<String, dynamic>? ?? {})
+        : (json.containsKey('data') && json['data'] is Map 
+            ? (json['data'] as Map<String, dynamic>) 
+            : json);
+
     return FranchiseRecentActivityModel(
-      orders: (activity['orders'] as List? ?? [])
+      orders: (data['orders'] as List? ?? [])
           .map((o) => RecentOrder.fromJson(o as Map<String, dynamic>))
           .toList(),
-      tickets: (activity['tickets'] as List? ?? [])
+      tickets: (data['tickets'] as List? ?? [])
           .map((t) => RecentTicket.fromJson(t as Map<String, dynamic>))
           .toList(),
     );

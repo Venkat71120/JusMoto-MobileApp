@@ -9,10 +9,8 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
-import 'package:car_service/services/profile_services/profile_info_service.dart';
 import 'package:car_service/utils/components/custom_network_image.dart';
 import 'package:car_service/view_models/franchise_home_view_model/franchise_home_view_model.dart';
-import 'package:car_service/views/landing_view/landing_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +35,12 @@ class FranchiseHomeAppBar extends StatelessWidget {
             : context.color.secondaryContrastColor;
             
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 8,
+            bottom: 8,
+            left: 20,
+            right: 20,
+          ),
           child: Consumer<FranchiseLoginService>(
             builder: (context, flService, child) {
               final displayName = flService.name.isNotEmpty 
@@ -45,58 +48,59 @@ class FranchiseHomeAppBar extends StatelessWidget {
                   : flService.username;
               final profileImage = flService.image;
               
-              return AppBar(
-                centerTitle: false,
-                leading: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: profileImage != null && profileImage.isNotEmpty
-                        ? null
-                        : Border.all(
-                            color: context.color.accentContrastColor,
+              return Row(
+                children: [
+                  // ✅ Profile Image
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: profileImage != null && profileImage.isNotEmpty
+                          ? null
+                          : Border.all(
+                              color: context.color.accentContrastColor,
+                            ),
+                    ),
+                    child: CustomNetworkImage(
+                      height: 42,
+                      width: 42,
+                      radius: 26,
+                      userPreloader: true,
+                      imageUrl: profileImage,
+                      fit: BoxFit.cover,
+                      name: flService.name.isNotEmpty ? flService.name : flService.username,
+                    ),
+                  ),
+                  12.toWidth,
+                  
+                  // ✅ Welcome Text
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          LocalKeys.welcomeBack,
+                          style: context.bodySmall?.copyWith(
+                            color: color.withOpacity(.7),
+                            fontWeight: FontWeight.w500,
                           ),
-                  ),
-                  child: CustomNetworkImage(
-                    height: 40,
-                    width: 40,
-                    radius: 26,
-                    userPreloader: true,
-                    imageUrl: profileImage,
-                    fit: BoxFit.cover,
-                    name: flService.name.isNotEmpty ? flService.name : flService.username,
-                  ),
-                ),
-                systemOverlayStyle: value < 200
-                    ? SystemUiOverlayStyle.light
-                    : SystemUiOverlayStyle.dark,
-                backgroundColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocalKeys.welcomeBack,
-                      style: context.bodyMedium?.copyWith(
-                        color: color.withOpacity(.7),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    4.toHeight,
-                    RichText(
-                      text: TextSpan(
-                        text: displayName.isNotEmpty 
-                            ? "$displayName !"
-                            : "Franchise User !",
-                        style: context.titleLarge?.copyWith(
-                          color: color,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
+                        2.toHeight,
+                        Text(
+                          displayName.isNotEmpty 
+                              ? "$displayName !"
+                              : "Franchise User !",
+                          style: context.titleMedium?.copyWith(
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                actions: [
+                  ),
+                  
                   // ✅ Franchise Badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -131,64 +135,10 @@ class FranchiseHomeAppBar extends StatelessWidget {
                       ],
                     ),
                   ),
-                  12.toWidth,
-                  
-                  // ✅ Logout Button
-                  IconButton(
-                    onPressed: () => _showLogoutDialog(context),
-                    icon: Icon(
-                      Icons.logout,
-                      color: color,
-                      size: 22,
-                    ),
-                    tooltip: LocalKeys.logout,
-                  ),
-                  8.toWidth,
                 ],
               );
             },
           ),
-        );
-      },
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(LocalKeys.confirmLogout),
-          content: Text(LocalKeys.logoutConfirmationMessage),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: Text(LocalKeys.cancel),
-            ),
-            TextButton(
-              onPressed: () async {
-                // Clear franchise data
-                await Provider.of<FranchiseLoginService>(context, listen: false)
-                    .clearFranchiseData();
-                
-                // Clear profile
-                Provider.of<ProfileInfoService>(context, listen: false).reset();
-                
-                // Navigate to landing page
-                Navigator.of(dialogContext).pop();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LandingView()),
-                  (route) => false,
-                );
-              },
-              child: Text(
-                LocalKeys.logout,
-                style: const TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
         );
       },
     );
