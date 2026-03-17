@@ -142,14 +142,14 @@ class ChangePhoneOtpView extends StatelessWidget {
                                                             .copyWith(
                                                                 color: context
                                                                     .color
-                                                                    .mutedWarningColor),
+                                                                    .primaryContrastColor),
                                                         separator: ':',
                                                         separatorStyle: context
                                                             .titleSmall!.bold6
                                                             .copyWith(
                                                                 color: context
                                                                     .color
-                                                                    .primaryWarningColor),
+                                                                    .primaryContrastColor),
                                                         decoration:
                                                             BoxDecoration(
                                                           color: Colors

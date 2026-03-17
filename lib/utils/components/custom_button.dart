@@ -42,6 +42,15 @@ class CustomButton extends StatelessWidget {
                   onPressed!();
                 },
         style: ButtonStyle(
+          backgroundColor: backgroundColor != null
+              ? WidgetStatePropertyAll(backgroundColor)
+              : null,
+          foregroundColor: foregroundColor != null
+              ? WidgetStatePropertyAll(foregroundColor)
+              : null,
+          side: borderColor != null
+              ? WidgetStatePropertyAll(BorderSide(color: borderColor!))
+              : null,
           shape: WidgetStateProperty.resolveWith<OutlinedBorder?>((states) {
             return SmoothRectangleBorder(
               borderRadius: SmoothBorderRadius(

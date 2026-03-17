@@ -120,8 +120,8 @@ class SignUpService with ChangeNotifier {
       // 2. Update Profile Info (Name)
       debugPrint('📤 Updating profile names...');
       final Map<String, String> fields = {
-        'firstName': sum.fNameController.text.trim(),
-        'lastName': sum.lNameController.text.trim(),
+        'first_name': sum.fNameController.text.trim(),
+        'last_name': sum.lNameController.text.trim(),
       };
 
       final profileRequest = http.MultipartRequest(

@@ -100,20 +100,75 @@ class ServiceCard extends StatelessWidget {
                         cartService.cartList[service.id
                             .toString()]?["quantity"] ??
                         0;
-                    final preventMultiCart =
-                        (isAdded && service.type.toString() == "0");
+                    final isService = service.type.toString() == "0";
+                    if (isAdded) {
+                      return SquircleContainer(
+                        radius: 8,
+                        color: context.color.accentContrastColor,
+                        borderColor: context.color.primaryBorderColor,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 3,
+                        ),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                if (currentQty <= 1) {
+                                  cartService.deleteFromCart(
+                                    service.id.toString(),
+                                  );
+                                } else {
+                                  cartService.updateToCart(
+                                    service.id.toString(),
+                                    service,
+                                    currentQty - 1,
+                                  );
+                                }
+                              },
+                              child: Icon(
+                                currentQty <= 1
+                                    ? Icons.delete_outline
+                                    : Icons.remove,
+                                size: 18,
+                                color: context.color.primaryContrastColor,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              child: Text(
+                                '$currentQty',
+                                style: context.titleSmall?.bold.copyWith(
+                                  color: context.color.primaryContrastColor,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: isService
+                                  ? null
+                                  : () {
+                                      cartService.updateToCart(
+                                        service.id.toString(),
+                                        service,
+                                        currentQty + 1,
+                                      );
+                                    },
+                              child: Icon(
+                                Icons.add,
+                                size: 18,
+                                color: isService
+                                    ? context.color.mutedContrastColor
+                                    : context.color.primaryContrastColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                     return GestureDetector(
                       onTap: () {
-                        if (preventMultiCart) return;
-                        if (isAdded) {
-                          cartService.updateToCart(
-                            service.id.toString(),
-                            service,
-                            (currentQty ?? 1) + 1,
-                          );
-                          LocalKeys.updatedSuccessfully.showToast();
-                          return;
-                        }
                         cartService.addToCart(
                           service.id.toString(),
                           service.toMinimizedJson(),
@@ -121,12 +176,7 @@ class ServiceCard extends StatelessWidget {
                       },
                       child: SquircleContainer(
                         radius: 8,
-                        color: preventMultiCart
-                            ? context.color.accentContrastColor
-                            : context.color.primaryContrastColor,
-                        borderColor: preventMultiCart
-                            ? context.color.primaryBorderColor
-                            : null,
+                        color: context.color.primaryContrastColor,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 3,
@@ -135,19 +185,13 @@ class ServiceCard extends StatelessWidget {
                           children: [
                             SvgAssets.cart.toSVGSized(
                               20,
-                              color: preventMultiCart
-                                  ? context.color.primaryContrastColor
-                                  : context.color.accentContrastColor,
+                              color: context.color.accentContrastColor,
                             ),
                             4.toWidth,
                             Text(
-                              preventMultiCart
-                                  ? LocalKeys.added
-                                  : LocalKeys.add,
+                              LocalKeys.add,
                               style: context.titleSmall?.bold.copyWith(
-                                color: preventMultiCart
-                                    ? context.color.primaryContrastColor
-                                    : context.color.accentContrastColor,
+                                color: context.color.accentContrastColor,
                               ),
                             ),
                           ],

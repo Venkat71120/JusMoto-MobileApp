@@ -178,6 +178,7 @@ class SignUpViewModel {
                     : null,
           );
         } catch (e) {}
+        SignUpViewModel.dispose;
         context.toUntilPage(const LandingView());
       });
     }

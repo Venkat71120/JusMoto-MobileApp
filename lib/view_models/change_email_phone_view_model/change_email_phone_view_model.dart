@@ -1,4 +1,5 @@
 import 'package:car_service/helper/extension/context_extension.dart';
+import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,6 +54,15 @@ class ChangeEmailPhoneViewModel {
   }
 
   void tryChangingPhone(BuildContext context) async {
+    final phone = phoneController.text.trim();
+    if (phone.isEmpty) {
+      "Please enter a phone number".showToast();
+      return;
+    }
+    if (phone.length < 10) {
+      "Please enter a valid phone number".showToast();
+      return;
+    }
     isLoading.value = true;
     try {
       final otpResult =

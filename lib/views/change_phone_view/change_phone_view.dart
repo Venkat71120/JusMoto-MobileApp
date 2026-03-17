@@ -40,6 +40,8 @@ class ChangePhoneView extends StatelessWidget {
                   label: LocalKeys.phone,
                   hintText: LocalKeys.phoneNumberHint,
                   controller: cep.phoneController,
+                  keyboardType: TextInputType.phone,
+                  maxLength: 10,
                 )
               ],
             )),

@@ -196,33 +196,19 @@ class ServiceDetailsView extends StatelessWidget {
                               final isAdded = cartService.cartList.containsKey(
                                 id.toString(),
                               );
-                              final currentQty =
-                                  cartService.cartList[id
-                                      .toString()]?["quantity"] ??
-                                  0;
-                              final preventMultiCart =
-                                  (isAdded &&
-                                      sd
-                                              .serviceDetailsModel(id)
-                                              .allServices!
-                                              .type
-                                              .toString() ==
-                                          "0");
+                              if (isAdded) {
+                                return CustomButton(
+                                  onPressed: () {
+                                    context.toPage(CartView());
+                                  },
+                                  btText: LocalKeys.added,
+                                  backgroundColor: context.color.accentContrastColor,
+                                  foregroundColor: context.color.primaryContrastColor,
+                                  borderColor: context.color.primaryBorderColor,
+                                );
+                              }
                               return CustomButton(
                                 onPressed: () {
-                                  if (preventMultiCart) {
-                                    context.toPage(CartView());
-                                    return;
-                                  }
-                                  if (isAdded) {
-                                    cartService.updateToCart(
-                                      id.toString(),
-                                      sd.serviceDetailsModel(id).allServices!,
-                                      (currentQty ?? 1) + 1,
-                                    );
-                                    LocalKeys.updatedSuccessfully.showToast();
-                                    return;
-                                  }
                                   cartService.addToCart(
                                     id.toString(),
                                     sd
@@ -231,10 +217,7 @@ class ServiceDetailsView extends StatelessWidget {
                                         .toMinimizedJson(),
                                   );
                                 },
-                                btText:
-                                    preventMultiCart
-                                        ? LocalKeys.viewCart
-                                        : LocalKeys.addToCart,
+                                btText: LocalKeys.addToCart,
                               );
                             },
                           ),
