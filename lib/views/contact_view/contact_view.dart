@@ -5,6 +5,7 @@ import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/utils/components/custom_preloader.dart';
 import 'package:car_service/utils/components/navigation_pop_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -164,13 +165,13 @@ class ContactView extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: [
         if (social.facebook != null && social.facebook!.isNotEmpty)
-          _buildSocialIcon(context, Icons.facebook, social.facebook!),
+          _buildSocialIcon(context, FontAwesomeIcons.facebook, social.facebook!),
         if (social.instagram != null && social.instagram!.isNotEmpty)
-           _buildSocialIcon(context, Icons.camera_alt_outlined, social.instagram!), // Instagram icon fallback
+           _buildSocialIcon(context, FontAwesomeIcons.instagram, social.instagram!),
         if (social.twitter != null && social.twitter!.isNotEmpty)
-          _buildSocialIcon(context, Icons.alternate_email, social.twitter!), // Twitter X fallback
+          _buildSocialIcon(context, FontAwesomeIcons.xTwitter, social.twitter!),
         if (social.youtube != null && social.youtube!.isNotEmpty)
-          _buildSocialIcon(context, Icons.play_circle_outline, social.youtube!),
+          _buildSocialIcon(context, FontAwesomeIcons.youtube, social.youtube!),
       ],
     );
   }

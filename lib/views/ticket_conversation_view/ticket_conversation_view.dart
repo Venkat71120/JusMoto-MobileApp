@@ -1,8 +1,6 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/helper/extension/string_extension.dart';
-import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/utils/components/navigation_pop_icon.dart';
 import 'package:car_service/view_models/ticket_conversation_view_model/ticket_conversation_view_model.dart';
 import 'package:car_service/views/ticket_conversation_view/components/ticket_chat_bubble.dart';
@@ -11,15 +9,16 @@ import 'package:provider/provider.dart';
 
 import '../../helper/local_keys.g.dart';
 import '../../services/support_services/ticket_conversation_service.dart';
-import '../../utils/components/custom_button.dart';
 import '../../utils/components/custom_preloader.dart';
 
 class TicketConversationView extends StatelessWidget {
   final String title;
   final dynamic id;
+  final String? status;
   const TicketConversationView({
     required this.title,
     required this.id,
+    this.status,
     super.key,
   });
 
@@ -80,207 +79,183 @@ class TicketConversationView extends StatelessWidget {
               },
               child: Consumer<TicketConversationService>(
                 builder: (context, tcProvider, child) {
+                  final isClosed = status == "close" || status == "closed";
                   return Column(
                     children: [
                       Expanded(child: messageListView(context, tcProvider)),
+                      if (isClosed)
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: context.color.accentContrastColor,
+                          ),
+                          child: Text(
+                            "This ticket is closed. You can no longer send messages.",
+                            textAlign: TextAlign.center,
+                            style: context.bodySmall?.copyWith(
+                              color: context.color.tertiaryContrastColo,
+                            ),
+                          ),
+                        )
+                      else
                       Container(
-                        padding: const EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: context.color.accentContrastColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: context.height / 7,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                ),
-                                child: TextField(
-                                  maxLines: 4,
-                                  controller: tcm.messageController,
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    hintText: LocalKeys.writeMessage,
-                                    hintStyle: TextStyle(
-                                      color: context.color.tertiaryContrastColo,
-                                      fontSize: 14,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(
-                                        color: context.color.primaryBorderColor,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: context.color.primaryBorderColor,
-                                      ),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: context.color.primaryBorderColor,
-                                      ),
-                                    ),
-                                  ),
-                                  onChanged: (value) {
-                                    tcProvider.setMessage(value);
-                                  },
-                                ),
-                              ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, -2),
                             ),
-                            const SizedBox(height: 8),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 15,
+                          ],
+                        ),
+                        child: SafeArea(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ── Image Preview ───────────────────────────
+                              ValueListenableBuilder(
+                                valueListenable: tcm.selectedFile,
+                                builder: (context, file, _) {
+                                  if (file == null) return const SizedBox();
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(0.05),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: Image.file(
+                                            file,
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: -2,
+                                          right: -2,
+                                          child: GestureDetector(
+                                            onTap: () => tcm.selectedFile.value = null,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: const BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(Icons.close_rounded,
+                                                  size: 14, color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                              child: Row(
+                              
+                              // ── Input Row ──────────────────────────────
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    LocalKeys.file,
-                                    style: TextStyle(
-                                      color: context.color.tertiaryContrastColo,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add_photo_alternate_outlined,
+                                        color: Colors.grey, size: 24),
+                                    onPressed: () => tcm.fileSelector(context),
+                                    padding: EdgeInsets.zero,
+                                    visualDensity: VisualDensity.compact,
                                   ),
-                                  const SizedBox(width: 10),
-                                  GestureDetector(
-                                    onTap: () {
-                                      tcm.fileSelector();
-                                    },
+                                  8.toWidth,
+                                  Expanded(
                                     child: Container(
-                                      padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
+                                        color: context.color.backgroundColor.withOpacity(0.05),
+                                        borderRadius: BorderRadius.circular(24),
                                         border: Border.all(
-                                          color:
-                                              context.color.primaryBorderColor,
+                                          color: context.color.primaryBorderColor.withOpacity(0.5),
                                         ),
                                       ),
-                                      child: Text(
-                                        LocalKeys.selectFile,
-                                        style: TextStyle(
-                                          color:
-                                              context
-                                                  .color
-                                                  .tertiaryContrastColo,
+                                      child: TextField(
+                                        controller: tcm.messageController,
+                                        maxLines: 5,
+                                        minLines: 1,
+                                        style: context.bodySmall,
+                                        decoration: InputDecoration(
+                                          hintText: LocalKeys.writeMessage,
+                                          hintStyle: TextStyle(
+                                            color: context.color.tertiaryContrastColo.withOpacity(0.5),
+                                            fontSize: 14,
+                                          ),
+                                          contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 10),
+                                          border: InputBorder.none,
+                                          isDense: true,
                                         ),
+                                        onChanged: (value) => tcProvider.setMessage(value),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
+                                  8.toWidth,
                                   ValueListenableBuilder(
-                                    valueListenable: tcm.selectedFile,
-                                    builder: (context, file, child) {
-                                      return SizedBox(
-                                        width: context.width / 3,
-                                        child: Text(
-                                          file == null
-                                              ? LocalKeys.noFileChosen
-                                              : file.path.split('/').last,
-                                          style:
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.titleSmall,
-                                        ),
+                                    valueListenable: tcm.isLoading,
+                                    builder: (context, loading, _) {
+                                      if (loading) {
+                                        return const Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                        );
+                                      }
+                                      return IconButton(
+                                        icon: const Icon(Icons.send_rounded,
+                                            color: primaryColor, size: 24),
+                                        onPressed: () => tcm.trySendingMessage(context),
+                                        padding: EdgeInsets.zero,
+                                        visualDensity: VisualDensity.compact,
                                       );
                                     },
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            ValueListenableBuilder(
-                              valueListenable: tcm.notifyEmail,
-                              builder: (context, notify, child) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                  ),
-                                  child: Row(
+                              
+                              // ── Extras ──────────────────────────────────
+                              ValueListenableBuilder(
+                                valueListenable: tcm.notifyEmail,
+                                builder: (context, notify, _) {
+                                  return Row(
                                     children: [
-                                      Transform.scale(
-                                        scale: 1.3,
+                                      SizedBox(
+                                        height: 30,
+                                        width: 30,
                                         child: Checkbox(
-                                          materialTapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          side: BorderSide(
-                                            width: 1,
-                                            color:
-                                                context
-                                                    .color
-                                                    .primaryBorderColor,
-                                          ),
+                                          value: notify,
                                           activeColor: primaryColor,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            side: BorderSide(
-                                              width: 1,
-                                              color:
-                                                  context
-                                                      .color
-                                                      .primaryBorderColor,
-                                            ),
-                                          ),
-                                          value: notify,
-                                          onChanged: (value) {
-                                            tcm.notifyEmail.value = !notify;
-                                          },
+                                              borderRadius: BorderRadius.circular(4)),
+                                          onChanged: (val) => tcm.notifyEmail.value = val ?? false,
                                         ),
                                       ),
-                                      const SizedBox(width: 5),
-                                      RichText(
-                                        softWrap: true,
-                                        text: TextSpan(
-                                          text: LocalKeys.notifyViaMail,
-                                          style: TextStyle(
-                                            color:
-                                                context
-                                                    .color
-                                                    .tertiaryContrastColo,
-                                            fontSize: 13,
-                                          ),
+                                      Text(
+                                        LocalKeys.notifyViaMail,
+                                        style: TextStyle(
+                                          color: context.color.tertiaryContrastColo,
+                                          fontSize: 11,
                                         ),
                                       ),
                                     ],
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 8),
-                            SingleChildScrollView(
-                              physics: const NeverScrollableScrollPhysics(),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                ),
-                                child: Builder(
-                                  builder: (context) {
-                                    return ValueListenableBuilder(
-                                      valueListenable: tcm.isLoading,
-                                      builder: (context, loading, child) {
-                                        return CustomButton(
-                                          btText: LocalKeys.send,
-                                          isLoading: loading,
-                                          onPressed: () async {
-                                            tcProvider.setIsLoading(true);
-                                            tcm.trySendingMessage(context);
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
+                                  );
+                                },
                               ),
-                            ),
-                            const SingleChildScrollView(
-                              physics: NeverScrollableScrollPhysics(),
-                              child: SizedBox(height: 25),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -307,7 +282,7 @@ class TicketConversationView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [Center(child: CustomPreloader())],
       );
-    } else if ((tcProvider.messagesList ?? []).isEmpty) {
+    } else if (tcProvider.messagesList.isEmpty) {
       return Center(
         child: Text(
           LocalKeys.noMessageFound,
@@ -342,78 +317,5 @@ class TicketConversationView extends StatelessWidget {
         },
       );
     }
-  }
-
-  Widget showFile(
-    BuildContext context,
-    String? url,
-    int id,
-    AlignmentGeometry alignment,
-  ) {
-    print('Url is: $url');
-    if (url != null &&
-        (!url.contains('.png') &&
-            !url.contains('.jpg') &&
-            !url.contains('.jpeg'))) {
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10),
-        height: 50,
-        width: 50,
-        child: SvgAssets.fileText.toSVGSized(
-          24,
-          color: context.color.tertiaryContrastColo,
-        ),
-      );
-    }
-    return GestureDetector(
-      onTap: () {},
-      child:
-          url != null
-              ? GestureDetector(
-                child: Container(
-                  alignment: alignment,
-                  constraints: BoxConstraints(maxWidth: context.width / 1.5),
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Image.network(
-                    url,
-                    alignment: alignment,
-                    loadingBuilder: (context, child, loding) {
-                      if (loding == null) {
-                        return child;
-                      }
-                      return Container(
-                        height: 200,
-                        margin: const EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            alignment: alignment,
-                            image: const AssetImage(
-                              'assets/images/app_icon.png',
-                            ),
-                            opacity: .4,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, str, some) {
-                      return Container(
-                        height: 200,
-                        margin: const EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            alignment: alignment,
-                            image: const AssetImage(
-                              'assets/images/app_icon.png',
-                            ),
-                            opacity: .4,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              )
-              : const SizedBox(),
-    );
   }
 }

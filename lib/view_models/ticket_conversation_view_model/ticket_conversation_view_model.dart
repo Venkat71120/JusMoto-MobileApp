@@ -52,9 +52,53 @@ class TicketConversationViewModel {
     return true;
   }
 
-  Future<void> fileSelector() async {
+  Future<void> fileSelector(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Select Attachment Type",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.image_outlined, color: Colors.blue),
+              title: const Text("Image / Gallery"),
+              onTap: () async {
+                Navigator.pop(context);
+                await _pickFile(FileType.image);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.description_outlined, color: Colors.orange),
+              title: const Text("Files / Documents"),
+              onTap: () async {
+                Navigator.pop(context);
+                await _pickFile(FileType.any);
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickFile(FileType type) async {
     try {
-      FilePickerResult? file = await FilePicker.platform.pickFiles();
+      FilePickerResult? file = await FilePicker.platform.pickFiles(
+        type: type,
+        allowMultiple: false,
+      );
       if (file?.files.firstOrNull?.path == null) {
         return;
       }
@@ -71,24 +115,25 @@ class TicketConversationViewModel {
       context,
       listen: false,
     );
+
+    final msg = messageController.text.trim();
+    if (msg.isEmpty && selectedFile.value == null) {
+      isLoading.value = false;
+      tcProvider.setIsLoading(false);
+      return;
+    }
+
     isLoading.value = true;
-    await tcProvider
-        .sendMessage(
-          context,
-          tcProvider.ticketDetails!.id,
-          message: messageController.text,
-          notifyViaMail: notifyEmail.value,
-          file: selectedFile.value,
-        )
-        .then((value) {
-          if (value != null) {
-            isLoading.value = false;
-            return;
-          }
-          messageController.clear();
-          selectedFile.value = null;
-          isLoading.value = false;
-        });
+    await tcProvider.sendMessage(
+      context,
+      tcProvider.ticketDetails!.id,
+      message: msg.isEmpty ? " " : msg,
+      notifyViaMail: notifyEmail.value,
+      file: selectedFile.value,
+    );
+    messageController.clear();
+    selectedFile.value = null;
+    isLoading.value = false;
   }
 
   void tryToLoadMoreMessages(BuildContext context) {

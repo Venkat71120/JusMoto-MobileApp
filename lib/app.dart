@@ -23,8 +23,6 @@ class MainApp extends StatelessWidget {
         builder: (context, dProvider, child) {
           coreInit(context);
           debugPrint(dProvider.appLocal.toString());
-          print("auto Building");
-          coreInit(context);
           return FutureBuilder(
               future: dProvider.onceRebuilt ? null : dProvider.getColors(),
               builder: (context, sn) {

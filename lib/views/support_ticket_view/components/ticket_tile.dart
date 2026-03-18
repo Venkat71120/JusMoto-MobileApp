@@ -27,6 +27,7 @@ class TicketTile extends StatelessWidget {
         context.toPage(TicketConversationView(
           id: ticket.id,
           title: ticket.title ?? "",
+          status: ticket.status,
         ));
       },
       child: SquircleContainer(

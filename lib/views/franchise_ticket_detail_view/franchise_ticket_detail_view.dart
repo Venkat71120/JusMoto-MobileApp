@@ -549,11 +549,13 @@ class _ReplyInputState extends State<_ReplyInput> {
     final msg = _controller.text.trim();
     if (msg.isEmpty && _attachment == null) return;
 
+    debugPrint('📤 Sending reply: "$msg" with file: ${(_attachment?.path != null) ? "Yes" : _attachment?.path}');
+    
     setState(() => _isSending = true);
     final success = await Provider.of<FranchiseTicketsService>(context, listen: false)
         .sendServiceRequestReply(
       widget.ticketId,
-      message: msg,
+      message: msg.isEmpty ? " " : msg,
       filePath: _attachment?.path,
     );
     

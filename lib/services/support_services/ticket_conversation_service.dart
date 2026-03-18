@@ -141,7 +141,7 @@ class TicketConversationService with ChangeNotifier {
     );
 
     if (responseData != null) {
-      debugPrint(responseData.toString());
+      debugPrint('📥 TicketConversationService.sendMessage response: $responseData');
       if (responseData["data"] != null) {
         messagesList.insert(0, TicketMessage.fromJson(responseData["data"]));
       } else if (responseData["ticket_message_lists"] is List) {

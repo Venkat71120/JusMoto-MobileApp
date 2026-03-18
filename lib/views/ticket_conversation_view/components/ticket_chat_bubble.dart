@@ -29,90 +29,61 @@ class TicketChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if ((datum.attachment != null &&
-                (datum.attachment is File ||
-                    datum.attachment.toString().isNotEmpty)) ||
-            ((datum.message != null && datum.message!.isNotEmpty)))
-          Row(
-            mainAxisAlignment:
-                senderFromWeb ? MainAxisAlignment.start : MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:
-                senderFromWeb
-                    ? widgetList(context, datum.message)
-                    : widgetList(context, datum.message).reversed.toList(),
+    final isAdmin = senderFromWeb;
+    return Align(
+      alignment: isAdmin ? Alignment.centerLeft : Alignment.centerRight,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+        ),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isAdmin ? context.color.accentContrastColor : primaryColor,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(isAdmin ? 0 : 16),
+            bottomRight: Radius.circular(isAdmin ? 16 : 0),
           ),
-      ],
-    );
-  }
-
-  widgetList(BuildContext context, message) {
-    final cs = Provider.of<ConversationService>(context, listen: false);
-    final ValueNotifier messageClicked = ValueNotifier(null);
-    return [
-      12.toWidth,
-      Column(
-        crossAxisAlignment:
-            senderFromWeb ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        children: [
-          if (message != null)
-            GestureDetector(
-              onTap: () {
-                if (datum.id == messageClicked.value) {
-                  messageClicked.value = null;
-                  return;
-                }
-                messageClicked.value = datum.id;
-              },
-              child: SquircleContainer(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                constraints: BoxConstraints(maxWidth: context.width / 1.7),
-                color:
-                    senderFromWeb
-                        ? context.color.accentContrastColor
-                        : primaryColor,
-                radius: 12,
-                child: Text(
-                  message,
-                  style: context.titleSmall?.copyWith(
-                    color:
-                        senderFromWeb
-                            ? null
-                            : context.color.accentContrastColor,
-                  ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment:
+              isAdmin ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          children: [
+            if (datum.message != null && datum.message!.isNotEmpty)
+              Text(
+                datum.message!.trim(),
+                style: context.bodySmall?.copyWith(
+                  color: isAdmin ? context.color.primaryContrastColor : Colors.white,
+                  height: 1.4,
                 ),
               ),
-            ),
-
-          if (datum.attachment != null &&
-              (datum.attachment is File ||
-                  datum.attachment.toString().isNotEmpty))
-            GestureDetector(
-              child: TicketAttachmentBubble(
+            if (datum.attachment != null && datum.attachment.toString().isNotEmpty) ...[
+              if (datum.message != null && datum.message!.isNotEmpty) 8.toHeight,
+              TicketAttachmentBubble(
                 file: datum.attachment,
                 senderFromWeb: senderFromWeb,
               ),
+            ],
+            4.toHeight,
+            Text(
+              DateFormat("EEEE, hh:mm aa").format(datum.createdAt ?? DateTime.now()),
+              style: TextStyle(
+                color: isAdmin ? Colors.grey[500] : Colors.white70,
+                fontSize: 9,
+              ),
             ),
-          4.toHeight,
-          ValueListenableBuilder(
-            valueListenable: messageClicked,
-            builder: (context, value, child) {
-              if (value != datum.id) {
-                return const SizedBox();
-              }
-              return Text(
-                DateFormat("EEEE, hh:mm aa").format(DateTime.now()),
-                style: context.bodySmall,
-              );
-            },
-          ),
-        ],
+          ],
+        ),
       ),
-    ];
+    );
   }
 }

@@ -81,8 +81,8 @@ class CustomNetworkImage extends StatelessWidget {
               ? CachedNetworkImage(
                   imageUrl: imageUrl ?? "",
                   fit: fit,
-                  memCacheWidth: width != null ? (width! * 2).toInt() : 400,
-                  memCacheHeight: height != null ? (height! * 2).toInt() : 400,
+                  memCacheWidth: width != null && width!.isFinite ? (width! * 2).toInt() : 400,
+                  memCacheHeight: height != null && height!.isFinite ? (height! * 2).toInt() : 400,
                   errorWidget: (context, url, error) {
                     if ((name ?? "").length >= 2) {
                       return errorWidget ??

@@ -6,11 +6,11 @@ import '../../helper/constant_helper.dart';
 class NotificationManageService {
   tryMarkingRead({id}) async {
     var url = id != null
-        ? "${AppUrls.myNotificationsListUrl}/mark-as-read/$id"
+        ? "${AppUrls.myNotificationsListUrl}/$id/read"
         : AppUrls.notificationReadUrl;
 
     final responseData = await NetworkApiServices()
-        .getApi(url, null, headers: acceptJsonAuthHeader);
+        .putApi(<String, String>{}, url, null, headers: acceptJsonAuthHeader);
 
     if (responseData != null) {
       UnreadCountService.instance.fetchUnreadCounts();

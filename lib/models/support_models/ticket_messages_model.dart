@@ -67,6 +67,7 @@ class TicketMessage {
   final String? notify;
   final String? attachment;
   final String? type;
+  final DateTime? createdAt;
 
   TicketMessage({
     this.id,
@@ -75,6 +76,7 @@ class TicketMessage {
     this.notify,
     this.attachment,
     this.type,
+    this.createdAt,
   });
 
   factory TicketMessage.fromJson(Map json) => TicketMessage(
@@ -84,6 +86,7 @@ class TicketMessage {
     notify: json["notify"],
     attachment: json["attachment"],
     type: json["type"] ?? (json["admin_id"] != null ? "admin" : "user"),
+    createdAt: json["created_at"] != null ? DateTime.tryParse(json["created_at"].toString()) : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -93,12 +96,13 @@ class TicketMessage {
     "notify": notify,
     "attachment": attachment,
     "type": type,
+    "created_at": createdAt?.toIso8601String(),
   };
 }
 
 class TicketDetails {
   final dynamic id;
-  final String? departmentId;
+  final dynamic departmentId;
   final dynamic adminId;
   final dynamic userId;
   final String? title;

@@ -93,8 +93,10 @@ class DynamicsService with ChangeNotifier {
   getLangList() async {
     final responseData = await NetworkApiServices()
         .getApi(AppUrls.languageListUrl, null, headers: acceptJsonAuthHeader);
+    debugPrint("LANG API RESPONSE: $responseData");
     if (responseData != null) {
       final tempData = LanguageListModel.fromJson(responseData);
+      debugPrint("LANG PARSED: ${tempData.language?.length} languages");
       _languageListModel = tempData;
       final lSlug = sPref?.getString("lang_slug");
       if (lSlug != null) {

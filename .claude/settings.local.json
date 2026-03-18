@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:jusmoto.blackitechs.in)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
@@ -215,6 +216,7 @@ class FranchiseTicketsService with ChangeNotifier {
   // ── Send service request reply ─────────────────────────────────────────────
   Future<bool> sendServiceRequestReply(int id, {required String message, String? filePath}) async {
     try {
+      debugPrint('🚀 FranchiseTicketsService.sendServiceRequestReply: ticket #$id, message: "$message", file: $filePath');
       final url = '${AppUrls.franchiseTicketsUrl}/$id/reply';
       Map? response;
 
@@ -229,7 +231,35 @@ class FranchiseTicketsService with ChangeNotifier {
         final request = http.MultipartRequest('POST', Uri.parse(url));
         request.headers.addAll(acceptJsonAuthHeader);
         request.fields['message'] = message;
-        request.files.add(await http.MultipartFile.fromPath('attachment', filePath));
+        
+        String extension = filePath.split('.').last.toLowerCase();
+        MediaType? mediaType;
+        if (['jpg', 'jpeg'].contains(extension)) {
+          mediaType = MediaType('image', 'jpeg');
+        } else if (extension == 'png') {
+          mediaType = MediaType('image', 'png');
+        } else if (extension == 'gif') {
+          mediaType = MediaType('image', 'gif');
+        } else if (extension == 'webp') {
+          mediaType = MediaType('image', 'webp');
+        } else if (extension == 'pdf') {
+          mediaType = MediaType('application', 'pdf');
+        } else if (extension == 'doc') {
+          mediaType = MediaType('application', 'msword');
+        } else if (extension == 'docx') {
+          mediaType = MediaType(
+            'application',
+            'vnd.openxmlformats-officedocument.wordprocessingml.document',
+          );
+        }
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'attachment',
+            filePath,
+            contentType: mediaType,
+          ),
+        );
 
         response = await NetworkApiServices().postWithFileApi(
           request,
@@ -239,9 +269,12 @@ class FranchiseTicketsService with ChangeNotifier {
       }
 
       if (response != null && response['success'] == true) {
+        debugPrint('📥 FranchiseTicketsService.sendServiceRequestReply success: $response');
         // Refresh detail to show new message
         await fetchTicketDetail(id);
         return true;
+      } else {
+        debugPrint('❌ FranchiseTicketsService.sendServiceRequestReply failure/no-success: $response');
       }
     } catch (e) {
       debugPrint('❌ sendServiceRequestReply: $e');

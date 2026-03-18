@@ -105,14 +105,6 @@ class MenuTiles extends StatelessWidget {
           color: context.color.accentContrastColor,
           child: Column(
             children: [
-              MenuTile(
-                title: LocalKeys.languages,
-                svg: SvgAssets.languages,
-                onPress: () {
-                  context.toPage(const ChangeLanguageView());
-                },
-                haveDivider: true,
-              ),
               const ThemeSettingTile(),
               MenuTile(
                 title: LocalKeys.termsAndConditions,

@@ -1,8 +1,10 @@
 import 'package:car_service/helper/extension/context_extension.dart';
+import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/auth_services/phone_manage_service.dart';
+import '../../services/profile_services/profile_info_service.dart';
 import './../../services/auth_services/email_otp_service.dart';
 import './../../views/change_email_view/change_email_otp_view.dart';
 import './../../views/change_phone_view/change_phone_otp_view.dart';
@@ -39,9 +41,11 @@ class ChangeEmailPhoneViewModel {
         final verifyResult = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChangeEmailOtpView(null),
+              builder: (context) => ChangeEmailOtpView(),
             ));
         if (verifyResult == true) {
+          Provider.of<ProfileInfoService>(context, listen: false)
+              .fetchProfileInfo();
           context.pop;
         }
       }
@@ -53,6 +57,15 @@ class ChangeEmailPhoneViewModel {
   }
 
   void tryChangingPhone(BuildContext context) async {
+    final phone = phoneController.text.trim();
+    if (phone.isEmpty) {
+      "Please enter a phone number".showToast();
+      return;
+    }
+    if (phone.length < 10) {
+      "Please enter a valid phone number".showToast();
+      return;
+    }
     isLoading.value = true;
     try {
       final otpResult =

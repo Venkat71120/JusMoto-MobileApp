@@ -134,13 +134,25 @@ class NetworkApiServices extends BaseApiServices {
       LocalKeys.noConnectionFound.showToast();
       return null;
     }
-    Map<String, String> h = headers ?? {};
+    Map<String, String> h = Map<String, String>.from(headers ?? {});
     h.putIfAbsent('Accept', () => 'application/json');
     Map? responseJson;
     try {
-      final response = await http
-          .put(Uri.parse(url), body: data, headers: h)
-          .timeout(Duration(seconds: timeoutSeconds ?? 10));
+      http.Response response;
+
+      final bool needsJson = data is Map &&
+          data.values.any((v) => v is! String);
+
+      if (needsJson) {
+        h['Content-Type'] = 'application/json';
+        response = await http
+            .put(Uri.parse(url), body: jsonEncode(data), headers: h)
+            .timeout(Duration(seconds: timeoutSeconds ?? 10));
+      } else {
+        response = await http
+            .put(Uri.parse(url), body: data, headers: h)
+            .timeout(Duration(seconds: timeoutSeconds ?? 10));
+      }
       if (kDebugMode) {
         debugPrint(response.body.toString());
         debugPrint(response.statusCode.toString());

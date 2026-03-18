@@ -22,13 +22,8 @@ class ServiceDetailsBasics extends StatelessWidget {
     }
 
     // 2. Determine which price to show (Car-specific price OR general service price)
-    final displayPrice = service.serviceCar?.price != 0 
-        ? service.serviceCar?.price 
-        : service.price;
-
-    final displayDiscount = service.serviceCar?.discountPrice != null 
-        ? service.serviceCar?.discountPrice 
-        : service.discountPrice;
+    final displayPrice = service.serviceCar?.price ?? service.price;
+    final displayDiscount = service.serviceCar?.discountPrice ?? service.discountPrice;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

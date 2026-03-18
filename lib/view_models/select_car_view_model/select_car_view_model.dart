@@ -67,6 +67,7 @@ class SelectCarViewModel {
           curve: Curves.easeIn,
         );
         pageIndex.value = pageController.page?.toInt() ?? 0;
+        break;
       default:
         // Variant Page (Index 2)
         if (selectedVariant.value == null) {
@@ -103,7 +104,7 @@ class SelectCarViewModel {
           }
           return;
         }
-        
+
         final tempCar = CarModel.fromJson(selectedCar.value?.toJson() ?? {});
         LandingViewModel.instance.selectedCar.value = tempCar;
         sPref?.setString("car", jsonEncode(tempCar.toJson()));
@@ -113,11 +114,7 @@ class SelectCarViewModel {
         );
         sPref?.setString("selectedVariant", jsonEncode(selectedVariant.value?.toJson() ?? {}));
         Provider.of<CartService>(context, listen: false).clearCart();
-        if (sPref?.getBool("intro") ?? false) {
-          context.toUntilPage(SplashView());
-        } else {
-          context.pop;
-        }
+        context.pop;
     }
   }
 

@@ -7,10 +7,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '/helper/extension/context_extension.dart';
 import '../../services/auth_services/sign_in_service.dart';
 import '../../services/chat_services/chat_credential_service.dart';
 import '../../services/profile_services/profile_info_service.dart';
 import '../../services/push_notification_service.dart';
+import '../../views/landing_view/landing_view.dart';
 
 /// Handles Google, Facebook, and Apple sign-in.
 /// Social login API: POST /auth/social/login
@@ -94,7 +96,7 @@ class SocialSignInViewModel {
             .fetchProfileInfo();
 
         if (context.mounted) {
-          Navigator.of(context).pop(false);
+          context.toUntilPage(const LandingView());
         }
       } else {
         LocalKeys.signInFailed.showToast();
