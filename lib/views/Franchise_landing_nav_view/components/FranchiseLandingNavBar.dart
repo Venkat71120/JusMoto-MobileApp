@@ -9,6 +9,7 @@ import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
+import 'package:car_service/services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,13 +44,16 @@ class FranchiseLandingNavBar extends StatelessWidget {
               0,
               fvm,
             ),
-            _navBarItem(
-              context,
-              LocalKeys.orders,
-              SvgAssets.list,
-              SvgAssets.list,
-              1,
-              fvm,
+            Consumer<FranchiseDashboardService>(
+              builder: (context, ds, _) => _navBarItem(
+                context,
+                LocalKeys.orders,
+                SvgAssets.list,
+                SvgAssets.list,
+                1,
+                fvm,
+                badgeCount: ds.orderCounts.pending + ds.orderCounts.active,
+              ),
             ),
             Consumer<FranchiseTicketsService>(
               builder: (context, ts, _) {

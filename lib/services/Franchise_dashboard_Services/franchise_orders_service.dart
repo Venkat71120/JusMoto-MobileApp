@@ -65,7 +65,9 @@ class FranchiseOrdersService with ChangeNotifier {
         query += '&date_from=$_dateFrom';
       }
       if (_dateTo != null && _dateTo!.isNotEmpty) {
-        query += '&date_to=$_dateTo';
+        // ✅ FIX: If date_to is just YYYY-MM-DD, append end of day to make it inclusive
+        final toParam = _dateTo!.length == 10 ? '$_dateTo 23:59:59' : _dateTo;
+        query += '&date_to=$toParam';
       }
 
       final url = '${AppUrls.franchiseOrdersUrl}?$query';

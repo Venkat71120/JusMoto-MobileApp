@@ -8,9 +8,9 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/models/franchise_models/franchise_order_model.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_orders_service.dart';
-import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/utils/components/image_view.dart';
 import '../../utils/components/custom_network_image.dart';
+import '../../helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -156,15 +156,9 @@ class _DetailContent extends StatelessWidget {
                 _SectionCard(
                   children: [
                     _IconRow(
-                      icon: Icons.calendar_today_outlined,
-                      label: 'Date',
-                      value: order.date,
-                    ),
-                    8.toHeight,
-                    _IconRow(
                       icon: Icons.access_time_outlined,
-                      label: 'Schedule',
-                      value: order.schedule,
+                      label: 'Placed',
+                      value: order.createdAt.toOrderTime,
                     ),
                     8.toHeight,
                     _IconRow(

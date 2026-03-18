@@ -3,18 +3,21 @@
 // Location: lib/views/franchise_services_view/franchise_ticket_detail_view.dart
 // ─────────────────────────────────────────────────────────────────────────────
 
+import 'dart:io';
+
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/models/franchise_models/franchise_ticket_model.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
+import 'package:car_service/services/socket_service.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/utils/components/image_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:timeago/timeago.dart' as timeago;
+
 
 class FranchiseTicketDetailView extends StatefulWidget {
   final int ticketId;
@@ -31,9 +34,22 @@ class _FranchiseTicketDetailViewState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<FranchiseTicketsService>(context, listen: false)
-          .fetchTicketDetail(widget.ticketId);
+      final ticketService = Provider.of<FranchiseTicketsService>(context, listen: false);
+      final socketService = Provider.of<SocketService>(context, listen: false);
+
+      ticketService.fetchTicketDetail(widget.ticketId).then((_) {
+        // After fetching details, join the real-time chat
+        ticketService.joinTicketChat(socketService, widget.ticketId);
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    // Leave the real-time chat when exiting the view
+    final ticketService = Provider.of<FranchiseTicketsService>(context, listen: false);
+    ticketService.leaveTicketChat();
+    super.dispose();
   }
 
   @override
@@ -371,16 +387,9 @@ class _LinkedOrderCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _MetaRow(
-                        icon: Icons.calendar_today_outlined,
-                        label: 'Date',
-                        value: _formatDateTime(sr.date)),
-                  ),
-                  SizedBoxExtension(12).toWidth,
-                  Expanded(
-                    child: _MetaRow(
                         icon: Icons.access_time_outlined,
-                        label: 'Time',
-                        value: sr.schedule),
+                        label: 'Placed',
+                        value: sr.createdAt.toOrderTime),
                   ),
                 ],
               ),
@@ -516,17 +525,43 @@ class _ReplyInput extends StatefulWidget {
 class _ReplyInputState extends State<_ReplyInput> {
   final _controller = TextEditingController();
   bool _isSending = false;
+  File? _attachment;
+
+  void _pickImage() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+      );
+      if (result != null && result.files.single.path != null) {
+        setState(() => _attachment = File(result.files.single.path!));
+      }
+    } catch (e) {
+      debugPrint('❌ _pickImage error: $e');
+    }
+  }
+
+  void _removeAttachment() {
+    setState(() => _attachment = null);
+  }
 
   void _send() async {
     final msg = _controller.text.trim();
-    if (msg.isEmpty) return;
+    if (msg.isEmpty && _attachment == null) return;
 
     setState(() => _isSending = true);
     final success = await Provider.of<FranchiseTicketsService>(context, listen: false)
-        .sendServiceRequestReply(widget.ticketId, message: msg);
+        .sendServiceRequestReply(
+      widget.ticketId,
+      message: msg,
+      filePath: _attachment?.path,
+    );
     
     if (mounted) {
-      if (success) _controller.clear();
+      if (success) {
+        _controller.clear();
+        setState(() => _attachment = null);
+      }
       setState(() => _isSending = false);
     }
   }
@@ -536,32 +571,86 @@ class _ReplyInputState extends State<_ReplyInput> {
     return _SectionCard(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  hintText: 'Type your reply...',
-                  hintStyle: context.bodySmall?.copyWith(color: Colors.grey[400]),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            if (_attachment != null) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                style: context.bodySmall,
-                maxLines: 4,
-                minLines: 1,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        _attachment!,
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      top: -2,
+                      right: -2,
+                      child: GestureDetector(
+                        onTap: _removeAttachment,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            _isSending
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : IconButton(
-                    icon: const Icon(Icons.send_rounded, color: primaryColor),
-                    onPressed: _send,
+              const Divider(height: 1),
+              4.toHeight,
+            ],
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.add_photo_alternate_outlined, color: Colors.grey, size: 22),
+                  onPressed: _isSending ? null : _pickImage,
+                  tooltip: 'Add Image',
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: 'Type your reply...',
+                      hintStyle: context.bodySmall?.copyWith(color: Colors.grey[400]),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    style: context.bodySmall,
+                    maxLines: 4,
+                    minLines: 1,
                   ),
+                ),
+                _isSending
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.send_rounded, color: primaryColor),
+                        onPressed: _send,
+                        tooltip: 'Send Message',
+                      ),
+              ],
+            ),
           ],
         ),
       ],
@@ -864,21 +953,7 @@ class _DetailError extends StatelessWidget {
 
 String _formatDateTime(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return 'N/A';
-  try {
-    final date = DateTime.parse(dateStr).toLocal();
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays < 1) {
-      return timeago.format(date);
-    } else if (difference.inDays < 7) {
-      return DateFormat('EEEE, h:mm a').format(date);
-    } else {
-      return DateFormat('MMM dd, yyyy').format(date);
-    }
-  } catch (e) {
-    return dateStr;
-  }
+  return dateStr.toOrderTime;
 }
 
 extension _WidthExt on int {

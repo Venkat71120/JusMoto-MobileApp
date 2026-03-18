@@ -27,6 +27,7 @@ class SignUpService with ChangeNotifier {
       'email': emailUsername,
       'password': password,
       'terms_conditions': true,
+      'user_type': '1', // ✅ Role assignment: 1 = Client
     };
 
     final headers = {
@@ -98,7 +99,7 @@ class SignUpService with ChangeNotifier {
         
         avatarRequest.files.add(
           await http.MultipartFile.fromPath(
-            'avatar',
+            'image', // ✅ Backend expects 'image'
             sum.profileImage.value!.path,
             contentType: MediaType('image', mimeType),
           ),
@@ -120,8 +121,8 @@ class SignUpService with ChangeNotifier {
       // 2. Update Profile Info (Name)
       debugPrint('📤 Updating profile names...');
       final Map<String, String> fields = {
-        'firstName': sum.fNameController.text.trim(),
-        'lastName': sum.lNameController.text.trim(),
+        'first_name': sum.fNameController.text.trim(), // ✅ snake_case
+        'last_name': sum.lNameController.text.trim(),  // ✅ snake_case
       };
 
       final profileRequest = http.MultipartRequest(

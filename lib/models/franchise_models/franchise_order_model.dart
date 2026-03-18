@@ -109,9 +109,9 @@ class FranchiseOrderItem {
         invoiceNumber: json['invoice_number'] ?? '',
         date: json['date'] ?? '',
         schedule: json['schedule'] ?? '',
-        status: _statusLabel(_toInt(json['status'])),
+        status: statusLabel(_toInt(json['status'])),
         statusCode: _toInt(json['status']),
-        paymentStatus: _paymentStatusLabel(_toInt(json['payment_status'])),
+        paymentStatus: paymentStatusLabel(_toInt(json['payment_status'])),
         paymentStatusCode: _toInt(json['payment_status']),
         total: _toNum(json['total']),
         customer: FranchiseOrderCustomer.fromJson(
@@ -125,7 +125,7 @@ class FranchiseOrderItem {
         createdAt: json['created_at'] ?? '',
       );
 
-  static String _statusLabel(int code) {
+  static String statusLabel(int code) {
     switch (code) {
       case 0:
         return 'Pending';
@@ -142,8 +142,15 @@ class FranchiseOrderItem {
     }
   }
 
-  static String _paymentStatusLabel(int code) {
-    return code == 1 ? 'Paid' : 'Unpaid';
+  static String paymentStatusLabel(int code) {
+    switch (code) {
+      case 0:
+        return 'Unpaid';
+      case 1:
+        return 'Paid';
+      default:
+        return 'Unknown';
+    }
   }
 
   static int _toInt(dynamic value) {
@@ -236,9 +243,9 @@ class FranchiseOrderDetailModel {
         invoiceNumber: order['invoice_number']?.toString() ?? '',
         date: order['date']?.toString() ?? '',
         schedule: order['schedule']?.toString() ?? '',
-        status: FranchiseOrderItem._statusLabel(statusInt),
+        status: FranchiseOrderItem.statusLabel(statusInt),
         statusCode: statusInt,
-        paymentStatus: FranchiseOrderItem._paymentStatusLabel(pStatusInt),
+        paymentStatus: FranchiseOrderItem.paymentStatusLabel(pStatusInt),
         paymentStatusCode: pStatusInt,
         paymentGateway: order['payment_gateway']?.toString() ?? '',
         transactionId: order['transaction_id']?.toString(),

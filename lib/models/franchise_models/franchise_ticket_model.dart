@@ -3,6 +3,8 @@
 // Location: lib/models/franchise_models/franchise_ticket_model.dart
 // ─────────────────────────────────────────────────────────────────────────────
 
+import 'franchise_order_model.dart';
+
 // ── Statistics ────────────────────────────────────────────────────────────────
 
 class FranchiseTicketStatisticsModel {
@@ -296,16 +298,17 @@ class FranchiseTicketServiceRequest {
   });
 
   factory FranchiseTicketServiceRequest.fromJson(Map<String, dynamic> json) {
-    final statusRaw = json['status'];
-    // Handle both { id, invoice_number } and flatter structures
+    final statusInt = _toInt(json['status']);
+    final pStatusInt = _toInt(json['payment_status']);
+
     return FranchiseTicketServiceRequest(
-      id: (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      id: _toInt(json['id']),
       invoiceNumber: json['invoice_number'] ?? json['invoice'] ?? '',
       date: json['date']?.toString() ?? '',
       schedule: json['schedule']?.toString() ?? '',
-      status: statusRaw?.toString() ?? '',
-      statusCode: (statusRaw is int) ? statusRaw : int.tryParse(statusRaw?.toString() ?? '0') ?? 0,
-      paymentStatus: json['payment_status']?.toString() ?? '',
+      status: FranchiseOrderItem.statusLabel(statusInt),
+      statusCode: statusInt,
+      paymentStatus: FranchiseOrderItem.paymentStatusLabel(pStatusInt),
       paymentGateway: json['payment_gateway']?.toString() ?? '',
       subTotal: _toNum(json['total'] ?? json['sub_total']),
       tax: _toNum(json['tax']),
@@ -314,15 +317,27 @@ class FranchiseTicketServiceRequest {
       total: _toNum(json['total']),
       orderNote: json['order_note']?.toString(),
       customer: FranchiseTicketCustomer.fromJson(
-        json['user'] as Map<String, dynamic>? ?? json['customer'] as Map<String, dynamic>? ?? {},
+        json['user'] as Map<String, dynamic>? ??
+            json['customer'] as Map<String, dynamic>? ??
+            {},
       ),
-      outlet: json['outlet'] != null ? FranchiseTicketOutlet.fromJson(json['outlet'] as Map<String, dynamic>) : null,
+      outlet: json['outlet'] != null
+          ? FranchiseTicketOutlet.fromJson(
+              json['outlet'] as Map<String, dynamic>)
+          : null,
       staff: json['staff'],
       createdAt: json['created_at']?.toString() ?? '',
       items: (json['items'] as List? ?? [])
-          .map((i) => FranchiseTicketOrderItem.fromJson(i as Map<String, dynamic>))
+          .map((i) =>
+              FranchiseTicketOrderItem.fromJson(i as Map<String, dynamic>))
           .toList(),
     );
+  }
+
+  static int _toInt(dynamic val) {
+    if (val == null) return 0;
+    if (val is int) return val;
+    return int.tryParse(val.toString()) ?? 0;
   }
 
   static num _toNum(dynamic val) {

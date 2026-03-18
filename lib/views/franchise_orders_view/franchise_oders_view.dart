@@ -12,6 +12,7 @@ import 'package:car_service/services/Franchise_dashboard_Services/franchise_orde
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
 import 'package:car_service/views/franchise_order_detail_view/franchise_order_detail_view.dart';
 // import 'package:car_service/views/franchise_orders_view/franchise_order_detail_view.dart';
+import '../../helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -216,7 +217,7 @@ class _OrderCard extends StatelessWidget {
                         4.toWidth,
                         Flexible(
                           child: Text(
-                            '${order.date}  ${order.schedule}',
+                            order.createdAt.toOrderTime,
                             style: context.bodySmall?.copyWith(
                               color: Colors.grey[500],
                               fontSize: 10,

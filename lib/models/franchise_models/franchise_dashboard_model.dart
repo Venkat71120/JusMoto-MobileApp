@@ -236,8 +236,7 @@ class FranchiseOrderCountsModel {
     return FranchiseOrderCountsModel(
       total: _toInt(data['total_orders'] ?? data['total']),
       pending: _toInt(data['pending_orders'] ?? data['pending']),
-      active: _toInt(data['active_orders'] ?? data['active'] ?? data['accepted_orders'] ?? 0) + 
-              _toInt(data['in_progress_orders'] ?? 0),
+      active: _toInt(data['active_orders'] ?? data['active'] ?? data['accepted_orders'] ?? 0),
       completed: _toInt(data['completed_orders'] ?? data['completed']),
       delivered: _toInt(data['delivered_orders'] ?? data['delivered']),
       cancelled: _toInt(data['cancelled_orders'] ?? data['cancelled']),

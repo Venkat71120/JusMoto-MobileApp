@@ -118,8 +118,12 @@ class EmailManageService with ChangeNotifier {
       LocalKeys.signUp,
     );
 
-    // Backend: { success: true, message: "Email verified successfully" }
+    // Backend: { success: true, message: "Email verified successfully", data: { token: "...", ... } }
     if (responseData != null && responseData['success'] == true) {
+      if (responseData['data'] != null && responseData['data']['token'] != null) {
+        setToken(responseData['data']['token'].toString());
+        debugPrint('✅ Token updated after email verification');
+      }
       return true;
     } else if (responseData != null && responseData.containsKey("message")) {
       responseData["message"]?.toString().showToast();

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'package:intl/intl.dart';
+
 import '../constant_helper.dart';
 import '../local_keys.g.dart';
 
@@ -669,6 +671,28 @@ extension TicketStatusExtension on String {
         return color.mutedWarningColor;
       default:
         return color.mutedPendingColor;
+    }
+  }
+
+  /// Formats a "created_at" string (ISO 8601) to "Just now", "Date Time", or "x mins ago"
+  /// Specifically tailored for the request: "Just now" if very recent, else "Date Time"
+  String get toOrderTime {
+    if (isEmpty) return '';
+    try {
+      final dt = DateTime.parse(this).toLocal();
+      final now = DateTime.now();
+      final diff = now.difference(dt);
+
+      // If within 2 minutes, show "Just now"
+      if (diff.inSeconds >= 0 && diff.inMinutes < 2) {
+        return 'Just now';
+      }
+
+      // If within 1 hour, maybe show "x mins ago" OR just stick to Date Time as requested
+      // The user said: "if that order is placed just now then show just now other wose just show time and date thats it"
+      return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+    } catch (_) {
+      return this;
     }
   }
 }

@@ -92,6 +92,11 @@ class _FranchiseServicesViewState extends State<FranchiseServicesView> {
                     ),
                   ),
 
+                  // ── Date Filter Section ──────────────────────────────
+                  SliverToBoxAdapter(
+                    child: _FilterSection(ts: ts),
+                  ),
+
                   // ── List body ────────────────────────────────────────
                   if (ts.isLoadingList && ts.shouldAutoFetch)
                     const SliverFillRemaining(
@@ -314,7 +319,149 @@ class _StatsHeaderSkeleton extends StatelessWidget {
   }
 }
 
-// ── Filter Bar ────────────────────────────────────────────────────────────────
+// ── Date Filter Section ───────────────────────────────────────────────────────
+
+class _FilterSection extends StatelessWidget {
+  final FranchiseTicketsService ts;
+  const _FilterSection({required this.ts});
+
+  Future<void> _selectDate(BuildContext context, bool isFrom) async {
+    final initialDate = DateTime.now();
+    final firstDate = DateTime(2020);
+    final lastDate = DateTime(2100);
+
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              onSurface: Colors.black87,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (selectedDate != null) {
+      final formattedDate =
+          "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+      if (isFrom) {
+        ts.setFilters(from: formattedDate, to: ts.dateTo);
+      } else {
+        ts.setFilters(from: ts.dateFrom, to: formattedDate);
+      }
+      ts.fetchAll(); // Refresh list with new dates
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasFilters = ts.dateFrom != null || ts.dateTo != null;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      decoration: BoxDecoration(
+        color: context.color.backgroundColor,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _DateFilterItem(
+              label: ts.dateFrom ?? 'From Date',
+              icon: Icons.calendar_today_rounded,
+              isActive: ts.dateFrom != null,
+              onTap: () => _selectDate(context, true),
+            ),
+          ),
+          8.toWidth,
+          Expanded(
+            child: _DateFilterItem(
+              label: ts.dateTo ?? 'To Date',
+              icon: Icons.calendar_today_rounded,
+              isActive: ts.dateTo != null,
+              onTap: () => _selectDate(context, false),
+            ),
+          ),
+          if (hasFilters) ...[
+            8.toWidth,
+            IconButton.filled(
+              onPressed: () {
+                ts.clearFilters();
+                ts.fetchAll();
+              },
+              icon: const Icon(Icons.close_rounded, size: 20),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.red.withOpacity(0.1),
+                foregroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DateFilterItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _DateFilterItem({
+    required this.label,
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isActive ? primaryColor.withOpacity(0.05) : context.color.accentContrastColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isActive ? primaryColor.withOpacity(0.3) : Colors.grey.withOpacity(0.15),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 14, color: isActive ? primaryColor : Colors.grey),
+            SizedBoxExtension(8).toWidth,
+            Expanded(
+              child: Text(
+                label,
+                style: context.bodySmall?.copyWith(
+                  color: isActive ? primaryColor : Colors.grey,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _FilterBarDelegate extends SliverPersistentHeaderDelegate {
   final String filter;
@@ -721,8 +868,4 @@ class _TicketListSkeleton extends StatelessWidget {
       ),
     );
   }
-}
-
-extension _WidthExt on int {
-  Widget get toWidth => SizedBox(width: toDouble());
 }
