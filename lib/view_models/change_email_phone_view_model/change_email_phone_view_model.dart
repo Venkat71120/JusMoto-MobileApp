@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/auth_services/phone_manage_service.dart';
+import '../../services/profile_services/profile_info_service.dart';
 import './../../services/auth_services/email_otp_service.dart';
 import './../../views/change_email_view/change_email_otp_view.dart';
 import './../../views/change_phone_view/change_phone_otp_view.dart';
@@ -40,9 +41,11 @@ class ChangeEmailPhoneViewModel {
         final verifyResult = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChangeEmailOtpView(null),
+              builder: (context) => ChangeEmailOtpView(),
             ));
         if (verifyResult == true) {
+          Provider.of<ProfileInfoService>(context, listen: false)
+              .fetchProfileInfo();
           context.pop;
         }
       }

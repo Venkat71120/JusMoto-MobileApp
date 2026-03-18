@@ -20,8 +20,8 @@ class ProfileEditService {
     }
     final pem = ProfileEditViewModel.instance;
     final data = {
-      'firstName': pem.fNameController.text,
-      'lastName': pem.lNameController.text,
+      'first_name': pem.fNameController.text,
+      'last_name': pem.lNameController.text,
     };
 
     var request = http.MultipartRequest(

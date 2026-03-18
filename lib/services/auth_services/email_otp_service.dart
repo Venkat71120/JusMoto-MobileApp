@@ -63,7 +63,7 @@ class EmailManageService with ChangeNotifier {
   // ─── Send OTP to new email (change email flow) ────────────────────────────
 
   /// Sends OTP to a new email address for the change-email flow.
-  /// Endpoint: POST /user/change-email   Body: { email }   Auth: Bearer token
+  /// Endpoint: POST /user/change-email   Body: { email }   (auth required)
   Future tryOtpToNewEmail({String? emailUsername}) async {
     if (emailUsername != null) email = emailUsername;
     final data = {'email': emailUsername ?? email ?? ""};
@@ -74,14 +74,13 @@ class EmailManageService with ChangeNotifier {
     final responseData = await NetworkApiServices().postApi(
       data,
       AppUrls.changeEmailUrl,
-      LocalKeys.signUp,
-      headers: acceptJsonAuthHeader,
+      LocalKeys.changeEmail,
+      headers: commonAuthHeader,
     );
 
     loadingSendOTP = false;
 
-    if (responseData != null && responseData['data'] != null) {
-      otp = responseData['data']['otp']?.toString();
+    if (responseData != null && responseData['success'] == true) {
       canSend = false;
       LocalKeys.otpSendToMailSuccessfully.showToast();
       _startResendTimer();
@@ -131,11 +130,10 @@ class EmailManageService with ChangeNotifier {
   // ─── Change email (confirm OTP) ───────────────────────────────────────────
 
   /// Confirms the OTP and completes the email change.
-  /// Endpoint: POST /user/change-email   Body: { email, email_verified, otp }   Auth: Bearer
+  /// Endpoint: POST /user/verify-email-otp   Body: { email, otp }   (auth required)
   Future tryEmailChange({required String otp}) async {
     final data = {
       'email': email,
-      'email_verified': '1',
       'otp': otp,
     };
 
@@ -144,15 +142,12 @@ class EmailManageService with ChangeNotifier {
 
     final responseData = await NetworkApiServices().postApi(
       data,
-      AppUrls.changeEmailUrl,
+      AppUrls.verifyEmailOtpUrl,
       LocalKeys.changeEmail,
-      headers: acceptJsonAuthHeader,
+      headers: commonAuthHeader,
     );
 
-    if (responseData != null &&
-        (responseData.containsKey("token") ||
-            responseData['data'] != null ||
-            responseData['success'] == true)) {
+    if (responseData != null && responseData['success'] == true) {
       LocalKeys.changedEmailSuccessfully.showToast();
       loadingVerify = false;
       notifyListeners();

@@ -20,12 +20,31 @@ class TicketListService with ChangeNotifier {
 
   bool nexLoadingFailed = false;
 
+  // Filter: "all", "open", "closed"
+  String _activeFilter = "all";
+  String get activeFilter => _activeFilter;
+
+  void setFilter(String filter) {
+    if (_activeFilter == filter) return;
+    _activeFilter = filter;
+    _ticketListModel = null;
+    nextPage = null;
+    notifyListeners();
+    fetchTicketList();
+  }
+
   bool get shouldAutoFetch => _ticketListModel == null || token.isInvalid;
+
+  String _buildUrl({int page = 1}) {
+    final base = '${AppUrls.ticketListListUrl}?page=$page&limit=15';
+    if (_activeFilter == "all") return base;
+    return '$base&status=$_activeFilter';
+  }
 
   fetchTicketList() async {
     token = getToken;
 
-    final url = '${AppUrls.ticketListListUrl}?status=open&page=1&limit=15';
+    final url = _buildUrl();
     final responseData = await NetworkApiServices().getApi(
       url,
       LocalKeys.supportTicket,
@@ -39,8 +58,7 @@ class TicketListService with ChangeNotifier {
         if (p.nextPageUrl != null) {
           nextPage = p.nextPageUrl;
         } else {
-          nextPage =
-              '${AppUrls.ticketListListUrl}?status=open&page=${(p.currentPage + 1).toInt()}&limit=15';
+          nextPage = _buildUrl(page: (p.currentPage + 1).toInt());
         }
       } else {
         nextPage = null;
@@ -69,8 +87,7 @@ class TicketListService with ChangeNotifier {
         if (p.nextPageUrl != null) {
           nextPage = p.nextPageUrl;
         } else {
-          nextPage =
-              '${AppUrls.ticketListListUrl}?status=open&page=${(p.currentPage + 1).toInt()}&limit=15';
+          nextPage = _buildUrl(page: (p.currentPage + 1).toInt());
         }
       } else {
         nextPage = null;

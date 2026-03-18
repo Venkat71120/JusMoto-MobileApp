@@ -10,7 +10,7 @@ import '../../../helper/local_keys.g.dart';
 import '../../../utils/components/custom_button.dart';
 import '../../../view_models/intro_view_model/intro_view_model.dart';
 import '../../landing_view/landing_view.dart';
-import '../../select_car_view/select_car_view.dart';
+import '../../sign_in_view/sign_in_view.dart';
 
 class IntroBase extends StatelessWidget {
   const IntroBase({
@@ -44,12 +44,12 @@ class IntroBase extends StatelessWidget {
                     flex: 1,
                     child: OutlinedButton(
                       onPressed: () {
-                        context.toPage(SelectCarView(), then: (_) {
+                        context.toPage(const SignInView(), then: (_) {
+                          if (!context.mounted) return;
                           Provider.of<IntroService>(context, listen: false)
                               .seeIntroValue();
                           context.toUntilPage(const LandingView());
                         });
-                        return;
                       },
                       child: Text(
                         LocalKeys.skip,
@@ -67,7 +67,8 @@ class IntroBase extends StatelessWidget {
                       onPressed: () {
                         if (iProvider.currentIndex ==
                             (iProvider.introData.length - 1)) {
-                          context.toPage(SelectCarView(), then: (_) {
+                          context.toPage(const SignInView(), then: (_) {
+                            if (!context.mounted) return;
                             Provider.of<IntroService>(context, listen: false)
                                 .seeIntroValue();
                             context.toUntilPage(const LandingView());

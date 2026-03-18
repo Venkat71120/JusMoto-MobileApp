@@ -1,5 +1,7 @@
 import '/customization.dart';
 
+const String _otpBaseUrl = 'https://16.112.128.19.nip.io/api/v1';
+
 class AppUrls {
   static String get statesUrl => '$baseEndPoint/general/states';
   static String get areaUrl => '$baseEndPoint/general/areas';
@@ -49,7 +51,7 @@ class AppUrls {
   static String get paymentGatewayUrl => '$baseEndPoint/payment-gateway-list';
   static String get conversationUrl => '$baseEndPoint/client/chat/fetch-record';
   static String get messageSendUrl => '$baseEndPoint/client/chat/message-send';
-  static String get signInUrl => '$baseEndPoint/auth/login';
+  static String get signInUrl => '$_otpBaseUrl/auth/login';
   static String get otpSignInUrl => "$baseEndPoint/login-otp/verification";
   static String get emailSignUpUrl => '$baseEndPoint/auth/register';
   static String get socialSignInUrl => '$baseEndPoint/auth/social/login';
@@ -78,7 +80,7 @@ class AppUrls {
   static String get providerDetailsUrl =>
       '$baseEndPoint/provider/profile/details';
   static String get favoriteServicesUrl => '$baseEndPoint/privacy-policy';
-  static String get changePasswordUrl => '$baseEndPoint/user/change-password';
+  static String get changePasswordUrl => '$_otpBaseUrl/user/change-password';
   static String get signOutUrl => '$baseEndPoint/auth/logout';
   static String get ratingAndReviewsUrl => '$baseEndPoint/client/reviews/all';
   static String get submitReviewsUrl => '$baseEndPoint/user/review-add';
@@ -119,14 +121,15 @@ class AppUrls {
   static String get myNotificationsListUrl => '$baseEndPoint/notifications';
   static String get notificationReadUrl =>
       '$baseEndPoint/user/notifications/clear';
-  static String get sentOtpToMailUrl => '$baseEndPoint/auth/resend-otp';
-  static String get verifyEmailUrl => '$baseEndPoint/auth/verify-email';
+  static String get sentOtpToMailUrl => '$_otpBaseUrl/auth/resend-otp';
+  static String get verifyEmailUrl => '$_otpBaseUrl/auth/verify-email';
   static String get profileInfoUpdateUrl => '$baseEndPoint/user/profile/update';
   static String get profileInfoUrl => '$baseEndPoint/user/profile';
   static String get reasonListUrl => '$baseEndPoint/reasons';
   static String get deleteAccountUrl =>
       '$baseEndPoint/user/settings/account-delete';
-  static String get changeEmailUrl => '$baseEndPoint/user/change-email';
+  static String get changeEmailUrl => '$_otpBaseUrl/user/change-email';
+  static String get verifyEmailOtpUrl => '$_otpBaseUrl/user/verify-email-otp';
   static String get sentOtpToPhoneUrl => '$baseEndPoint/login-otp/send';
   static String get verifyPhoneUrl => '$baseEndPoint/login-otp/verification';
   static String get changePhoneUrl => '$baseEndPoint/user/change-phone-number';

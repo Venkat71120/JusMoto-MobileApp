@@ -579,6 +579,7 @@ extension TicketStatusExtension on String {
       case "open":
         return LocalKeys.open;
       case "close":
+      case "closed":
         return LocalKeys.closed;
       default:
         return LocalKeys.pending;
@@ -592,6 +593,7 @@ extension TicketStatusExtension on String {
       case "open":
         return primaryColor;
       case "close":
+      case "closed":
         return color.primaryWarningColor;
       default:
         return color.primaryPendingColor;
@@ -605,6 +607,7 @@ extension TicketStatusExtension on String {
       case "open":
         return mutedPrimaryColor;
       case "close":
+      case "closed":
         return color.mutedWarningColor;
       default:
         return color.mutedPendingColor;

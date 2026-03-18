@@ -71,24 +71,25 @@ class TicketConversationViewModel {
       context,
       listen: false,
     );
+
+    final msg = messageController.text.trim();
+    if (msg.isEmpty && selectedFile.value == null) {
+      isLoading.value = false;
+      tcProvider.setIsLoading(false);
+      return;
+    }
+
     isLoading.value = true;
-    await tcProvider
-        .sendMessage(
-          context,
-          tcProvider.ticketDetails!.id,
-          message: messageController.text,
-          notifyViaMail: notifyEmail.value,
-          file: selectedFile.value,
-        )
-        .then((value) {
-          if (value != null) {
-            isLoading.value = false;
-            return;
-          }
-          messageController.clear();
-          selectedFile.value = null;
-          isLoading.value = false;
-        });
+    await tcProvider.sendMessage(
+      context,
+      tcProvider.ticketDetails!.id,
+      message: msg.isEmpty ? " " : msg,
+      notifyViaMail: notifyEmail.value,
+      file: selectedFile.value,
+    );
+    messageController.clear();
+    selectedFile.value = null;
+    isLoading.value = false;
   }
 
   void tryToLoadMoreMessages(BuildContext context) {

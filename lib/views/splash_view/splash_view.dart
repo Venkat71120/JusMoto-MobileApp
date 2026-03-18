@@ -8,12 +8,28 @@ import '../../helper/local_keys.g.dart';
 import '../../view_models/splash_view_model/splash_view_model.dart';
 import 'components/splash_video.dart';
 
-class SplashView extends StatelessWidget {
+class SplashView extends StatefulWidget {
   static const routeName = '/';
   const SplashView({super.key});
+
+  @override
+  State<SplashView> createState() => _SplashViewState();
+}
+
+class _SplashViewState extends State<SplashView> {
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      SplashViewModel().initiateStartingSequence(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    SplashViewModel().initiateStartingSequence(context);
     return Material(
       color: Colors.transparent,
       child: SafeArea(
@@ -34,37 +50,6 @@ class SplashView extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              // Commented out the retry button/popup for now
-              // Consumer<DynamicsService>(builder: (context, lProvider, child) {
-              //   return Positioned(
-              //     bottom: context.width / 2.5,
-              //     child: lProvider.noConnection
-              //         ? TextButton(
-              //             onPressed: () {
-              //               lProvider.setNoConnection(false);
-              //               SplashViewModel().initiateStartingSequence(context);
-              //             },
-              //             style: TextButton.styleFrom(
-              //               foregroundColor: primaryColor,
-              //               backgroundColor: context.color.accentContrastColor,
-              //               padding: const EdgeInsets.symmetric(horizontal: 40),
-              //               shape: RoundedRectangleBorder(
-              //                   borderRadius: BorderRadius.circular(12)),
-              //               surfaceTintColor: Colors.transparent,
-              //               splashFactory: NoSplash.splashFactory,
-              //               elevation: 0,
-              //             ),
-              //             child: Text(
-              //               LocalKeys.retry,
-              //               style: Theme.of(context)
-              //                   .textTheme
-              //                   .titleSmall!
-              //                   .copyWith(color: primaryColor),
-              //             ),
-              //           )
-              //         : SizedBox(),
-              //   );
-              // }),
             ],
           ),
         ),

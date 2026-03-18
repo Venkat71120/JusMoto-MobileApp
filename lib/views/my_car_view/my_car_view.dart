@@ -89,9 +89,7 @@ class _MyCarViewState extends State<MyCarView> {
             return SquircleContainer(
               radius: 12,
               padding: const EdgeInsets.all(16),
-              color: isDefault
-                  ? context.color.accentContrastColor
-                  : Colors.grey.shade100,
+              color: context.color.accentContrastColor,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

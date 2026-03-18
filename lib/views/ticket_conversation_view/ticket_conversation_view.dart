@@ -17,9 +17,11 @@ import '../../utils/components/custom_preloader.dart';
 class TicketConversationView extends StatelessWidget {
   final String title;
   final dynamic id;
+  final String? status;
   const TicketConversationView({
     required this.title,
     required this.id,
+    this.status,
     super.key,
   });
 
@@ -80,9 +82,25 @@ class TicketConversationView extends StatelessWidget {
               },
               child: Consumer<TicketConversationService>(
                 builder: (context, tcProvider, child) {
+                  final isClosed = status == "close" || status == "closed";
                   return Column(
                     children: [
                       Expanded(child: messageListView(context, tcProvider)),
+                      if (isClosed)
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: context.color.accentContrastColor,
+                          ),
+                          child: Text(
+                            "This ticket is closed. You can no longer send messages.",
+                            textAlign: TextAlign.center,
+                            style: context.bodySmall?.copyWith(
+                              color: context.color.tertiaryContrastColo,
+                            ),
+                          ),
+                        )
+                      else
                       Container(
                         padding: const EdgeInsets.only(top: 20),
                         decoration: BoxDecoration(

@@ -21,14 +21,40 @@ class ProfileImage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CustomNetworkImage(
-              height: 72,
-              width: 72,
-              radius: 36,
-              name: pi.profileInfoModel.userDetails?.firstName,
-              fit: BoxFit.cover,
-              imageUrl: pi.profileInfoModel.userDetails?.image,
-              userPreloader: true,
+            Row(
+              children: [
+                CustomNetworkImage(
+                  height: 72,
+                  width: 72,
+                  radius: 36,
+                  name: pi.profileInfoModel.userDetails?.firstName,
+                  fit: BoxFit.cover,
+                  imageUrl: pi.profileInfoModel.userDetails?.image,
+                  userPreloader: true,
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      [
+                        pi.profileInfoModel.userDetails?.firstName,
+                        pi.profileInfoModel.userDetails?.lastName,
+                      ].where((s) => s != null && s.isNotEmpty).join(' '),
+                      style: context.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (pi.profileInfoModel.userDetails?.email != null)
+                      Text(
+                        pi.profileInfoModel.userDetails!.email!,
+                        style: context.bodySmall?.copyWith(
+                          color: context.color.secondaryContrastColor,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ),
             ElevatedButton(
                 onPressed: () {
