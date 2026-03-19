@@ -122,10 +122,13 @@ class UserCarsService with ChangeNotifier {
     Map<String, dynamic> data = {
       "brand_id": brandId.toString(),
       "car_id": carId.toString(),
-      "variant_id": variantId.toString(),
       "is_default": isDefault ? "1" : "0",
     };
-    
+
+    if (variantId != null) {
+      data["variant_id"] = variantId.toString();
+    }
+
     if (registrationNumber != null && registrationNumber.isNotEmpty) {
       data["registration_number"] = registrationNumber.toString();
     }
@@ -156,10 +159,13 @@ class UserCarsService with ChangeNotifier {
     Map<String, dynamic> data = {
       "brand_id": brandId.toString(),
       "car_id": carId.toString(),
-      "variant_id": variantId.toString(),
       "is_default": isDefault ? "1" : "0",
     };
-    
+
+    if (variantId != null) {
+      data["variant_id"] = variantId.toString();
+    }
+
     if (registrationNumber != null && registrationNumber.isNotEmpty) {
       data["registration_number"] = registrationNumber.toString();
     }

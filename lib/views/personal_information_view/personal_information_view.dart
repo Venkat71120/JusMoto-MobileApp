@@ -32,7 +32,7 @@ class PersonalInformationView extends StatelessWidget {
             children: [
               8.toHeight,
               const ProfileImage(),
-              8.toHeight,
+              16.toHeight,
               const ProfileInfoTiles(),
             ],
           ),

@@ -81,42 +81,44 @@ class SelectCarDetailsPage extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldLabel(label: "Variants"),
-                                  Wrap(
-                                    children:
-                                        (vls.variantListModel.allVariants ?? [])
-                                            .map((e) {
-                                              return SizedBox(
-                                                width:
-                                                    ((context.width - 100) /
-                                                                2) <
-                                                            100
-                                                        ? null
-                                                        : (context.width -
-                                                                100) /
-                                                            2,
-                                                child: RadioListTile(
-                                                  dense: true,
-                                                  value: value?.id == e.id,
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                  groupValue: true,
-                                                  onChanged: (val) {
-                                                    scm.selectedVariant.value =
-                                                        e;
-                                                  },
-                                                  title: Text(
-                                                    "${e.name ?? ''}\n${e.engineType?.name ?? ''} | ${e.fuelType?.name ?? ''}",
-                                                    style: context.titleSmall,
+                                  if ((vls.variantListModel.allVariants ?? []).isNotEmpty) ...[
+                                    FieldLabel(label: "Variants"),
+                                    Wrap(
+                                      children:
+                                          (vls.variantListModel.allVariants ?? [])
+                                              .map((e) {
+                                                return SizedBox(
+                                                  width:
+                                                      ((context.width - 100) /
+                                                                  2) <
+                                                              100
+                                                          ? null
+                                                          : (context.width -
+                                                                  100) /
+                                                              2,
+                                                  child: RadioListTile(
+                                                    dense: true,
+                                                    value: value?.id == e.id,
+                                                    contentPadding:
+                                                        EdgeInsets.zero,
+                                                    visualDensity:
+                                                        VisualDensity.compact,
+                                                    groupValue: true,
+                                                    onChanged: (val) {
+                                                      scm.selectedVariant.value =
+                                                          e;
+                                                    },
+                                                    title: Text(
+                                                      "${e.name ?? ''}\n${e.engineType?.name ?? ''} | ${e.fuelType?.name ?? ''}",
+                                                      style: context.titleSmall,
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            })
-                                            .toList(),
-                                  ),
-                                  16.toHeight,
+                                                );
+                                              })
+                                              .toList(),
+                                    ),
+                                    16.toHeight,
+                                  ],
                                   FieldWithLabel(
                                     label: "Registration Number (Optional)",
                                     hintText: "Enter registration number",

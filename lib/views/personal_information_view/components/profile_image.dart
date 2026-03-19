@@ -19,43 +19,45 @@ class ProfileImage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         color: context.color.accentContrastColor,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                CustomNetworkImage(
-                  height: 72,
-                  width: 72,
-                  radius: 36,
-                  name: pi.profileInfoModel.userDetails?.firstName,
-                  fit: BoxFit.cover,
-                  imageUrl: pi.profileInfoModel.userDetails?.image,
-                  userPreloader: true,
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      [
-                        pi.profileInfoModel.userDetails?.firstName,
-                        pi.profileInfoModel.userDetails?.lastName,
-                      ].where((s) => s != null && s.isNotEmpty).join(' '),
-                      style: context.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (pi.profileInfoModel.userDetails?.email != null)
-                      Text(
-                        pi.profileInfoModel.userDetails!.email!,
-                        style: context.bodySmall?.copyWith(
-                          color: context.color.secondaryContrastColor,
-                        ),
-                      ),
-                  ],
-                ),
-              ],
+            CustomNetworkImage(
+              height: 72,
+              width: 72,
+              radius: 36,
+              name: pi.profileInfoModel.userDetails?.firstName,
+              fit: BoxFit.cover,
+              imageUrl: pi.profileInfoModel.userDetails?.image,
+              userPreloader: true,
             ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    [
+                      pi.profileInfoModel.userDetails?.firstName,
+                      pi.profileInfoModel.userDetails?.lastName,
+                    ].where((s) => s != null && s.isNotEmpty).join(' '),
+                    style: context.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (pi.profileInfoModel.userDetails?.email != null)
+                    Text(
+                      pi.profileInfoModel.userDetails!.email!,
+                      style: context.bodySmall?.copyWith(
+                        color: context.color.secondaryContrastColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
             ElevatedButton(
                 onPressed: () {
                   ProfileEditViewModel.dispose;
