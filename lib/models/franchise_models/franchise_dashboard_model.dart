@@ -356,6 +356,7 @@ class RecentOrder {
   final int statusCode;
   final String paymentStatus;
   final String createdAt;
+  final String? image;
 
   RecentOrder({
     required this.id,
@@ -366,18 +367,36 @@ class RecentOrder {
     required this.statusCode,
     required this.paymentStatus,
     required this.createdAt,
+    this.image,
   });
 
-  factory RecentOrder.fromJson(Map<String, dynamic> json) => RecentOrder(
-        id: json['id'] ?? 0,
-        invoiceNumber: json['invoice_number'] ?? '',
-        customerName: json['customer_name'] ?? '',
-        total: json['total'] ?? 0,
-        status: json['status'] ?? '',
-        statusCode: json['status_code'] ?? 0,
-        paymentStatus: json['payment_status'] ?? '',
-        createdAt: json['created_at'] ?? '',
-      );
+  factory RecentOrder.fromJson(Map<String, dynamic> json) {
+    final items = (json['items'] ?? json['order_details'] ?? []) as List;
+    return RecentOrder(
+      id: json['id'] ?? 0,
+      invoiceNumber: json['invoice_number'] ?? '',
+      customerName: json['customer_name'] ?? '',
+      total: json['total'] ?? 0,
+      status: json['status'] ?? '',
+      statusCode: json['status_code'] ?? 0,
+      paymentStatus: json['payment_status'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      image: json['image'] ?? (items.isNotEmpty ? _extractImage(items.first) : null),
+    );
+  }
+
+  static String? _extractImage(dynamic item) {
+    if (item is! Map) return null;
+    final Map<String, dynamic> itemMap = Map<String, dynamic>.from(item);
+    dynamic img = itemMap['image'] ?? itemMap['img'];
+    if (img == null) {
+      final serviceGroup = itemMap['service'] as Map?;
+      final productGroup = itemMap['product'] as Map?;
+      if (serviceGroup != null) img = serviceGroup['image'] ?? serviceGroup['img'];
+      else if (productGroup != null) img = productGroup['image'] ?? productGroup['img'];
+    }
+    return img?.toString();
+  }
 }
 
 class RecentTicket {

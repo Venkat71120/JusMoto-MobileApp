@@ -41,12 +41,7 @@ class FranchiseOrdersView extends StatelessWidget {
               style: context.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh_rounded),
-                onPressed: os.isLoadingList ? null : () => os.refreshOrders(),
-                tooltip: 'Refresh',
-              ),
-              SizedBoxExtension(12).toWidth,
+              12.toWidth,
             ],
           ),
           body: Column(
@@ -118,18 +113,12 @@ class _OrderCard extends StatelessWidget {
 
   Color _statusColor(int code) {
     switch (code) {
-      case 0:
-        return Colors.orange;
-      case 1:
-        return Colors.blue;
-      case 2:
-        return Colors.green;
-      case 3:
-        return Colors.teal;
-      case 4:
-        return Colors.red;
-      default:
-        return Colors.grey;
+      case 0: return Colors.orange;
+      case 1: return Colors.blue;
+      case 2: return Colors.green;
+      case 3: return Colors.teal;
+      case 4: return Colors.red;
+      default: return Colors.grey;
     }
   }
 
@@ -141,156 +130,283 @@ class _OrderCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: context.color.accentContrastColor,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+            BoxShadow(
+              color: statusColor.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Column(
-          children: [
-            // ── Top row: invoice + amount ────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-              child: Row(
-                children: [
-                  // Status dot
-                  Container(
-                    width: 10,
-                    height: 10,
-                    margin: const EdgeInsets.only(right: 10),
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      shape: BoxShape.circle,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1. Dynamic Status Gradient Bar
+                Container(
+                  width: 7,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        statusColor,
+                        statusColor.withOpacity(0.4),
+                        statusColor.withOpacity(0.1),
+                      ],
                     ),
                   ),
-                  Expanded(
+                ),
+
+                // 2. Image Section with Floating Indicator
+                Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 20, 12, 20),
+                      child: Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: Colors.grey[50],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          image: order.firstItemImage != null
+                              ? DecorationImage(
+                                  image: NetworkImage(order.firstItemImage!),
+                                  fit: BoxFit.cover,
+                                  onError: (e, s) => const Icon(
+                                      Icons.broken_image,
+                                      size: 24,
+                                      color: Colors.grey),
+                                )
+                              : null,
+                        ),
+                        child: order.firstItemImage == null
+                            ? Icon(Icons.shopping_bag_outlined,
+                                color: Colors.grey[200], size: 36)
+                            : null,
+                      ),
+                    ),
+                    // Floating Real-time Status Dot
+                    Positioned(
+                      top: 14,
+                      right: 6,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: statusColor.withOpacity(0.4),
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // 3. Core Info Section
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 20, 20, 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '#${order.invoiceNumber}',
-                          style: context.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        // Header: Invoice Tag & Hero Price
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withOpacity(0.06),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '#${order.invoiceNumber}',
+                                style: context.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: primaryColor,
+                                  fontSize: 10.5,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '₹${order.total}',
+                              style: context.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: context.color.primaryContrastColor,
+                                fontSize: 20,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ],
                         ),
-                        4.toHeight,
-                        Text(
-                          order.customer.name,
-                          style: context.bodySmall
-                              ?.copyWith(color: Colors.grey[600]),
+                        14.toHeight,
+
+                        // Customer Info with specialized icon
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.person_outline_rounded,
+                                  size: 12, color: Colors.grey[500]),
+                            ),
+                            10.toWidth,
+                            Expanded(
+                              child: Text(
+                                order.customer.name,
+                                style: context.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: context.color.primaryContrastColor
+                                      .withOpacity(0.85),
+                                  fontSize: 13.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        16.toHeight,
+                        const Spacer(),
+
+                        // Footer Row: Metadata Chips & Status Badges
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Metadata Group
+                            Row(
+                              children: [
+                                _MetaIcon(
+                                  icon: Icons.calendar_today_rounded,
+                                  label: order.createdAt.toOrderTime,
+                                ),
+                                14.toWidth,
+                                _MetaIcon(
+                                  icon: Icons.inventory_2_outlined,
+                                  label: '${order.itemsCount} Items',
+                                ),
+                              ],
+                            ),
+                            // Badges Group
+                            Row(
+                              children: [
+                                _V2Badge(
+                                    label: order.status,
+                                    color: statusColor,
+                                    isSolid: true),
+                                6.toWidth,
+                                _V2Badge(
+                                  label: order.paymentStatus,
+                                  color: isPaid ? Colors.green : Colors.red,
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  Text(
-                    '₹${order.total}',
-                    style: context.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-
-            // ── Divider ──────────────────────────────────────────────
-            Divider(height: 1, color: Colors.grey.withOpacity(0.12)),
-
-            // ── Bottom row: metadata + badges ────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-              child: Row(
-                children: [
-                  // Metadata group (Date, schedule, count)
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.calendar_today_outlined,
-                            size: 11, color: Colors.grey[500]),
-                        4.toWidth,
-                        Flexible(
-                          child: Text(
-                            order.createdAt.toOrderTime,
-                            style: context.bodySmall?.copyWith(
-                              color: Colors.grey[500],
-                              fontSize: 10,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        6.toWidth,
-                        // Items count chip
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '${order.itemsCount} item${order.itemsCount == 1 ? '' : 's'}',
-                            style: TextStyle(
-                              fontSize: 9,
-                              color: primaryColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  8.toWidth,
-                  // Status badge
-                  _Badge(
-                    label: order.status,
-                    color: statusColor,
-                  ),
-                  4.toWidth,
-                  // Payment badge
-                  _Badge(
-                    label: order.paymentStatus,
-                    color: isPaid ? Colors.green : Colors.red,
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Badge ─────────────────────────────────────────────────────────────────────
+class _MetaIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
 
-class _Badge extends StatelessWidget {
+  const _MetaIcon({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: Colors.grey[400]),
+        5.toWidth,
+        Text(
+          label,
+          style: context.bodySmall?.copyWith(
+            color: Colors.grey[500],
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _V2Badge extends StatelessWidget {
   final String label;
   final Color color;
+  final bool isSolid;
 
-  const _Badge({required this.label, required this.color});
+  const _V2Badge(
+      {required this.label, required this.color, this.isSolid = false});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(5),
+        color: isSolid ? color : color.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(100),
+        border: isSolid
+            ? null
+            : Border.all(color: color.withOpacity(0.15), width: 0.5),
+        boxShadow: isSolid
+            ? [
+                BoxShadow(
+                  color: color.withOpacity(0.25),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                )
+              ]
+            : null,
       ),
       child: Text(
-        label,
+        label.toUpperCase(),
         style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          color: color,
+          fontSize: 8.5,
+          fontWeight: FontWeight.w900,
+          color: isSolid ? Colors.white : color,
+          letterSpacing: 0.6,
         ),
       ),
     );
@@ -528,23 +644,31 @@ class _FilterItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: isActive
-              ? primaryColor.withOpacity(0.05)
-              : context.color.mutedContrastColor.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(10),
+              ? primaryColor.withOpacity(0.06)
+              : context.color.mutedContrastColor.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? primaryColor.withOpacity(0.3) : Colors.transparent,
+            color: isActive 
+                ? primaryColor.withOpacity(0.3) 
+                : Colors.grey.withOpacity(0.1),
+            width: 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: isActive ? primaryColor : Colors.grey),
-            8.toWidth,
+            Icon(
+              icon, 
+              size: 14, 
+              color: isActive ? primaryColor : Colors.grey[400],
+            ),
+            10.toWidth,
             Expanded(
               child: Text(
                 label,
                 style: context.bodySmall?.copyWith(
-                  color: isActive ? primaryColor : Colors.grey[600],
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                  color: isActive ? primaryColor : Colors.grey[500],
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 11,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

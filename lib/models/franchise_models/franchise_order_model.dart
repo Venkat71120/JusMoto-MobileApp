@@ -86,6 +86,7 @@ class FranchiseOrderItem {
   final FranchiseOrderStaff? staff;
   final int itemsCount;
   final String createdAt;
+  final String? firstItemImage;
 
   FranchiseOrderItem({
     required this.id,
@@ -101,10 +102,13 @@ class FranchiseOrderItem {
     this.staff,
     required this.itemsCount,
     required this.createdAt,
+    this.firstItemImage,
   });
 
-  factory FranchiseOrderItem.fromJson(Map<String, dynamic> json) =>
-      FranchiseOrderItem(
+  factory FranchiseOrderItem.fromJson(Map<String, dynamic> json) {
+    try {
+      final items = (json['items'] ?? json['order_details'] ?? []) as List;
+      return FranchiseOrderItem(
         id: json['id'] ?? 0,
         invoiceNumber: json['invoice_number'] ?? '',
         date: json['date'] ?? '',
@@ -121,9 +125,36 @@ class FranchiseOrderItem {
             ? FranchiseOrderStaff.fromJson(
                 json['staff'] as Map<String, dynamic>)
             : null,
-        itemsCount: (json['items'] as List?)?.length ?? 0,
+        itemsCount: items.length,
         createdAt: json['created_at'] ?? '',
+        firstItemImage: items.isNotEmpty ? _extractImage(items.first) : null,
       );
+    } catch (e) {
+      debugPrint('❌ Error parsing FranchiseOrderItem: $e');
+      rethrow;
+    }
+  }
+
+  static String? _extractImage(dynamic item) {
+    if (item is! Map) return null;
+    final Map<String, dynamic> itemMap = Map<String, dynamic>.from(item);
+    
+    // Try all common title/name keys at top level first
+    dynamic image = itemMap['image'] ?? itemMap['img'];
+
+    if (image == null) {
+      final serviceGroup = itemMap['service'] as Map?;
+      final productGroup = itemMap['product'] as Map?;
+      
+      if (serviceGroup != null) {
+        image = serviceGroup['image'] ?? serviceGroup['img'];
+      } else if (productGroup != null) {
+        image = productGroup['image'] ?? productGroup['img'];
+      }
+    }
+
+    return image?.toString();
+  }
 
   static String statusLabel(int code) {
     switch (code) {
