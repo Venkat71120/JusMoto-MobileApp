@@ -349,6 +349,10 @@ class NetworkApiServices extends BaseApiServices {
 
   showValidationErrors(Map json) {
     debugPrint("in validation error method".toString());
+    // Handle singular "error" key (e.g. {"success":false,"error":"Email already registered"})
+    if (json.containsKey("error") && json["error"] is String) {
+      throw json["error"];
+    }
     if (!json.containsKey("errors") || json["errors"] == {}) {
       debugPrint(json["message"].toString());
       throw json["message"] ?? json["msg"];

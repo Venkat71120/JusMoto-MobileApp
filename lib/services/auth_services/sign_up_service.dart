@@ -99,7 +99,7 @@ class SignUpService with ChangeNotifier {
         
         avatarRequest.files.add(
           await http.MultipartFile.fromPath(
-            'image', // ✅ Backend expects 'image'
+            'avatar', // ✅ Backend expects 'avatar' (matches /upload/avatar endpoint)
             sum.profileImage.value!.path,
             contentType: MediaType('image', mimeType),
           ),

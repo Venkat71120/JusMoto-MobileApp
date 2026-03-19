@@ -2,7 +2,6 @@ import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
-import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/models/order_models/order_list_model.dart';
 import 'package:car_service/utils/components/custom_squircle_widget.dart';
@@ -24,8 +23,8 @@ class OrderListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ UPDATED: Convert int? status to String for existing string extensions
     final statusStr = (order.status ?? 0).toString();
+    final itemCount = order.items.length;
 
     return GestureDetector(
       onTap: () {
@@ -34,106 +33,137 @@ class OrderListTile extends StatelessWidget {
         ));
       },
       child: SquircleContainer(
-        margin: const EdgeInsets.symmetric(horizontal: 24),
-        padding: const EdgeInsets.all(8),
-        radius: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        radius: 12,
+        borderColor: context.color.primaryBorderColor,
         color: context.color.accentContrastColor,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
           children: [
-            CustomNetworkImage(
-              imageUrl: order.firstServiceImage,
-              height: 70,
-              width: 70,
-              radius: 8,
-            ),
-            12.toWidth,
-            Expanded(
-              child: Column(
+            // Top section: image + details
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "#${index + 1} | ${LocalKeys.id}: ",
-                                style: context.bodySmall?.bold6,
-                              ),
-                              TextSpan(
-                                text: order.id.toString(),
-                                style: context.bodySmall?.bold.copyWith(
-                                    color: context.color.primaryContrastColor),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SquircleContainer(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          // ✅ UPDATED: Use pre-converted statusStr
-                          color: statusStr.getOrderMutedStatusColor,
-                          radius: 4,
-                          child: Text(
-                            statusStr.getOrderStatus,
-                            style: context.bodySmall?.copyWith(
-                                color: statusStr.getOrderPrimaryStatusColor),
-                          ))
-                    ],
+                  // Service image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CustomNetworkImage(
+                      imageUrl: order.firstServiceImage,
+                      height: 80,
+                      width: 80,
+                      radius: 8,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  4.toHeight,
-                  Wrap(
-                    spacing: 4,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(order.total.cur,
-                          style: context.titleSmall?.bold
-                              .copyWith(color: primaryColor)),
-                      if (!["4", "5"].contains(statusStr))
-                        OrderPaymentStatusChip(
-                            status: (order.paymentStatus ?? 0).toString(),
-                            isCOD: ["cod", "cash_on_delivery"]
-                                .contains(order.paymentGateway)),
-                    ],
-                  ),
-                  8.toHeight,
-                  Wrap(
-                    children: [
-                      // ✅ UPDATED: `time` is removed from API — show `schedule` instead
-                      FittedBox(
-                        child: Row(
+                  12.toWidth,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Service title + status badge
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SvgAssets.clock.toSVGSized(16, color: primaryColor),
-                            4.toWidth,
-                            Text(
-                              order.schedule?.capitalize ?? "---",
-                              style: context.bodySmall?.bold,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    order.firstServiceTitle ?? "Service",
+                                    style: context.titleSmall?.bold,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (itemCount > 1)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Text(
+                                        "+${itemCount - 1} more service${itemCount > 2 ? 's' : ''}",
+                                        style: context.bodySmall?.copyWith(
+                                          color: context
+                                              .color.secondaryContrastColor,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            6.toWidth,
+                            SquircleContainer(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              color: statusStr.getOrderMutedStatusColor,
+                              radius: 6,
+                              child: Text(
+                                statusStr.getOrderStatus,
+                                style: context.labelSmall?.copyWith(
+                                  color: statusStr.getOrderPrimaryStatusColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      8.toWidth,
-                      FittedBox(
-                        child: Row(
+                        8.toHeight,
+                        // Price + payment status
+                        Row(
                           children: [
-                            SvgAssets.calendar.toSVGSized(16, color: primaryColor),
-                            4.toWidth,
-                            Text(
-                              order.date == null
-                                  ? "---"
-                                  : DateFormat("EEE, dd MMM yyyy")
-                                      .format(order.date ?? DateTime.now()),
-                              style: context.bodySmall?.bold,
-                            ),
+                            Text(order.total.cur,
+                                style: context.titleMedium?.bold
+                                    .copyWith(color: primaryColor)),
+                            8.toWidth,
+                            if (!["4", "5"].contains(statusStr))
+                              OrderPaymentStatusChip(
+                                  status:
+                                      (order.paymentStatus ?? 0).toString(),
+                                  isCOD: ["cod", "cash_on_delivery"]
+                                      .contains(order.paymentGateway)),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                ],
+              ),
+            ),
+            // Divider
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: context.color.primaryBorderColor,
+            ),
+            // Bottom section: schedule, date, chevron
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  SvgAssets.calendar.toSVGSized(14,
+                      color: context.color.secondaryContrastColor),
+                  4.toWidth,
+                  Text(
+                    order.date == null
+                        ? "---"
+                        : DateFormat("dd MMM yyyy")
+                            .format(order.date ?? DateTime.now()),
+                    style: context.bodySmall?.copyWith(
+                        color: context.color.secondaryContrastColor),
+                  ),
+                  16.toWidth,
+                  SvgAssets.clock.toSVGSized(14,
+                      color: context.color.secondaryContrastColor),
+                  4.toWidth,
+                  Expanded(
+                    child: Text(
+                      order.schedule?.capitalize ?? "---",
+                      style: context.bodySmall?.copyWith(
+                          color: context.color.secondaryContrastColor),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SvgAssets.chevron.toSVGSized(16,
+                      color: context.color.secondaryContrastColor),
                 ],
               ),
             ),

@@ -13,6 +13,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/car_services/user_cars_service.dart';
+import '../../services/car_services/variant_list_service.dart';
 import '../../views/splash_view/splash_view.dart';
 
 class SelectCarViewModel {
@@ -70,7 +71,10 @@ class SelectCarViewModel {
         break;
       default:
         // Variant Page (Index 2)
-        if (selectedVariant.value == null) {
+        final variants = Provider.of<VariantListService>(context, listen: false)
+            .variantListModel
+            .allVariants ?? [];
+        if (variants.isNotEmpty && selectedVariant.value == null) {
            "Please select variant type".showToast();
            return;
         }
