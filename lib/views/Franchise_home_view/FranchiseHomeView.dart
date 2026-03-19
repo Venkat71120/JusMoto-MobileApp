@@ -11,7 +11,7 @@ import 'package:car_service/services/theme_service.dart';
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
 import 'package:car_service/view_models/franchise_home_view_model/franchise_home_view_model.dart';
 import 'package:car_service/views/Franchise_home_view/components/FranchiseHomeViewHeader.dart';
-import 'package:car_service/views/Franchise_home_view/components/franchise_activity_section.dart';
+import 'package:car_service/views/Franchise_home_view/components/activity_v2.dart';
 import 'package:car_service/views/Franchise_home_view/components/franchise_earnings_section.dart';
 import 'package:car_service/views/Franchise_home_view/components/franchise_home_app_bar.dart';
 // import 'package:car_service/views/Franchise_home_view/components/franchise_home_view_header.dart';

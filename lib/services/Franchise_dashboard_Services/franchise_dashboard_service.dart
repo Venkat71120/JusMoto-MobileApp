@@ -61,6 +61,7 @@ class FranchiseDashboardService with ChangeNotifier {
         ),
         _fetchEarningsPeriodic(),
         _fetchRecentActivity(),
+        _fetchOrderCounts(),
       ]);
 
       final dashboardResponse = results[0] as Map<String, dynamic>?;
@@ -74,8 +75,10 @@ class FranchiseDashboardService with ChangeNotifier {
         // 1. Map to Statistics (Orders, Tickets, Earnings - initially from consolidated)
         _statistics = FranchiseDashboardStatisticsModel.fromJson(data);
 
-        // 2. Map to Order Counts (for breakdown section)
-        _orderCounts = FranchiseOrderCountsModel.fromJson(data);
+        // 2. Map to Order Counts (for breakdown section) - only if dedicated fetch didn't set it
+        if (_orderCounts == null || _orderCounts!.total == 0) {
+          _orderCounts = FranchiseOrderCountsModel.fromJson(data);
+        }
 
         // 3. Map to Earnings model (consolidated)
         _earnings = FranchiseEarningsModel.fromJson(data);
@@ -132,6 +135,26 @@ class FranchiseDashboardService with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('❌ _fetchEarningsPeriodic: $e');
+    }
+    return false;
+  }
+
+  Future<bool> _fetchOrderCounts() async {
+    try {
+      final response = await NetworkApiServices().getApi(
+        AppUrls.franchiseDashboardOrderCountsUrl,
+        null,
+        headers: acceptJsonAuthHeader,
+        timeoutSeconds: 20,
+      );
+      if (response != null && response['success'] == true) {
+        _orderCounts = FranchiseOrderCountsModel.fromJson(
+          Map<String, dynamic>.from(response['data']),
+        );
+        return true;
+      }
+    } catch (e) {
+      debugPrint('❌ _fetchOrderCounts: $e');
     }
     return false;
   }

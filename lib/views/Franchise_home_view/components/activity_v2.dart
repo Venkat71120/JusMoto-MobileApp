@@ -8,51 +8,45 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/models/franchise_models/franchise_dashboard_model.dart';
-import 'package:car_service/services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
+import 'package:car_service/view_models/franchise_home_view_model/franchise_home_view_model.dart';
 
 class FranchiseActivitySection extends StatelessWidget {
-  const FranchiseActivitySection({super.key});
+  final FranchiseRecentActivityModel activity;
+  final FranchiseHomeViewModel hvm;
+
+  const FranchiseActivitySection({
+    super.key,
+    required this.activity,
+    required this.hvm,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FranchiseDashboardService>(
-      builder: (context, ds, _) {
-        if (ds.isLoading) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(40),
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+    final recentOrders = activity.orders;
+    final recentTickets = activity.tickets;
 
-        final recentOrders = ds.dashboardData?.recentOrders ?? [];
-        final recentTickets = ds.dashboardData?.recentTickets ?? [];
+    return Column(
+      children: [
+        // ── Recent Orders ──────────────────────────────────────────────────
+        _SectionHeader(
+          title: LocalKeys.recentOrders,
+          onTap: () {},
+        ),
+        _OrdersList(orders: recentOrders),
 
-        return Column(
-          children: [
-            // ── Recent Orders ──────────────────────────────────────────────────
-            _SectionHeader(
-              title: LocalKeys.recentOrders,
-              onTap: () {},
-            ),
-            _OrdersList(orders: recentOrders),
+        24.toHeight,
 
-            24.toHeight,
+        // ── Recent Tickets ─────────────────────────────────────────────────
+        _SectionHeader(
+          title: LocalKeys.recentTickets,
+          onTap: () {},
+        ),
+        _TicketsList(tickets: recentTickets),
 
-            // ── Recent Tickets ─────────────────────────────────────────────────
-            _SectionHeader(
-              title: LocalKeys.recentTickets,
-              onTap: () {},
-            ),
-            _TicketsList(tickets: recentTickets),
-            
-            32.toHeight,
-          ],
-        );
-      },
+        32.toHeight,
+      ],
     );
   }
 }

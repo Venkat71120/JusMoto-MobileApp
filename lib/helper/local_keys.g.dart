@@ -563,6 +563,7 @@ abstract class LocalKeys {
   static const String _referenceType = "Reference Type";
   static const String _insufficientWalletBalance = "Insufficient wallet balance";
   static const String _recentOrders = "Recent Orders";
+  static const String _recentTickets = "Recent Tickets";
   
   // ✅ FRANCHISE LOGIN CONSTANTS
   static const String _franchiseLogin = 'Franchise Login';
@@ -1143,6 +1144,7 @@ abstract class LocalKeys {
   static String get translatingText => _translatingText.tr();
   static String get cancel => _cancel.tr();
   static String get recentOrders => _recentOrders.tr();
+  static String get recentTickets => _recentTickets.tr();
   
   // ✅ FRANCHISE LOGIN GETTERS
   static String get franchiseLogin => _franchiseLogin.tr();
@@ -1173,6 +1175,7 @@ abstract class LocalKeys {
 
   static final stringsMap = {
     _recentOrders: _recentOrders,
+    _recentTickets: _recentTickets,
     _state: _state,
     _city: _city,
     _selectAState: _selectAState,
