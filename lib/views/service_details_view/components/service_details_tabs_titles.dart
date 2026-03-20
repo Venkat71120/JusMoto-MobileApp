@@ -16,11 +16,12 @@ class ServiceDetailsTabsTitles extends StatelessWidget {
       valueListenable: sdm.selectedTab,
       builder: (context, tab, child) {
         return Container(
-          margin: 24.paddingH,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(
-                      color: context.color.primaryBorderColor, width: 1))),
+            color: context.color.mutedContrastColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
           child: Row(
             children: ((serviceDetails.relatedServices ?? []).isNotEmpty
                     ? sdm.sectionKeys
@@ -28,27 +29,48 @@ class ServiceDetailsTabsTitles extends StatelessWidget {
                 .keys
                 .map((e) {
               final isSelected = e == tab;
-              return GestureDetector(
-                onTap: () {
-                  if (isSelected) {
-                    return;
-                  }
-                  sdm.scrollToSection(e);
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-                  height: 52,
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                    color: isSelected ? primaryColor : Colors.transparent,
-                    width: 4,
-                  ))),
-                  child: Text(
-                    e,
-                    style: context.titleSmall
-                        ?.copyWith(color: isSelected ? primaryColor : null),
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    if (isSelected) return;
+                    sdm.scrollToSection(e);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 4, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.color.accentContrastColor
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : [],
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        e,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: context.bodySmall?.copyWith(
+                          color: isSelected
+                              ? primaryColor
+                              : context.color.tertiaryContrastColo,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               );

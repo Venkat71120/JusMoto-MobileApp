@@ -95,10 +95,7 @@ class OrderSummaryCostInfo extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         final url = "${AppUrls.invoiceUrl}/${orderDetails.id}";
-                        final Uri launchUri = Uri(
-                          scheme: 'https',
-                          path: url.replaceAll("https://", ""),
-                        );
+                        final Uri launchUri = Uri.parse(url);
                         await urlLauncher.launchUrl(launchUri,
                             mode: urlLauncher.LaunchMode.externalApplication);
                       },

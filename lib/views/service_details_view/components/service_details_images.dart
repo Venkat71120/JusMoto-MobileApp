@@ -102,41 +102,83 @@ class ServiceDetailsImages extends StatelessWidget {
                     },
                     child: Container(width: double.infinity),
                   ),
+                  // Gradient overlay at bottom for better visibility
                   Positioned(
                     bottom: 0,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 8,
+                    left: 0,
+                    right: 0,
+                    height: 100,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.45),
+                            ],
+                          ),
+                        ),
                       ),
-                      scrollDirection: Axis.horizontal,
-                      child: Wrap(
-                        spacing: 6,
+                    ),
+                  ),
+                  // Image counter pill
+                  if (galleryImages.length > 1)
+                    Positioned(
+                      bottom: 14,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.55),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          "${ind + 1}/${galleryImages.length}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  // Dot indicators
+                  if (galleryImages.length > 1)
+                    Positioned(
+                      bottom: 16,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(galleryImages.length, (i) {
+                          final isActive = i == ind;
                           return GestureDetector(
                             onTap: () {
                               index.value = i;
                               swipeController.move(i);
                             },
-                            child: SquircleContainer(
-                              height: 60,
-                              width: 80,
-                              radius: 12,
-                              borderColor: i == ind ? primaryColor : null,
-                              borderWidth: 4,
-                              child: CustomNetworkImage(
-                                height: 60,
-                                width: 80,
-                                radius: 12,
-                                imageUrl: galleryImages[i],
-                                fit: BoxFit.contain,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              height: 6,
+                              width: isActive ? 24 : 6,
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? primaryColor
+                                    : Colors.white.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(3),
                               ),
                             ),
                           );
                         }),
                       ),
                     ),
-                  ),
                 ],
               ),
             );

@@ -70,7 +70,7 @@ class WalletBalanceCard extends StatelessWidget {
             16.toHeight,
             Text(
               balance.cur,
-              style: context.headlineLarge?.copyWith(
+              style: context.headlineLarge?.price.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 32,

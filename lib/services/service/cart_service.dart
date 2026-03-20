@@ -139,22 +139,22 @@ class CartService with ChangeNotifier {
 
   addToCart(String id, service) async {
     final cartId = id;
-    final item = {
+    // Only send columns that exist in the DB schema
+    final dbItem = {
       'serviceId': id,
       "service": jsonEncode(service),
       "quantity": 1.toString(),
-      "tax": "0",               // ✅ ADDED
-      "addons": jsonEncode({}), // ✅ ADDED
     };
-    debugPrint(item.toString());
-    await DbHelper.insert('cart', item);
+    debugPrint(dbItem.toString());
+    await DbHelper.insert('cart', dbItem);
 
+    // In-memory map can hold extra fields
     final cartI = {
       'serviceId': id,
       "service": service,
       "quantity": 1,
-      "tax": 0,    // ✅ ADDED
-      "addons": {}, // ✅ ADDED
+      "tax": 0,
+      "addons": {},
     };
     _cartItem.putIfAbsent(cartId, () => cartI);
     LocalKeys.addedToCartSuccessfully.showToast();
@@ -162,21 +162,20 @@ class CartService with ChangeNotifier {
   }
 
   updateToCart(String id, service, quantity) async {
-    final item = {
+    // Only send columns that exist in the DB schema
+    final dbItem = {
       'serviceId': id.toString(),
       "service": jsonEncode(service),
       "quantity": quantity.toString(),
-      "tax": "0",               // ✅ ADDED
-      "addons": jsonEncode({}), // ✅ ADDED
     };
-    await DbHelper.updatedb('cart', id.toString(), item);
+    await DbHelper.updatedb('cart', id.toString(), dbItem);
 
     final cartI = {
       'serviceId': id.toString(),
       "service": service,
       "quantity": quantity,
-      "tax": 0,    // ✅ ADDED
-      "addons": {}, // ✅ ADDED
+      "tax": 0,
+      "addons": {},
     };
     _cartItem.update(id, (_) => cartI);
     notifyListeners();

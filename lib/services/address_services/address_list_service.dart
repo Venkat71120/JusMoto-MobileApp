@@ -25,6 +25,7 @@ class AddressListService with ChangeNotifier {
   bool get shouldAutoFetch => _addressListModel == null || token.isInvalid;
 
   fetchAddressList({bool refresh = false}) async {
+    if (isLoading) return;
     token = getToken;
     if (!refresh) {
       isLoading = true;
@@ -38,6 +39,7 @@ class AddressListService with ChangeNotifier {
 
     try {
       if (responseData != null) {
+        log('Address list response: ${responseData.toString()}');
         final tempData = AddressListModel.fromJson(responseData);
         _addressListModel = tempData;
         nextPage = tempData.pagination?.nextPageUrl;
@@ -47,9 +49,10 @@ class AddressListService with ChangeNotifier {
       } else {
         _addressListModel ??= AddressListModel(allLocations: []);
       }
-    } catch (e) {
-      debugPrint(e.toString());
-      log(e.toString());
+    } catch (e, stackTrace) {
+      debugPrint('Address list error: $e');
+      log('Address list error: $e\n$stackTrace');
+      _addressListModel ??= AddressListModel(allLocations: []);
     } finally {
       isLoading = false;
       notifyListeners();

@@ -18,17 +18,55 @@ class ServiceDetailsDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ReadMoreText(
-          serviceDetails.allServices?.description ?? "---",
-          trimMode: TrimMode.Line,
-          trimLines: 3,
-          colorClickableText: primaryColor,
-          trimCollapsedText: LocalKeys.showMore,
-          trimExpandedText: " ${LocalKeys.showLess}",
-          style: context.bodyMedium,
+        // Section header with icon
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.description_outlined,
+                color: primaryColor,
+                size: 20,
+              ),
+            ),
+            12.toWidth,
+            Text(
+              LocalKeys.overview,
+              style: context.titleMedium?.bold.copyWith(
+                fontSize: 17,
+              ),
+            ),
+          ],
         ),
-        6.toHeight,
+        16.toHeight,
+        // Description text
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: context.color.mutedContrastColor.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: ReadMoreText(
+            serviceDetails.allServices?.description ?? "---",
+            trimMode: TrimMode.Line,
+            trimLines: 4,
+            colorClickableText: primaryColor,
+            trimCollapsedText: LocalKeys.showMore,
+            trimExpandedText: " ${LocalKeys.showLess}",
+            style: context.bodyMedium?.copyWith(
+              height: 1.7,
+              color: context.color.secondaryContrastColor,
+            ),
+          ),
+        ),
+        16.toHeight,
         ServiceDetailsPrimaryOffers(
             serviceAdditional:
                 serviceDetails.allServices?.serviceAdditional ?? []),

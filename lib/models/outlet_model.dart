@@ -57,7 +57,7 @@ class Outlet {
   factory Outlet.fromJson(Map<String, dynamic> json) => Outlet(
         id: json["id"],
         outletName: (json["outlet_name"] ?? json["name"])?.toString(),
-        address: json["address"],
+        address: (json["address"] ?? json["full_address"] ?? json["location"])?.toString(),
         latitude: double.tryParse(json["latitude"].toString()),
         longitude: double.tryParse(json["longitude"].toString()),
       );

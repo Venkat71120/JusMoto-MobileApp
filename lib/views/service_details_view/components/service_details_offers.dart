@@ -18,8 +18,15 @@ class ServiceDetailsOffers extends StatelessWidget {
     return offers.isEmpty
         ? const SizedBox()
         : Container(
-            margin: const EdgeInsets.only(top: 16),
-            color: context.color.accentContrastColor,
+            margin: const EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: context.color.primarySuccessColor.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: context.color.primarySuccessColor.withOpacity(0.15),
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -30,7 +37,7 @@ class ServiceDetailsOffers extends StatelessWidget {
                 12.toHeight.divider,
                 12.toHeight,
                 Wrap(
-                  runSpacing: 8,
+                  runSpacing: 10,
                   children: offers.map((e) {
                     final showDesc = ValueNotifier(false);
                     return GestureDetector(
@@ -50,7 +57,7 @@ class ServiceDetailsOffers extends StatelessWidget {
                                     20,
                                     color: color.primarySuccessColor,
                                   ),
-                                  8.toWidth,
+                                  10.toWidth,
                                   Expanded(
                                     flex: 1,
                                     child: Text(

@@ -66,10 +66,10 @@ class ServiceCard extends StatelessWidget {
                   service: service,
                   duration: service.duration,
                 ),
-                12.toHeight,
+                8.toHeight,
                 Text(
                   service.title ?? "---",
-                  style: context.titleSmall?.bold6,
+                  style: context.titleSmall?.bold6.copyWith(fontSize: 13),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
@@ -78,10 +78,11 @@ class ServiceCard extends StatelessWidget {
                   avgRating: service.avgRating,
                   soldCount: service.soldCount,
                 ),
-                12.toHeight,
+                8.toHeight,
               ],
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   flex: 1,
@@ -91,6 +92,7 @@ class ServiceCard extends StatelessWidget {
                     discountPrice: displayDiscountPrice,
                   ),
                 ),
+                8.toWidth,
                 Consumer<CartService>(
                   builder: (context, cartService, child) {
                     final isAdded = cartService.cartList.containsKey(
@@ -130,17 +132,17 @@ class ServiceCard extends StatelessWidget {
                                 currentQty <= 1
                                     ? Icons.delete_outline
                                     : Icons.remove,
-                                size: 18,
+                                size: 16,
                                 color: context.color.primaryContrastColor,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
+                                horizontal: 5,
                               ),
                               child: Text(
                                 '$currentQty',
-                                style: context.titleSmall?.bold.copyWith(
+                                style: context.labelSmall?.bold.copyWith(
                                   color: context.color.primaryContrastColor,
                                 ),
                               ),
@@ -157,7 +159,7 @@ class ServiceCard extends StatelessWidget {
                                     },
                               child: Icon(
                                 Icons.add,
-                                size: 18,
+                                size: 16,
                                 color: isService
                                     ? context.color.mutedContrastColor
                                     : context.color.primaryContrastColor,
@@ -179,18 +181,18 @@ class ServiceCard extends StatelessWidget {
                         color: context.color.primaryContrastColor,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
-                          vertical: 3,
+                          vertical: 4,
                         ),
                         child: Row(
                           children: [
                             SvgAssets.cart.toSVGSized(
-                              20,
+                              14,
                               color: context.color.accentContrastColor,
                             ),
-                            4.toWidth,
+                            3.toWidth,
                             Text(
                               LocalKeys.add,
-                              style: context.titleSmall?.bold.copyWith(
+                              style: context.labelSmall?.bold.copyWith(
                                 color: context.color.accentContrastColor,
                               ),
                             ),

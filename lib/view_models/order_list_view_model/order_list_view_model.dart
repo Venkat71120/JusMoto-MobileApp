@@ -12,6 +12,10 @@ class OrderListViewModel {
   final ValueNotifier<BookingStatus?> bookingStatus = ValueNotifier(null);
   final ValueNotifier<PaymentStatus?> paymentStatus = ValueNotifier(null);
 
+  /// Selected order status filter index.
+  /// null = all, 0 = pending, 1 = processing (confirmed), 4 = cancelled
+  final ValueNotifier<int?> selectedStatusFilter = ValueNotifier(null);
+
   final TextEditingController declineReasonController = TextEditingController();
 
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -66,6 +70,13 @@ class OrderListViewModel {
     return true;
   }
 
+  /// Apply a status filter and re-fetch orders from the API.
+  void applyStatusFilter(BuildContext context, int? status) {
+    selectedStatusFilter.value = status;
+    final ol = Provider.of<OrderListService>(context, listen: false);
+    ol.fetchOrderList(status: status);
+  }
+
   tryToLoadMore(BuildContext context) {
     try {
       final moProvider = Provider.of<OrderListService>(context, listen: false);
@@ -78,7 +89,7 @@ class OrderListViewModel {
               scrollController.position.maxScrollExtent &&
           !scrollController.position.outOfRange) {
         if (nextPage != null && !nextPageLoading) {
-          moProvider.fetchNextPage();
+          moProvider.fetchNextPage(status: selectedStatusFilter.value);
           return;
         }
       }

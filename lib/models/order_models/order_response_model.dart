@@ -104,9 +104,9 @@ class OrderDetails {
             ? null
             : OrderLocation.fromJson(json["location"] ?? json["user_location"]),
 
-        outletDetails: json["outlet_details"] == null
+        outletDetails: (json["outlet_details"] ?? json["outlet"]) == null
             ? null
-            : Outlet.fromJson(json["outlet_details"]),
+            : Outlet.fromJson(json["outlet_details"] ?? json["outlet"]),
         deliveryCharge: json["delivery_charge"].toString().tryToParse,
         deliveryMode: json["delivery_mode"],
 
@@ -127,10 +127,10 @@ class OrderDetails {
             : Staff.fromJson(json["staff_details"]),
 
         // ✅ UPDATED: items now contain nested "service" object for title/image
-        items: json["items"] == null
+        items: (json["items"] ?? json["order_items"] ?? json["sub_orders"]) == null
             ? []
             : List<OrderItem>.from(
-                json["items"]!.map((x) => OrderItem.fromJson(x))),
+                (json["items"] ?? json["order_items"] ?? json["sub_orders"])!.map((x) => OrderItem.fromJson(x))),
 
         commissionCharge: json["commission_charge"],
         commissionAmount: json["commission_amount"],
@@ -195,8 +195,8 @@ class OrderLocation {
 
 class OrderItem {
   final dynamic id;
-  final String? image;
-  final String? itemTitle;
+  String? image;
+  String? itemTitle;
   final String? type;
   final String? serviceId;
   final num qty;
@@ -216,25 +216,32 @@ class OrderItem {
     this.service,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    final serviceData = json["service"] as Map<String, dynamic>?;
+    return OrderItem(
         id: json["id"],
-        // ✅ Prefer service.image > item.image
+        // ✅ Try: image → service_image → service.image
         image: json["image"]?.toString() ??
-            json["service"]?["image"]?.toString(),
-        // ✅ Prefer service.title > item_title
+            json["service_image"]?.toString() ??
+            serviceData?["image"]?.toString(),
+        // ✅ Try: item_title → title → name → service.title
         itemTitle: json["item_title"]?.toString() ??
-            json["service"]?["title"]?.toString(),
+            json["title"]?.toString() ??
+            json["name"]?.toString() ??
+            serviceData?["title"]?.toString() ??
+            serviceData?["name"]?.toString(),
         type: json["type"]?.toString(),
-        serviceId: json["service_id"]?.toString(),
-        qty: json["qty"].toString().tryToParse,
+        serviceId: (json["service_id"] ?? json["id"])?.toString(),
+        qty: (json["qty"] ?? json["quantity"] ?? 1).toString().tryToParse,
         price: json["price"].toString().tryToParse,
         reviewsAll: json["reviews_all"] == null
             ? []
             : List<dynamic>.from(json["reviews_all"]!.map((x) => x)),
-        service: json["service"] == null
+        service: serviceData == null
             ? null
-            : OrderItemService.fromJson(json["service"]),
+            : OrderItemService.fromJson(serviceData),
       );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

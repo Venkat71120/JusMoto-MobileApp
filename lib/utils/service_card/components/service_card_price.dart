@@ -22,9 +22,9 @@ class ServiceCardPrice extends StatelessWidget {
           TextSpan(
             text: "${discountPrice > 0 ? discountPrice.cur : price.cur} ",
             style:
-                context.titleSmall
-                    ?.copyWith(color: primaryColor, fontSize: 14)
-                    .bold6,
+                context.labelMedium
+                    ?.copyWith(color: primaryColor, fontSize: 13)
+                    .bold6.price,
           ),
           if (discountPrice > 0)
             TextSpan(
@@ -33,10 +33,11 @@ class ServiceCardPrice extends StatelessWidget {
                   context.bodySmall
                       ?.copyWith(
                         color: context.color.tertiaryContrastColo,
+                        fontSize: 11,
                         decoration: TextDecoration.lineThrough,
                         decorationColor: context.color.tertiaryContrastColo,
                       )
-                      .bold5,
+                      .bold5.price,
             ),
         ],
       ),

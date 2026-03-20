@@ -15,12 +15,7 @@ class ServiceDetailsTabs extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: sdm.selectedTab,
       builder: (context, value, child) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          color: context.color.accentContrastColor,
-          child: ServiceDetailsDescription(serviceDetails: serviceDetails),
-        );
+        return ServiceDetailsDescription(serviceDetails: serviceDetails);
       },
     );
   }

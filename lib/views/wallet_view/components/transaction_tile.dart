@@ -95,7 +95,7 @@ class TransactionTile extends StatelessWidget {
               8.toWidth,
               Text(
                 "${isDeposit ? "+" : "-"}${transaction.amount.cur}",
-                style: context.bodyLarge?.copyWith(
+                style: context.bodyLarge?.price.copyWith(
                   color: isDeposit
                       ? context.color.primarySuccessColor
                       : context.color.primaryWarningColor,

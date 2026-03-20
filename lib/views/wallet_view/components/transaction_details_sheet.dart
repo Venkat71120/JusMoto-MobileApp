@@ -73,7 +73,7 @@ class TransactionDetailsSheet extends StatelessWidget {
               Center(
                 child: Text(
                   "${isDeposit ? "+" : "-"}${transaction.amount.cur}",
-                  style: context.headlineLarge?.copyWith(
+                  style: context.headlineLarge?.price.copyWith(
                     color: isDeposit
                         ? context.color.primarySuccessColor
                         : context.color.primaryWarningColor,

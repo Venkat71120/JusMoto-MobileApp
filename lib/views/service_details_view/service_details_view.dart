@@ -19,6 +19,7 @@ import 'package:car_service/views/service_details_view/components/service_detail
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../customizations/colors.dart';
 import '../../helper/local_keys.g.dart';
 import '../../services/home_services/service_details_service.dart';
 import '../../utils/components/custom_button.dart';
@@ -45,6 +46,7 @@ class ServiceDetailsView extends StatelessWidget {
     final sdm = ServiceDetailsViewModel.instance;
     sdm.listenToScroll(context);
     return Scaffold(
+      backgroundColor: context.color.backgroundColor,
       body: CustomRefreshIndicator(
         onRefresh: () async {
           await sdProvider.fetchServiceDetails(id);
@@ -89,7 +91,7 @@ class ServiceDetailsView extends StatelessWidget {
                         child: ServiceDetailsFavoriteIcon(id: id),
                       ),
                     ],
-                    expandedHeight: 250,
+                    expandedHeight: 300,
                     flexibleSpace: ServiceDetailsImages(
                       serviceDetails: sd.serviceDetailsModel(id),
                     ),
@@ -98,49 +100,129 @@ class ServiceDetailsView extends StatelessWidget {
                     serviceDetails: sd.serviceDetailsModel(id),
                     id: id,
                   ).toSliver,
-                  8.toHeight.toSliver,
+                  SliverToBoxAdapter(
+                    child: Container(
+                      height: 12,
+                      color: context.color.backgroundColor,
+                    ),
+                  ),
                   SliverAppBar(
                     titleSpacing: 0,
                     pinned: true,
                     primary: false,
                     leadingWidth: 0,
-                    backgroundColor: context.color.accentContrastColor,
+                    toolbarHeight: 56,
+                    backgroundColor: context.color.backgroundColor,
                     leading: SizedBox(),
                     title: ServiceDetailsTabsTitles(
                       serviceDetails: sd.serviceDetailsModel(id),
                     ),
                     flexibleSpace: SizedBox(),
                   ),
-                  ServiceDetailsTabs(
-                    key: sdm.sectionKeys[LocalKeys.overview],
-                    serviceDetails: sd.serviceDetailsModel(id),
-                  ).toSliver,
-                  16.toHeight.toSliver,
-                  ServiceDetailsReviewTab(
-                    key: sdm.sectionKeys[LocalKeys.reviews],
-                    serviceDetails: sd.serviceDetailsModel(id),
-                  ).toSliver,
-                  16.toHeight.toSliver,
+                  SliverToBoxAdapter(
+                    child: Container(height: 8),
+                  ),
+                  // Overview section in card
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: sdm.sectionKeys[LocalKeys.overview],
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: context.color.accentContrastColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ServiceDetailsTabs(
+                        serviceDetails: sd.serviceDetailsModel(id),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: 16.toHeight),
+                  // Reviews section in card
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: sdm.sectionKeys[LocalKeys.reviews],
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                        color: context.color.accentContrastColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ServiceDetailsReviewTab(
+                        serviceDetails: sd.serviceDetailsModel(id),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: 16.toHeight),
                   if (serviceDetails
                           .allServices
                           ?.admin
                           ?.serviceArea
                           ?.latitude !=
                       null) ...[
-                    16.toHeight.toSliver,
+                    SliverToBoxAdapter(child: 8.toHeight),
                   ],
-                  ServiceDetailsFaqTab(
-                    key: sdm.sectionKeys[LocalKeys.faq],
-                    serviceDetails: sd.serviceDetailsModel(id),
-                  ).toSliver,
+                  // FAQ section in card
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: sdm.sectionKeys[LocalKeys.faq],
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                        color: context.color.accentContrastColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ServiceDetailsFaqTab(
+                        serviceDetails: sd.serviceDetailsModel(id),
+                      ),
+                    ),
+                  ),
                   if ((sd.serviceDetailsModel(id).relatedServices ?? [])
                       .isNotEmpty) ...[
-                    16.toHeight.toSliver,
-                    RelatedServiceList(
-                      key: sdm.sectionKeys[LocalKeys.relatedServices],
-                      relatedServices:
-                          sd.serviceDetailsModel(id).relatedServices!,
-                    ).toSliver,
+                    SliverToBoxAdapter(child: 16.toHeight),
+                    SliverToBoxAdapter(
+                      child: Container(
+                        key: sdm.sectionKeys[LocalKeys.relatedServices],
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        decoration: BoxDecoration(
+                          color: context.color.accentContrastColor,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 12,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: RelatedServiceList(
+                          relatedServices:
+                              sd.serviceDetailsModel(id).relatedServices!,
+                        ),
+                      ),
+                    ),
                   ],
                   if (1 == 2) ...[
                     8.toHeight.toSliver,
@@ -148,83 +230,88 @@ class ServiceDetailsView extends StatelessWidget {
                     8.toHeight.toSliver,
                     const ServiceDetailsCancellationPolicy().toSliver,
                   ],
-                  92.toHeight.toSliver,
+                  SliverToBoxAdapter(child: 110.toHeight),
                 ],
               );
             },
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Consumer<CartService>(
-        builder: (context, cs, child) {
+      // Bottom add to cart button
+      bottomNavigationBar: Consumer<CartService>(
+        builder: (context, cartService, child) {
           return Consumer<ServiceDetailsService>(
             builder: (context, sd, child) {
-              return sd.serviceDetailsModel(id).allServices == null
-                  ? const SizedBox()
-                  : Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: Platform.isIOS ? 0 : 16,
-                    ),
-                    child: Row(
-                      children: [
-                        if (1 == 2)
-                          Expanded(
-                            flex: 1,
-                            child: CustomButton(
-                              onPressed: () {
-                                ServiceBookingViewModel.dispose;
-                                final svm = ServiceBookingViewModel.instance;
-                                svm.selectedService.value =
-                                    sd.serviceDetailsModel(id).allServices!;
-                                Provider.of<BookingAddonsService>(
-                                  context,
-                                  listen: false,
-                                ).reset();
-                              },
-                              btText:
-                                  cs.cartList.containsKey(id.toString())
-                                      ? LocalKeys.viewCart
-                                      : LocalKeys.addToCart,
+              if (sd.serviceDetailsModel(id).allServices == null) {
+                return const SizedBox.shrink();
+              }
+              final isAdded =
+                  cartService.cartList.containsKey(id.toString());
+              return Container(
+                padding: EdgeInsets.fromLTRB(
+                    20, 10, 20, Platform.isIOS ? 26 : 14),
+                color: context.color.accentContrastColor,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: isAdded
+                      ? ElevatedButton.icon(
+                          onPressed: () =>
+                              context.toPage(CartView()),
+                          icon: const Icon(
+                              Icons.check_circle_rounded,
+                              size: 18),
+                          label: Text(
+                            LocalKeys.added,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
                             ),
                           ),
-                        Expanded(
-                          flex: 1,
-                          child: Consumer<CartService>(
-                            builder: (context, cartService, child) {
-                              final isAdded = cartService.cartList.containsKey(
-                                id.toString(),
-                              );
-                              if (isAdded) {
-                                return CustomButton(
-                                  onPressed: () {
-                                    context.toPage(CartView());
-                                  },
-                                  btText: LocalKeys.added,
-                                  backgroundColor: context.color.accentContrastColor,
-                                  foregroundColor: context.color.primaryContrastColor,
-                                  borderColor: context.color.primaryBorderColor,
-                                );
-                              }
-                              return CustomButton(
-                                onPressed: () {
-                                  cartService.addToCart(
-                                    id.toString(),
-                                    sd
-                                        .serviceDetailsModel(id)
-                                        .allServices!
-                                        .toMinimizedJson(),
-                                  );
-                                },
-                                btText: LocalKeys.addToCart,
-                              );
-                            },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                context.color.mutedContrastColor,
+                            foregroundColor:
+                                context.color.primaryContrastColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
+                          ),
+                        )
+                      : ElevatedButton.icon(
+                          onPressed: () {
+                            cartService.addToCart(
+                              id.toString(),
+                              sd
+                                  .serviceDetailsModel(id)
+                                  .allServices!
+                                  .toMinimizedJson(),
+                            );
+                          },
+                          icon: const Icon(
+                              Icons.add_shopping_cart_rounded,
+                              size: 18),
+                          label: Text(
+                            LocalKeys.addToCart,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  );
+                ),
+              );
             },
           );
         },
