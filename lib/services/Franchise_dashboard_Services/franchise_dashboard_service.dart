@@ -171,25 +171,79 @@ class FranchiseDashboardService with ChangeNotifier {
 
 
 
+  String _getOrderStatusLabel(dynamic code) {
+    int c = int.tryParse(code?.toString() ?? '0') ?? 0;
+    switch (c) {
+      case 0: return 'Pending';
+      case 1: return 'Accepted';
+      case 2: return 'In Progress';
+      case 3: return 'Completed';
+      case 4: return 'Cancelled';
+      default: return 'Unknown';
+    }
+  }
+
+  String _getPaymentStatusLabel(dynamic code) {
+    int c = int.tryParse(code?.toString() ?? '0') ?? 0;
+    if (c == 1) return 'Paid';
+    return 'Unpaid';
+  }
+
   Future<bool> _fetchRecentActivity() async {
     try {
-      final response = await NetworkApiServices().getApi(
-        AppUrls.franchiseDashboardRecentActivityUrl,
-        null,
-        headers: acceptJsonAuthHeader,
-        timeoutSeconds: 20,
-      );
-      if (response != null) {
-        debugPrint('📊 FranchiseDashboardService._fetchRecentActivity response: $response');
-        _recentActivity = FranchiseRecentActivityModel.fromJson(
-          Map<String, dynamic>.from(response),
-        );
-        return true;
+      // Fetch specifically from Orders and Tickets APIs natively since dashboard API is returning empty arrays
+      final results = await Future.wait([
+        NetworkApiServices().getApi('${AppUrls.franchiseOrdersUrl}?page=1', null, headers: acceptJsonAuthHeader, timeoutSeconds: 20),
+        NetworkApiServices().getApi('${AppUrls.franchiseTicketsUrl}?page=1', null, headers: acceptJsonAuthHeader, timeoutSeconds: 20),
+      ]);
+
+      final ordersResponse = results[0] as Map<String, dynamic>?;
+      final ticketsResponse = results[1] as Map<String, dynamic>?;
+
+      List<dynamic> ordersList = [];
+      List<dynamic> ticketsList = [];
+
+      if (ordersResponse != null && ordersResponse['success'] == true) {
+        final rawOrders = ordersResponse['data'] as List? ?? [];
+        ordersList = rawOrders.map((o) {
+          if (o is! Map) return o;
+          final user = o['user'] as Map?;
+          return {
+            ...Map<String,dynamic>.from(o),
+            'customer_name': '${user?['first_name'] ?? ''} ${user?['last_name'] ?? ''}'.trim(),
+            'status_code': o['status'],
+            'status': _getOrderStatusLabel(o['status']),
+            'payment_status': _getPaymentStatusLabel(o['payment_status']),
+          };
+        }).toList();
       }
+      
+      if (ticketsResponse != null && ticketsResponse['success'] == true) {
+        final rawTickets = ticketsResponse['data'] as List? ?? [];
+        ticketsList = rawTickets.map((t) {
+          if (t is! Map) return t;
+          final user = t['user'] as Map?;
+          return {
+            ...Map<String,dynamic>.from(t),
+            'customer_name': '${user?['first_name'] ?? ''} ${user?['last_name'] ?? ''}'.trim(),
+            'title': t['title'] ?? t['subject'] ?? '',
+          };
+        }).toList();
+      }
+
+      // Map them through the dashboard model's fromJson which natively knows how to parse them
+      _recentActivity = FranchiseRecentActivityModel.fromJson({
+        'data': {
+          'orders': ordersList,
+          'tickets': ticketsList,
+        }
+      });
+      return true;
+
     } catch (e) {
       debugPrint('❌ _fetchRecentActivity: $e');
+      _recentActivity = FranchiseRecentActivityModel.empty();
+      return false;
     }
-    _recentActivity = FranchiseRecentActivityModel.empty();
-    return false;
   }
 }

@@ -122,7 +122,6 @@ class _OrdersList extends StatelessWidget {
       itemBuilder: (context, i) {
         final order = orders[i];
         final statusColor = _statusColor(order.statusCode);
-        final isPaid = order.paymentStatus == 'Paid';
 
         return Container(
           decoration: BoxDecoration(
@@ -234,8 +233,6 @@ class _OrdersList extends StatelessWidget {
                         Row(
                           children: [
                             _CompactV2Badge(label: order.status, color: statusColor, isSolid: true),
-                            4.toWidth,
-                            _CompactV2Badge(label: order.paymentStatus, color: isPaid ? Colors.green : Colors.red),
                           ],
                         ),
                       ],

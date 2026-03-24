@@ -11,6 +11,7 @@ import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
 import 'package:car_service/utils/components/custom_network_image.dart';
 import 'package:car_service/view_models/franchise_home_view_model/franchise_home_view_model.dart';
+import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,12 @@ class FranchiseHomeAppBar extends StatelessWidget {
                   : flService.username;
               final profileImage = flService.image;
               
-              return Row(
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  FranchiseLandingViewModel.instance.setNavIndex(3);
+                },
+                child: Row(
                 children: [
                   // ✅ Profile Image
                   Container(
@@ -136,6 +142,7 @@ class FranchiseHomeAppBar extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
               );
             },
           ),

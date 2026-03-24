@@ -26,13 +26,30 @@ class SignInView extends StatelessWidget {
       backgroundColor: context.color.accentContrastColor,
       appBar: AppBar(
         leading: const NavigationPopIcon(),
-        title: Text(LocalKeys.signIn),
       ),
       body: Scrollbar(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
+              Text(
+                LocalKeys.welcomeBack,
+                style: context.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              8.toHeight,
+              Text(
+                LocalKeys.signIn,
+                style: context.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+              24.toHeight,
+
               const EmailSignIn(),
               12.toHeight,
               
