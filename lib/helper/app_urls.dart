@@ -136,6 +136,9 @@ class AppUrls {
   static String get completeRequestHistoryUrl =>
       '$baseEndPoint/provider/orders/complete-request/history?';
   static String get invoiceUrl => '$baseEndPoint/client/order/invoice-details';
+
+  /// New invoice endpoint — returns HTML. Usage: `${orderInvoiceUrl}/<orderId>/invoice`
+  static String get orderInvoiceUrl => '$baseEndPoint/orders';
   static String get hireProviderUrl => '$baseEndPoint/client/job/hire';
   static String get changeJobPublishStatusUrl =>
       '$baseEndPoint/client/job/published-status';

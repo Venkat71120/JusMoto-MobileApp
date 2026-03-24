@@ -255,7 +255,7 @@ abstract class LocalKeys {
   static const String _invalidCardNumber = "Invalid card number";
   static const String _cvvCvc = "CVV/CVC";
   static const String _expireDate = "Expire Date";
-  static const String _orderSummery = "Order Summery";
+  static const String _orderSummery = "Order Summary";
   static const String _shareDetails = "Share Details";
   static const String _bookingSuccessful = "Booking successful";
   static const String _billed = "Billed:";

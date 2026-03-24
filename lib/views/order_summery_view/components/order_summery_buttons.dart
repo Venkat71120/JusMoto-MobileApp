@@ -4,10 +4,9 @@ import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/services/booking_services/place_order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 
-import '../../../helper/app_urls.dart';
 import '../../../helper/local_keys.g.dart';
+import '../../invoice_view/invoice_view.dart' show downloadInvoicePdf;
 
 class OrderSummeryButtons extends StatelessWidget {
   const OrderSummeryButtons({super.key});
@@ -25,15 +24,17 @@ class OrderSummeryButtons extends StatelessWidget {
           Expanded(
             flex: 1,
             child: ElevatedButton.icon(
-              onPressed: () async {
-                final url =
-                    "${AppUrls.invoiceUrl}/${Provider.of<PlaceOrderService>(context, listen: false).orderResponseModel.orderDetails?.id}";
-                final Uri launchUri = Uri(
-                  scheme: 'https',
-                  path: url.replaceAll("https://", ""),
+              onPressed: () {
+                final order =
+                    Provider.of<PlaceOrderService>(context, listen: false)
+                        .orderResponseModel
+                        .orderDetails;
+                if (order == null) return;
+                downloadInvoicePdf(
+                  context,
+                  orderId: order.id,
+                  invoiceNumber: order.invoiceNumber,
                 );
-                await urlLauncher.launchUrl(launchUri,
-                    mode: urlLauncher.LaunchMode.externalApplication);
               },
               label: Text(LocalKeys.downloadInvoice),
               icon: SvgAssets.download.toSVGSized(

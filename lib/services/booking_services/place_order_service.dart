@@ -17,6 +17,7 @@ import '../../app_static_values.dart';
 import '../../data/network/network_api_services.dart';
 import '../../models/order_models/order_response_model.dart';
 import '../profile_services/profile_info_service.dart';
+import '../service/cart_service.dart';
 
 class PlaceOrderService with ChangeNotifier {
   OrderResponseModel? _orderResponseModel;
@@ -94,7 +95,9 @@ class PlaceOrderService with ChangeNotifier {
         timeoutSeconds: 60,
       );
       if (responseData != null) {
+        log('Place order (multipart) response: ${jsonEncode(responseData)}');
         _orderResponseModel = OrderResponseModel.fromJson(responseData);
+        _enrichItemsFromCart(context);
         return true;
       }
     } else {
@@ -124,9 +127,54 @@ class PlaceOrderService with ChangeNotifier {
       );
 
       if (responseData != null) {
+        log('Place order response: ${jsonEncode(responseData)}');
         _orderResponseModel = OrderResponseModel.fromJson(responseData);
+        _enrichItemsFromCart(context);
         return true;
       }
+    }
+  }
+
+  /// Fill missing title/image in order items using cart data,
+  /// since the place-order API doesn't return them.
+  void _enrichItemsFromCart(BuildContext context) {
+    final items = _orderResponseModel?.orderDetails?.items;
+    if (items == null || items.isEmpty) return;
+
+    try {
+      final cartService = Provider.of<CartService>(context, listen: false);
+      final cart = cartService.cartList;
+
+      for (final item in items) {
+        final serviceId = item.serviceId?.toString();
+        if (serviceId == null) continue;
+
+        // Find matching cart entry by service_id
+        final cartEntry = cart[serviceId];
+        if (cartEntry == null) continue;
+
+        final service = cartEntry["service"];
+        if (service == null) continue;
+
+        // Fill missing image
+        if (item.image == null || item.image!.isEmpty) {
+          final cartImage = service["image"]?.toString() ??
+              service["service_car"]?["image"]?.toString();
+          if (cartImage != null && cartImage.isNotEmpty) {
+            item.image = cartImage;
+          }
+        }
+
+        // Fill missing title
+        if (item.itemTitle == null || item.itemTitle!.isEmpty) {
+          final cartTitle = service["title"]?.toString();
+          if (cartTitle != null && cartTitle.isNotEmpty) {
+            item.itemTitle = cartTitle;
+          }
+        }
+      }
+    } catch (e) {
+      log('Error enriching items from cart: $e');
     }
   }
 

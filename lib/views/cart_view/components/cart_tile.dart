@@ -5,7 +5,6 @@ import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/services/service/cart_service.dart';
 import 'package:car_service/utils/components/alerts.dart';
-import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:car_service/views/cart_view/components/cart_tile_quantity_update_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,23 +49,25 @@ class CartTile extends StatelessWidget {
               LocalKeys.overview;
         });
       },
-      child: SquircleContainer(
-        padding: const EdgeInsets.all(8),
-        color: context.color.accentContrastColor,
-        radius: 8,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CustomNetworkImage(
-              height: 58,
-              width: 80,
-              radius: 6,
-              fit: BoxFit.cover,
-              imageUrl: serviceImage,
+            // Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: CustomNetworkImage(
+                height: 60,
+                width: 60,
+                radius: 10,
+                fit: BoxFit.cover,
+                imageUrl: serviceImage,
+              ),
             ),
-            8.toWidth,
+            12.toWidth,
+            // Title + price
             Expanded(
-              flex: 1,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -74,21 +75,25 @@ class CartTile extends StatelessWidget {
                     serviceTitle ?? "---",
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: context.titleSmall?.bold,
+                    style: context.bodySmall?.bold6.copyWith(
+                      color: context.color.primaryContrastColor,
+                      fontSize: 13,
+                      height: 1.3,
+                    ),
                   ),
-                  6.toHeight,
+                  4.toHeight,
                   Text(
                     totalAmount.cur,
-                    style: context.bodySmall
-                        ?.copyWith(
-                          color: primaryColor,
-                        )
-                        .bold,
+                    style: context.bodySmall?.bold.price.copyWith(
+                      color: primaryColor,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
             ),
-            8.toWidth,
+            10.toWidth,
+            // Quantity / delete
             serviceType.toString() == "0"
                 ? GestureDetector(
                     onTap: () {
@@ -103,8 +108,9 @@ class CartTile extends StatelessWidget {
                           buttonText: LocalKeys.yes,
                           description: LocalKeys.thisWillRemoveItemFromCart);
                     },
-                    child: SvgAssets.trash.toSVGSized(24,
-                        color: context.color.primaryWarningColor))
+                    child: SvgAssets.trash.toSVGSized(20,
+                        color: context.color.primaryWarningColor),
+                  )
                 : CartTileQuantityUpdateButtons(
                     quantity: quantity.toInt(),
                     onAdd: () {

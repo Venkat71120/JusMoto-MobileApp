@@ -121,16 +121,23 @@ extension TextThemeExtension on BuildContext {
   );
   TextStyle? get headlineSmall => textTheme.headlineSmall?.copyWith(
     color: color.primaryContrastColor,
+    fontFamily: 'Poppins',
     fontSize: 16,
   );
   TextStyle? get headlineMedium => textTheme.headlineMedium?.copyWith(
     color: color.primaryContrastColor,
+    fontFamily: 'Poppins',
     fontSize: 18,
   );
   TextStyle? get headlineLarge => textTheme.headlineLarge?.copyWith(
     color: color.primaryContrastColor,
+    fontFamily: 'Poppins',
     fontSize: 20,
   );
+}
+
+extension PriceTextExtension on TextStyle {
+  TextStyle get price => copyWith(fontFamily: 'Bebas Neue', letterSpacing: 1.2);
 }
 
 extension LocalizationExtension on BuildContext {

@@ -99,7 +99,7 @@ class RefundListTile extends StatelessWidget {
                           TextSpan(
                             text: refundModel.amount.cur,
                             style: context.titleSmall?.bold
-                                .copyWith(color: primaryColor)
+                                .price.copyWith(color: primaryColor)
                                 .bold,
                           ),
                         ],

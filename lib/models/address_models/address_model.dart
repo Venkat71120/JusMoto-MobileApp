@@ -17,15 +17,25 @@ class AddressListModel {
     this.pagination,
   });
 
-  factory AddressListModel.fromJson(json) => AddressListModel(
-        allLocations: json["data"] == null
-            ? []
-            : List<Address>.from(
-                json["data"]!.map((x) => Address.fromJson(x))),
-        pagination: json["pagination"] == null
-            ? null
-            : Pagination.fromJson(json["pagination"]),
-      );
+  factory AddressListModel.fromJson(json) {
+    // Handle: {"data": [...]} or {"data": {"data": [...]}} or {"addresses": [...]}
+    var rawList = json["data"] ?? json["addresses"] ?? json["all_locations"];
+
+    // If data is a map with a nested "data" list, unwrap it
+    if (rawList is Map && rawList.containsKey("data")) {
+      rawList = rawList["data"];
+    }
+
+    return AddressListModel(
+      allLocations: rawList == null || rawList is! List
+          ? []
+          : List<Address>.from(
+              rawList.map((x) => Address.fromJson(x))),
+      pagination: json["pagination"] == null
+          ? null
+          : Pagination.fromJson(json["pagination"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "data": List<dynamic>.from(allLocations.map((x) => x.toJson())),

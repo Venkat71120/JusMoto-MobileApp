@@ -53,43 +53,51 @@ class OrderDetailsView extends StatelessWidget {
                       child: SingleChildScrollView(
                         padding: 8.paddingV,
                         physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          spacing: 12,
-                          children: [
-                            OrderDetailsItems(
-                              orderItems:
-                                  od.orderDetailsModel.orderDetails?.items,
-                            ),
+                        child: Builder(
+                          builder: (context) {
+                            final order = od.orderDetailsModel.orderDetails!;
+                            final isPickup =
+                                order.deliveryMode?.toLowerCase() == "pickup";
+                            final hasAddress = order.userLocation != null &&
+                                (order.userLocation!.address ?? "").isNotEmpty;
+                            return Column(
+                              spacing: 12,
+                              children: [
+                                OrderDetailsItems(
+                                  orderItems: order.items,
+                                ),
 
-                            // ✅ FIXED: userLocation is now OrderLocation (not Address)
-                            if (od.orderDetailsModel.orderDetails?.userLocation != null)
-                              OrderDetailsAddress(
-                                address: od.orderDetailsModel.orderDetails!.userLocation!,
-                              ),
+                                // Show address only for home delivery with a non-empty address
+                                if (!isPickup && hasAddress)
+                                  OrderDetailsAddress(
+                                    address: order.userLocation!,
+                                  ),
 
-                            if (od.orderDetailsModel.orderDetails?.outletDetails != null)
-                              OrderDetailsOutlet(
-                                outlet: od.orderDetailsModel.orderDetails!.outletDetails!,
-                              ),
+                                // Show outlet for pickup, or if outlet data exists
+                                if (order.outletDetails != null)
+                                  OrderDetailsOutlet(
+                                    outlet: order.outletDetails!,
+                                  ),
 
-                            if (od.orderDetailsModel.orderDetails?.date != null)
-                              OrderDetailsBookingDate(
-                                date: od.orderDetailsModel.orderDetails!.date!,
-                              ),
+                                if (order.date != null)
+                                  OrderDetailsBookingDate(
+                                    date: order.date!,
+                                  ),
 
-                            // ✅ FIXED: guard null — "schedule" can be null from API
-                            if (od.orderDetailsModel.orderDetails?.time != null)
-                              OrderDetailsBookingTime(
-                                time: od.orderDetailsModel.orderDetails!.time!,
-                              ),
+                                if (order.time != null)
+                                  OrderDetailsBookingTime(
+                                    time: order.time!,
+                                  ),
 
-                            if (od.orderDetailsModel.orderDetails?.staffDetails != null)
-                              OrderDetailsStaff(
-                                staff: od.orderDetailsModel.orderDetails!.staffDetails!,
-                              ),
+                                if (order.staffDetails != null)
+                                  OrderDetailsStaff(
+                                    staff: order.staffDetails!,
+                                  ),
 
-                            OrderDetailsCostInfo(od: od),
-                          ],
+                                OrderDetailsCostInfo(od: od),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),

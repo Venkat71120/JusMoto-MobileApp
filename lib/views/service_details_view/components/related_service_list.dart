@@ -17,22 +17,34 @@ class RelatedServiceList extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            LocalKeys.relatedServices,
-            style: context.titleMedium?.bold,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  LocalKeys.relatedServices,
+                  style: context.titleSmall?.bold,
+                ),
+              ),
+              Text(
+                "${relatedServices.length}",
+                style: context.bodySmall?.copyWith(
+                  color: context.color.tertiaryContrastColo,
+                ),
+              ),
+            ],
           ),
         ),
-        16.toHeight,
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Wrap(
-            spacing: 16,
-            children: relatedServices
-                .map((e) => ServiceCard(
-                      service: e,
-                    ))
-                .toList(),
+        14.toHeight,
+        SizedBox(
+          height: 220,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: relatedServices.length,
+            separatorBuilder: (_, __) => 14.toWidth,
+            itemBuilder: (context, i) => ServiceCard(
+              service: relatedServices[i],
+            ),
           ),
         ),
       ],

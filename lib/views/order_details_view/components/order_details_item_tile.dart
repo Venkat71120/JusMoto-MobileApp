@@ -92,7 +92,7 @@ class OrderDetailsItemTile extends StatelessWidget {
                           children: [
                             TextSpan(
                               text: (orderItem.price * orderItem.qty).cur,
-                              style: context.titleSmall?.bold.copyWith(
+                              style: context.titleSmall?.bold.price.copyWith(
                                 color: primaryColor,
                               ),
                             ),

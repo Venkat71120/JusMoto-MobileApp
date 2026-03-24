@@ -1,6 +1,6 @@
+import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:flutter/material.dart';
 
 class CartTileQuantityUpdateButtons extends StatelessWidget {
@@ -17,50 +17,62 @@ class CartTileQuantityUpdateButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: SquircleContainer(
-        radius: 8,
-        color: context.color.primaryContrastColor,
-        padding: EdgeInsets.all(6),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: onRemove,
-              child: SquircleContainer(
-                padding: 4.paddingAll,
-                radius: 4,
-                color: context.color.accentContrastColor.withOpacity(.1),
-                child: Icon(
-                  Icons.remove,
-                  size: 14,
-                  color: context.color.accentContrastColor,
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: context.color.mutedContrastColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Remove button
+          GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: quantity == 1
+                    ? context.color.primaryWarningColor.withOpacity(0.08)
+                    : context.color.primaryContrastColor.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                quantity == 1 ? Icons.delete_outline_rounded : Icons.remove,
+                size: 18,
+                color: quantity == 1
+                    ? context.color.primaryWarningColor
+                    : context.color.primaryContrastColor,
               ),
             ),
-            6.toWidth,
-            Text(
+          ),
+          // Quantity
+          Container(
+            constraints: const BoxConstraints(minWidth: 36),
+            alignment: Alignment.center,
+            child: Text(
               '$quantity',
-              style: context.bodySmall
-                  ?.copyWith(color: context.color.accentContrastColor)
-                  .bold6,
-            ),
-            6.toWidth,
-            GestureDetector(
-              onTap: onAdd,
-              child: SquircleContainer(
-                padding: 4.paddingAll,
-                radius: 4,
-                color: context.color.accentContrastColor.withOpacity(.1),
-                child: Icon(
-                  Icons.add,
-                  size: 14,
-                  color: context.color.accentContrastColor,
-                ),
+              style: context.titleSmall?.bold.copyWith(
+                fontSize: 15,
               ),
             ),
-          ],
-        ),
+          ),
+          // Add button
+          GestureDetector(
+            onTap: onAdd,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.add,
+                size: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

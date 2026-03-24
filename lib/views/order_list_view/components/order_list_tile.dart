@@ -111,7 +111,7 @@ class OrderListTile extends StatelessWidget {
                           children: [
                             Text(order.total.cur,
                                 style: context.titleMedium?.bold
-                                    .copyWith(color: primaryColor)),
+                                    .price.copyWith(color: primaryColor)),
                             8.toWidth,
                             if (!["4", "5"].contains(statusStr))
                               OrderPaymentStatusChip(

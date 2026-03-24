@@ -17,13 +17,20 @@ class ServiceDetailsPrimaryOffers extends StatelessWidget {
     return serviceAdditional.isEmpty
         ? const SizedBox()
         : Container(
-            margin: const EdgeInsets.only(top: 8),
-            color: context.color.accentContrastColor,
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: primaryColor.withOpacity(0.1),
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Wrap(
-                  runSpacing: 8,
+                  runSpacing: 10,
                   children: serviceAdditional.map((e) {
                     final showDesc = ValueNotifier(false);
                     return ValueListenableBuilder(
@@ -46,7 +53,7 @@ class ServiceDetailsPrimaryOffers extends StatelessWidget {
                                     size: 22,
                                   ),
                                 ),
-                                8.toWidth,
+                                10.toWidth,
                                 Expanded(
                                   flex: 1,
                                   child: Text(
