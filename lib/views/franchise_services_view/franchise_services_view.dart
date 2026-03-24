@@ -211,20 +211,20 @@ class _StatsHeader extends StatelessWidget {
                 ),
                 12.toHeight,
                 // Open / Closed / Priority row
-                Row(
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
                   children: [
                     _StatPill(
                       label: 'Open',
                       value: stats.open,
                       color: Colors.greenAccent,
                     ),
-                    SizedBoxExtension(10).toWidth,
                     _StatPill(
                       label: 'In Progress',
                       value: stats.inProgress,
                       color: Colors.orangeAccent,
                     ),
-                    SizedBoxExtension(10).toWidth,
                     _StatPill(
                       label: 'Closed',
                       value: stats.closed,

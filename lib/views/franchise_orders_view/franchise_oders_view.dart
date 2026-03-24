@@ -169,69 +169,10 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ),
 
-                // 2. Image Section with Floating Indicator
-                Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 20, 12, 20),
-                      child: Container(
-                        width: 88,
-                        height: 88,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          color: Colors.grey[50],
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                          image: order.firstItemImage != null
-                              ? DecorationImage(
-                                  image: NetworkImage(order.firstItemImage!),
-                                  fit: BoxFit.cover,
-                                  onError: (e, s) => const Icon(
-                                      Icons.broken_image,
-                                      size: 24,
-                                      color: Colors.grey),
-                                )
-                              : null,
-                        ),
-                        child: order.firstItemImage == null
-                            ? Icon(Icons.shopping_bag_outlined,
-                                color: Colors.grey[200], size: 36)
-                            : null,
-                      ),
-                    ),
-                    // Floating Real-time Status Dot
-                    Positioned(
-                      top: 14,
-                      right: 6,
-                      child: Container(
-                        width: 14,
-                        height: 14,
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: statusColor.withOpacity(0.4),
-                              blurRadius: 6,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
                 // 3. Core Info Section
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(4, 20, 20, 20),
+                    padding: const EdgeInsets.fromLTRB(16, 20, 20, 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -240,23 +181,28 @@ class _OrderCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.06),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                '#${order.invoiceNumber}',
-                                style: context.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: primaryColor,
-                                  fontSize: 10.5,
-                                  letterSpacing: 0.8,
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withOpacity(0.06),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '#${order.invoiceNumber}',
+                                  style: context.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    color: primaryColor,
+                                    fontSize: 10.5,
+                                    letterSpacing: 0.8,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),
+                            8.toWidth,
                             Text(
                               '₹${order.total}',
                               style: context.titleLarge?.copyWith(
@@ -265,6 +211,8 @@ class _OrderCard extends StatelessWidget {
                                 fontSize: 20,
                                 letterSpacing: -0.5,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -292,6 +240,8 @@ class _OrderCard extends StatelessWidget {
                                       .withOpacity(0.85),
                                   fontSize: 13.5,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -300,17 +250,20 @@ class _OrderCard extends StatelessWidget {
                         const Spacer(),
 
                         // Footer Row: Metadata Chips & Status Badges
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             // Metadata Group
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 _MetaIcon(
                                   icon: Icons.calendar_today_rounded,
                                   label: order.createdAt.toOrderTime,
                                 ),
-                                14.toWidth,
+                                10.toWidth,
                                 _MetaIcon(
                                   icon: Icons.inventory_2_outlined,
                                   label: '${order.itemsCount} Items',
@@ -319,6 +272,7 @@ class _OrderCard extends StatelessWidget {
                             ),
                             // Badges Group
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 _V2Badge(
                                     label: order.status,

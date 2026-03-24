@@ -10,6 +10,7 @@ import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/models/franchise_models/franchise_dashboard_model.dart';
 import 'package:flutter/material.dart';
 
+import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
 import 'package:car_service/view_models/franchise_home_view_model/franchise_home_view_model.dart';
 
 class FranchiseActivitySection extends StatelessWidget {
@@ -24,15 +25,17 @@ class FranchiseActivitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recentOrders = activity.orders;
-    final recentTickets = activity.tickets;
+    final recentOrders = activity.orders.take(3).toList();
+    final recentTickets = activity.tickets.take(3).toList();
 
     return Column(
       children: [
         // ── Recent Orders ──────────────────────────────────────────────────
         _SectionHeader(
           title: LocalKeys.recentOrders,
-          onTap: () {},
+          onTap: () {
+            FranchiseLandingViewModel.instance.setNavIndex(1);
+          },
         ),
         _OrdersList(orders: recentOrders),
 
@@ -41,7 +44,9 @@ class FranchiseActivitySection extends StatelessWidget {
         // ── Recent Tickets ─────────────────────────────────────────────────
         _SectionHeader(
           title: LocalKeys.recentTickets,
-          onTap: () {},
+          onTap: () {
+            FranchiseLandingViewModel.instance.setNavIndex(2);
+          },
         ),
         _TicketsList(tickets: recentTickets),
 

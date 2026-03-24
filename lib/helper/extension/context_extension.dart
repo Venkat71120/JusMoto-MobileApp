@@ -5,6 +5,7 @@ import 'package:car_service/services/dynamics/dynamics_service.dart';
 import 'package:car_service/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '/services/app_string_service.dart';
@@ -80,7 +81,7 @@ extension DurationExtension on BuildContext {
 
 extension TextThemeExtension on BuildContext {
   TextTheme get textTheme =>
-      Theme.of(this).textTheme.apply(fontFamily: 'Inter Tight');
+      Theme.of(this).textTheme.apply(fontFamily: GoogleFonts.poppins().fontFamily);
 
   TextStyle? get bodySmall => textTheme.bodySmall?.copyWith(
     color: color.secondaryContrastColor,
