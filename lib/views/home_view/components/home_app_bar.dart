@@ -90,25 +90,14 @@ class HomeAppBar extends StatelessWidget {
                                   ),
                                 ),
                           4.toHeight,
-                          RichText(
-                            text: TextSpan(
-                              text: null,
-                              style: context.titleLarge?.bold.copyWith(
-                                color: color,
-                              ),
-                              children: [
-                                if (pi.profileInfoModel.userDetails?.firstName !=
-                                    null)
-                                  TextSpan(
-                                    text: pi.profileInfoModel.userDetails
-                                                ?.firstName ==
-                                            null
-                                        ? null
-                                        : "${pi.profileInfoModel.userDetails?.firstName} ${pi.profileInfoModel.userDetails?.lastName} !",
-                                  ),
-                              ],
-                            ),
-                          ),
+                          pi.profileInfoModel.userDetails?.firstName == null
+                              ? const SizedBox()
+                              : Text(
+                                  "${pi.profileInfoModel.userDetails?.firstName} !",
+                                  style: context.titleLarge?.bold.copyWith(color: color),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                         ],
                       ),
                     ),

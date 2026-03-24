@@ -78,18 +78,57 @@ class UploadProfileImageView extends StatelessWidget {
                 ],
               )),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: ValueListenableBuilder(
-                valueListenable: sum.profileSetupLoading,
-                builder: (context, loading, child) => CustomButton(
-                  onPressed: () {
-                    sum.tryToSetProfileInfo(context);
-                  },
-                  btText: (LocalKeys.continueO),
-                  isLoading: loading,
-                ),
-              ),
+            ValueListenableBuilder(
+              valueListenable: sum.profileImage,
+              builder: (context, f, child) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ValueListenableBuilder(
+                        valueListenable: sum.profileSetupLoading,
+                        builder: (context, loading, child) => CustomButton(
+                          onPressed: () {
+                            sum.tryToSetProfileInfo(context);
+                          },
+                          btText: LocalKeys.continueO,
+                          isLoading: loading,
+                        ),
+                      ),
+                    ),
+                    if (f == null) ...[
+                      8.toHeight,
+                      SizedBox(
+                        width: double.infinity,
+                        child: ValueListenableBuilder(
+                          valueListenable: sum.profileSetupLoading,
+                          builder: (context, loading, child) => TextButton(
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: loading
+                                ? null
+                                : () {
+                                    sum.tryToSetProfileInfo(context);
+                                  },
+                            child: Text(
+                              LocalKeys.skipForLater,
+                              style: context.titleMedium?.copyWith(
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
             ),
             24.toHeight,
           ],

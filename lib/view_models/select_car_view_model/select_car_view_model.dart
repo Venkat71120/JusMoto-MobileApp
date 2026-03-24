@@ -20,9 +20,9 @@ class SelectCarViewModel {
   final ValueNotifier<BrandModel?> selectedBrand = ValueNotifier(null);
   final ValueNotifier<CarModel?> selectedCar = ValueNotifier(null);
   final ValueNotifier<ModelVariant?> selectedVariant = ValueNotifier(null);
-  final ValueNotifier<int> pageIndex = ValueNotifier(0);
+  ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ScrollController scrollController = ScrollController();
-  final PageController pageController = PageController(initialPage: 0);
+  PageController pageController = PageController(initialPage: 0);
   final ValueNotifier<List<ModelVariant>> variantsList = ValueNotifier([]);
   final TextEditingController regNoController = TextEditingController();
   
@@ -122,8 +122,8 @@ class SelectCarViewModel {
     }
   }
 
-  goBack(BuildContext context) async {
-    if (pageIndex.value <= 0) {
+  goBack(BuildContext context, {bool forceSteps = false}) async {
+    if (pageIndex.value <= 0 || (isEditing && pageIndex.value == 2 && !forceSteps)) {
       context.pop;
       return;
     }
@@ -138,6 +138,9 @@ class SelectCarViewModel {
     editingCarId = car.id;
     regNoController.text = car.registrationNumber ?? "";
     
+    // Jump straight to the details page (index 2) so the user doesn't have to navigate from Brand again
+    pageIndex.value = 2;
+    
     // Note: We can only set IDs here. 
     // The lists for models and variants are normally fetched when brand/car are selected.
     // For a better UX, one might want to pre-fetch these, 
@@ -146,7 +149,7 @@ class SelectCarViewModel {
     // but UserSelectedCarModel only has names and IDs.
     
     selectedBrand.value = BrandModel(id: car.brandId, name: car.brandName);
-    selectedCar.value = CarModel(id: car.carId, name: car.carName);
+    selectedCar.value = CarModel(id: car.carId, name: car.carName, image: car.carImage);
     selectedVariant.value = ModelVariant(id: car.variantId);
   }
 }

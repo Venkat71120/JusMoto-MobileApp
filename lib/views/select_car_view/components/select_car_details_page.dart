@@ -8,6 +8,7 @@ import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:car_service/utils/components/field_label.dart';
 import '../../../utils/components/field_with_label.dart';
 import 'package:car_service/view_models/select_car_view_model/select_car_view_model.dart';
+import 'package:car_service/customizations/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,6 +67,26 @@ class SelectCarDetailsPage extends StatelessWidget {
                                   style: context.titleMedium?.bold,
                                 ),
                               ),
+                              if (scm.isEditing) ...[
+                                4.toHeight,
+                                Center(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Force navigate backward to Model Selection
+                                      scm.goBack(context, forceSteps: true);
+                                    },
+                                    child: Text(
+                                      "Change Car Model",
+                                      style: context.labelMedium?.copyWith(
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w600,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
