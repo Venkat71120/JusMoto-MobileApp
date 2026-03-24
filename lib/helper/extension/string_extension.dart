@@ -591,25 +591,42 @@ extension RefundStatusExtension on String {
 
 extension TicketStatusExtension on String {
   String get getTicketStatus {
-    switch (this) {
-      case "0":
-        return LocalKeys.pending;
+    switch (toLowerCase()) {
       case "open":
-        return LocalKeys.open;
-      case "close":
+      case "accepted":
+      case "pending":
+      case "0":
+      case "1":
+        return LocalKeys.accepted; // Label: "Accepted"
+      case "in_progress":
+      case "3":
+        return "In Progress";
       case "closed":
-        return LocalKeys.closed;
+      case "close":
+      case "completed":
+      case "cancelled":
+      case "canceled":
+      case "2":
+      case "4":
+        return LocalKeys.complete; // Label: "Completed"
       default:
-        return LocalKeys.pending;
+        return capitalize;
     }
   }
 
   Color get getTicketPrimaryStatusColor {
-    switch (this) {
+    switch (toLowerCase()) {
       case "0":
+      case "pending":
         return color.primaryPendingColor;
       case "open":
+      case "accepted":
+      case "in_progress":
         return primaryColor;
+      case "completed":
+        return color.primarySuccessColor;
+      case "cancelled":
+      case "canceled":
       case "close":
       case "closed":
         return color.primaryWarningColor;
@@ -619,11 +636,18 @@ extension TicketStatusExtension on String {
   }
 
   Color get getTicketMutedStatusColor {
-    switch (this) {
+    switch (toLowerCase()) {
       case "0":
+      case "pending":
         return color.mutedPendingColor;
       case "open":
+      case "accepted":
+      case "in_progress":
         return mutedPrimaryColor;
+      case "completed":
+        return color.mutedSuccessColor;
+      case "cancelled":
+      case "canceled":
       case "close":
       case "closed":
         return color.mutedWarningColor;

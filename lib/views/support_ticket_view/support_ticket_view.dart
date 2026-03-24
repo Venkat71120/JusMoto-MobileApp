@@ -38,26 +38,48 @@ class SupportTicketView extends StatelessWidget {
             children: [
               Consumer<TicketListService>(
                 builder: (context, tl, child) {
-                  return Row(
-                    children: [
-                      _FilterChip(
-                        label: "All",
-                        isSelected: tl.activeFilter == "all",
-                        onTap: () => tl.setFilter("all"),
-                      ),
-                      8.toWidth,
-                      _FilterChip(
-                        label: "Open",
-                        isSelected: tl.activeFilter == "open",
-                        onTap: () => tl.setFilter("open"),
-                      ),
-                      8.toWidth,
-                      _FilterChip(
-                        label: "Closed",
-                        isSelected: tl.activeFilter == "closed",
-                        onTap: () => tl.setFilter("closed"),
-                      ),
-                    ],
+                  return SizedBox(
+                    height: 40,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _FilterChip(
+                          label: "All",
+                          isSelected: tl.activeFilter == "all",
+                          onTap: () => tl.setFilter("all"),
+                        ),
+                        8.toWidth,
+                        _FilterChip(
+                          label: "Pending",
+                          isSelected: tl.activeFilter == "pending",
+                          onTap: () => tl.setFilter("pending"),
+                        ),
+                        8.toWidth,
+                        _FilterChip(
+                          label: "Accepted",
+                          isSelected: tl.activeFilter == "accepted",
+                          onTap: () => tl.setFilter("accepted"),
+                        ),
+                        8.toWidth,
+                        _FilterChip(
+                          label: "In Progress",
+                          isSelected: tl.activeFilter == "in_progress",
+                          onTap: () => tl.setFilter("in_progress"),
+                        ),
+                        8.toWidth,
+                        _FilterChip(
+                          label: "Completed",
+                          isSelected: tl.activeFilter == "completed",
+                          onTap: () => tl.setFilter("completed"),
+                        ),
+                        8.toWidth,
+                        _FilterChip(
+                          label: "Cancelled",
+                          isSelected: tl.activeFilter == "cancelled",
+                          onTap: () => tl.setFilter("cancelled"),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),

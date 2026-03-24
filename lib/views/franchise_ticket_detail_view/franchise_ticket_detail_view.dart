@@ -56,7 +56,7 @@ class _FranchiseTicketDetailViewState
   Widget build(BuildContext context) {
     return Consumer<FranchiseTicketsService>(
       builder: (context, ts, _) {
-        if (ts.isLoadingDetail) {
+        if (ts.isLoadingDetail && ts.ticketDetail == null) {
           return const _DetailSkeleton();
         }
         if (ts.hasDetailError || ts.ticketDetail == null) {
@@ -92,7 +92,6 @@ class _DetailContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final ticket = detail.ticket;
     final pColor = _priorityColor(ticket.priority);
-    final isOpen = ticket.status.toLowerCase() == 'open';
 
     return Scaffold(
       backgroundColor: context.color.backgroundColor,
@@ -134,10 +133,8 @@ class _DetailContent extends StatelessWidget {
                         Row(
                           children: [
                             _WhiteBadge(
-                              label: ticket.status.toUpperCase(),
-                              dotColor: isOpen
-                                  ? Colors.greenAccent
-                                  : Colors.white54,
+                              label: ticket.status.getTicketStatus.toUpperCase(),
+                              dotColor: ticket.status.getTicketPrimaryStatusColor,
                             ),
                             SizedBoxExtension(8).toWidth,
                             _WhiteBadge(
@@ -681,14 +678,23 @@ class _StatusPopup extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
         ),
       ),
-      onSelected: (val) {
-        Provider.of<FranchiseTicketsService>(context, listen: false)
-            .updateServiceRequestStatus(ticket.id, val);
+      onSelected: (val) async {
+        final ts = Provider.of<FranchiseTicketsService>(context, listen: false);
+        final success = await ts.updateServiceRequestStatus(ticket.id, val);
+        
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(success ? 'Status updated successfully' : 'Failed to update status'),
+              backgroundColor: success ? Colors.green : Colors.red,
+            ),
+          );
+        }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(value: 'open', child: Text('Open')),
+        const PopupMenuItem(value: 'open', child: Text('Accepted')),
         const PopupMenuItem(value: 'in_progress', child: Text('In Progress')),
-        const PopupMenuItem(value: 'closed', child: Text('Closed')),
+        const PopupMenuItem(value: 'closed', child: Text('Completed')),
       ],
     );
   }

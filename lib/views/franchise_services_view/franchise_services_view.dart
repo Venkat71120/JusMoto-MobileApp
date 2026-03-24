@@ -11,6 +11,7 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/models/franchise_models/franchise_ticket_model.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
+import '../../helper/extension/string_extension.dart';
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
 // import 'package:car_service/views/franchise_services_view/franchise_ticket_detail_view.dart';
 import 'package:car_service/views/franchise_ticket_detail_view/franchise_ticket_detail_view.dart';
@@ -143,12 +144,22 @@ class _FranchiseServicesViewState extends State<FranchiseServicesView> {
 
   List<FranchiseTicketItem> _applyFilter(List<FranchiseTicketItem> all) {
     if (_filter == 'all') return all;
-    // Map 'closed' filter to match API value 'closed' OR 'close'
-    final f = _filter == 'closed' ? 'closed' : _filter;
+    
+    final target = _filter.toLowerCase();
     return all.where((t) {
-      final status = t.status.toLowerCase();
-      final target = f.toLowerCase();
-      return status == target || (target == 'closed' && status == 'close');
+      final status = t.status.toString().toLowerCase();
+      final targetMapped = target == 'closed' ? 'close' : target;
+      
+      // Explicit mapping for common values
+      if (target == 'pending') return status == 'pending' || status == '0';
+      if (target == 'open') return status == 'open' || status == '1';
+      if (target == 'accepted') return status == 'accepted';
+      if (target == 'in_progress') return status == 'in_progress' || status == 'progress' || status == '3';
+      if (target == 'completed') return status == 'completed' || status == 'complete';
+      if (target == 'cancelled') return status == 'cancelled' || status == 'canceled';
+      if (target == 'closed') return status == 'closed' || status == 'close' || status == '2';
+      
+      return status == targetMapped;
     }).toList();
   }
 
@@ -501,14 +512,29 @@ class _FilterBarDelegate extends SliverPersistentHeaderDelegate {
                   onTap: () => onChanged('all')),
               SizedBoxExtension(10).toWidth,
               _FilterChip(
-                  label: 'Open (${stats.open})',
-                  selected: filter == 'open',
-                  onTap: () => onChanged('open')),
+                  label: 'Pending',
+                  selected: filter == 'pending',
+                  onTap: () => onChanged('pending')),
+              SizedBoxExtension(10).toWidth,
+              _FilterChip(
+                  label: 'Accepted',
+                  selected: filter == 'accepted',
+                  onTap: () => onChanged('accepted')),
               SizedBoxExtension(10).toWidth,
               _FilterChip(
                   label: 'Progress (${stats.inProgress})',
                   selected: filter == 'in_progress',
                   onTap: () => onChanged('in_progress')),
+              SizedBoxExtension(10).toWidth,
+              _FilterChip(
+                  label: 'Completed',
+                  selected: filter == 'completed',
+                  onTap: () => onChanged('completed')),
+              SizedBoxExtension(10).toWidth,
+              _FilterChip(
+                  label: 'Cancelled',
+                  selected: filter == 'cancelled',
+                  onTap: () => onChanged('cancelled')),
               SizedBoxExtension(10).toWidth,
               _FilterChip(
                   label: 'Closed (${stats.closed})',
@@ -577,9 +603,7 @@ class _TicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusSafe = ticket.status.toString();
     final pColor = _priorityColor(ticket.priority.toString());
-    final isOpen = statusSafe.toLowerCase() == 'open' || statusSafe == '1';
 
     return GestureDetector(
       onTap: onTap,
@@ -634,8 +658,8 @@ class _TicketCard extends StatelessWidget {
                           SizedBoxExtension(10).toWidth,
                           // Status badge
                           _SmallBadge(
-                            label: ticket.status.toUpperCase(),
-                            color: isOpen ? Colors.green : Colors.grey,
+                            label: ticket.status.getTicketStatus.toUpperCase(),
+                            color: ticket.status.getTicketPrimaryStatusColor,
                           ),
                         ],
                       ),

@@ -64,7 +64,8 @@ class SplashViewModel {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-    await Future.delayed(Duration(seconds: 2));
+    // Removed fixed 2s delay as it produced a double-splash effect
+    // await Future.delayed(Duration(seconds: 2));
     await Provider.of<AppStringService>(
       context,
       listen: false,

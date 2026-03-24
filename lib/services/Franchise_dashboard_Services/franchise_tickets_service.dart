@@ -94,12 +94,14 @@ class FranchiseTicketsService with ChangeNotifier {
   }
 
   // ── Fetch ticket detail ────────────────────────────────────────────────────
-  Future<void> fetchTicketDetail(int ticketId) async {
+  Future<void> fetchTicketDetail(int ticketId, {bool quiet = false}) async {
     if (_isLoadingDetail) return;
 
     _isLoadingDetail = true;
     _hasDetailError = false;
-    _ticketDetail = null;
+    if (!quiet) {
+      _ticketDetail = null;
+    }
     notifyListeners();
 
     try {
@@ -201,9 +203,9 @@ class FranchiseTicketsService with ChangeNotifier {
           _fetchTickets(page: 1),
         ]);
 
-        // Refresh detail if currently open
+        // Refresh detail if currently open (using quiet refresh to avoid flicker)
         if (_ticketDetail?.ticket.id == id) {
-          await fetchTicketDetail(id);
+          await fetchTicketDetail(id, quiet: true);
         }
         return true;
       }
@@ -302,13 +304,15 @@ class FranchiseTicketsService with ChangeNotifier {
         for (var ticket in _ticketList?.tickets ?? []) {
           total++;
           final status = ticket.status.toLowerCase();
-          if (status == 'open' || status == '1') {
+          
+          if (status == 'open' || status == '1' || status == 'accepted') {
             open++;
-          } else if (status == 'closed' || status == 'close' || status == '2') {
+          } else if (status == 'closed' || status == 'close' || status == '2' || status == 'completed') {
             closed++;
           } else if (status == 'in_progress' || status == 'in-progress' || status == '3') {
             inProgress++;
           }
+          // Note: Add other counters if FranchiseTicketStatisticsModel is expanded
         }
         _statistics = FranchiseTicketStatisticsModel(
           open: open,

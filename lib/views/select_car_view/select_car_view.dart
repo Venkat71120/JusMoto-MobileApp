@@ -38,7 +38,7 @@ class SelectCarView extends StatelessWidget {
         body: PageView.builder(
             physics: NeverScrollableScrollPhysics(),
             itemCount: 3,
-            controller: PageController(initialPage: scm.isEditing ? 2 : 0),
+            controller: scm.pageController,
             itemBuilder: (context, index) {
               return [
                 SelectCarBrandPage(),

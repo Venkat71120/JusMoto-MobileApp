@@ -140,6 +140,7 @@ class SelectCarViewModel {
     
     // Jump straight to the details page (index 2) so the user doesn't have to navigate from Brand again
     pageIndex.value = 2;
+    pageController = PageController(initialPage: 2);
     
     // Note: We can only set IDs here. 
     // The lists for models and variants are normally fetched when brand/car are selected.
