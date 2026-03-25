@@ -1,4 +1,5 @@
 import 'package:car_service/helper/extension/string_extension.dart';
+import 'package:car_service/services/home_services/unread_count_service.dart';
 
 import 'package:flutter/material.dart';
 
@@ -31,6 +32,12 @@ class NotificationListService with ChangeNotifier {
     if (responseData != null) {
       _notificationListModel = NotificationListModel.fromJson(responseData);
       nextPage = _notificationListModel?.pagination?.nextPageUrl;
+      // Sync badge count with actual unread notifications from the list
+      final unreadCount = _notificationListModel?.notifications
+              .where((n) => !n.isRead)
+              .length ??
+          0;
+      UnreadCountService.instance.notificationCount.value = unreadCount;
     } else {}
     notifyListeners();
   }

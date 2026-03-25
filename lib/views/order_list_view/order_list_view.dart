@@ -24,7 +24,8 @@ class OrderListView extends StatelessWidget {
   static const List<_FilterOption> _filters = [
     _FilterOption(label: "All", status: null),
     _FilterOption(label: "Pending", status: 0),
-    _FilterOption(label: "Processing", status: 1),
+    _FilterOption(label: "Accepted", status: 1),
+    _FilterOption(label: "In Progress", status: 2),
     _FilterOption(label: "Completed", status: 3),
     _FilterOption(label: "Cancelled", status: 4),
   ];

@@ -276,11 +276,11 @@ extension OrderStatusExtension on String {
       case "0":
         return LocalKeys.pending;
       case "1":
-        return LocalKeys.complete;
+        return LocalKeys.accepted;
       case "2":
-        return LocalKeys.complete;
+        return LocalKeys.inProgress;
       case "3":
-        return LocalKeys.delivered;
+        return LocalKeys.complete;
       case "4":
         return LocalKeys.canceled;
       case "5":
