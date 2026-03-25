@@ -102,43 +102,70 @@ class SelectCarDetailsPage extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  FieldLabel(label: "Variants"),
                                   if ((vls.variantListModel.allVariants ?? []).isNotEmpty) ...[
-                                    FieldLabel(label: "Variants"),
                                     Wrap(
-                                      children:
-                                          (vls.variantListModel.allVariants ?? [])
-                                              .map((e) {
-                                                return SizedBox(
-                                                  width:
-                                                      ((context.width - 100) /
-                                                                  2) <
-                                                              100
-                                                          ? null
-                                                          : (context.width -
-                                                                  100) /
-                                                              2,
-                                                  child: RadioListTile(
-                                                    dense: true,
-                                                    value: value?.id == e.id,
-                                                    contentPadding:
-                                                        EdgeInsets.zero,
-                                                    visualDensity:
-                                                        VisualDensity.compact,
-                                                    groupValue: true,
-                                                    onChanged: (val) {
-                                                      scm.selectedVariant.value =
-                                                          e;
-                                                    },
-                                                    title: Text(
-                                                      "${e.name ?? ''}\n${e.engineType?.name ?? ''} | ${e.fuelType?.name ?? ''}",
-                                                      style: context.titleSmall,
-                                                    ),
-                                                  ),
-                                                );
-                                              })
-                                              .toList(),
+                                      children: [
+                                        ...(vls.variantListModel.allVariants ?? [])
+                                            .map((e) {
+                                          return SizedBox(
+                                            width: ((context.width - 100) / 2) < 100
+                                                ? null
+                                                : (context.width - 100) / 2,
+                                            child: RadioListTile<ModelVariant>(
+                                              dense: true,
+                                              value: e,
+                                              contentPadding: EdgeInsets.zero,
+                                              visualDensity: VisualDensity.compact,
+                                              groupValue: value,
+                                              onChanged: (val) {
+                                                if (val != null) {
+                                                  scm.selectedVariant.value = val;
+                                                }
+                                              },
+                                              title: Text(
+                                                "${e.name ?? ''}\n${e.engineType?.name ?? ''} | ${e.fuelType?.name ?? ''}",
+                                                style: context.titleSmall,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        // Custom Variant Option
+                                        SizedBox(
+                                          width: ((context.width - 100) / 2) < 100
+                                              ? null
+                                              : (context.width - 100) / 2,
+                                          child: RadioListTile<ModelVariant>(
+                                            dense: true,
+                                            value: ModelVariant(
+                                              id: -1,
+                                              name: "Custom",
+                                            ),
+                                            contentPadding: EdgeInsets.zero,
+                                            visualDensity: VisualDensity.compact,
+                                            groupValue: value,
+                                            onChanged: (val) {
+                                              if (val != null) {
+                                                scm.selectedVariant.value = val;
+                                              }
+                                            },
+                                            title: Text(
+                                              "Custom\n(Enter manually)",
+                                              style: context.titleSmall,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     16.toHeight,
+                                  ],
+                                  if (scm.isCustomVariant || (vls.variantListModel.allVariants ?? []).isEmpty) ...[
+                                    FieldWithLabel(
+                                      label: "Custom Variant Name",
+                                      hintText: "E.g. V8 Turbo, Special Edition",
+                                      controller: scm.customVariantController,
+                                    ),
+                                    12.toHeight,
                                   ],
                                   FieldWithLabel(
                                     label: "Registration Number (Optional)",

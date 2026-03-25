@@ -6,7 +6,7 @@ import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/services/profile_services/profile_info_service.dart';
 import 'package:car_service/view_models/sign_in_view_model/sign_in_view_model.dart';
 import 'package:car_service/view_models/sign_in_view_model/social_sign_in_view_model.dart';
-import 'package:car_service/view_models/wallet_view_model/wallet_view_model.dart';
+
 import 'package:car_service/views/address_list_view/address_list_view.dart';
 import 'package:car_service/views/delete_account_view/delete_account_view.dart';
 import 'package:car_service/views/favorite_services_view/favorite_services_view.dart';
@@ -16,16 +16,20 @@ import 'package:car_service/views/notification_list_view/notification_list_view.
 import 'package:car_service/views/sign_in_view/sign_in_view.dart';
 import 'package:car_service/views/support_ticket_view/support_ticket_view.dart';
 import 'package:car_service/views/tac_pp_view/tac_pp_view.dart';
-import 'package:car_service/views/wallet_view/wallet_view.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../services/auth_services/sign_out_service.dart';
 import '../../../utils/components/alerts.dart';
 import '../../../view_models/delete_account_view_model/delete_account_view_model.dart';
-import '../../change_language_view/change_language_view.dart';
 import '../../refund_list_view/refund_list_view.dart';
 import '../../contact_view/contact_view.dart';
+import '../../../services/car_services/brand_list_service.dart';
+import '../../../services/car_services/model_list_service.dart';
+import '../../../services/car_services/variant_list_service.dart';
+import '../../../services/car_services/user_cars_service.dart';
+import '../../../view_models/select_car_view_model/select_car_view_model.dart';
 
 class MenuTiles extends StatelessWidget {
   final bool signedIn;
@@ -170,10 +174,16 @@ class MenuTiles extends StatelessWidget {
                         await SignOutService().trySignOut().then((result) {
                           if (result == true) {
                             context.pop;
-                            Provider.of<ProfileInfoService>(
-                              context,
-                              listen: false,
-                            ).reset();
+                            
+                            // Reset core services to prevent data leakage between accounts
+                            Provider.of<ProfileInfoService>(context, listen: false).reset();
+                            Provider.of<BrandListService>(context, listen: false).reset();
+                            Provider.of<ModelListService>(context, listen: false).reset();
+                            Provider.of<VariantListService>(context, listen: false).reset();
+                            Provider.of<UserCarsService>(context, listen: false).reset();
+                            
+                            // Reset View Models
+                            SelectCarViewModel.dispose;
                             SocialSignInViewModel.instance.signOut();
                           }
                         });

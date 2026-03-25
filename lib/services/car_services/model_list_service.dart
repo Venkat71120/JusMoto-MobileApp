@@ -85,4 +85,12 @@ class ModelListService with ChangeNotifier {
     nextPageLoading = false;
     notifyListeners();
   }
+
+  void reset() {
+    _carModelsModel = null;
+    token = "";
+    brandId = "";
+    nextPage = null;
+    notifyListeners();
+  }
 }

@@ -692,9 +692,11 @@ class _StatusPopup extends StatelessWidget {
         }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(value: 'open', child: Text('Accepted')),
+        const PopupMenuItem(value: 'pending', child: Text('Pending')),
+        const PopupMenuItem(value: 'accepted', child: Text('Accepted')),
         const PopupMenuItem(value: 'in_progress', child: Text('In Progress')),
-        const PopupMenuItem(value: 'closed', child: Text('Completed')),
+        const PopupMenuItem(value: 'completed', child: Text('Completed')),
+        const PopupMenuItem(value: 'cancelled', child: Text('Cancelled')),
       ],
     );
   }

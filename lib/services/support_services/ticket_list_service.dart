@@ -24,6 +24,32 @@ class TicketListService with ChangeNotifier {
   String _activeFilter = "all";
   String get activeFilter => _activeFilter;
 
+  List<Ticket> get filteredTickets {
+    final allTickets = ticketListModel.tickets;
+    if (_activeFilter == "all") return allTickets;
+
+    return allTickets.where((ticket) {
+      final status = ticket.status?.toLowerCase() ?? "";
+      switch (_activeFilter) {
+        case "pending":
+          return status == "pending" || status == "0";
+        case "accepted":
+          return status == "accepted" || status == "open" || status == "1";
+        case "in_progress":
+          return status == "in_progress" || status == "3";
+        case "completed":
+          return status == "completed" ||
+              status == "closed" ||
+              status == "close" ||
+              status == "2";
+        case "cancelled":
+          return status == "cancelled" || status == "canceled" || status == "4";
+        default:
+          return false;
+      }
+    }).toList();
+  }
+
   void setFilter(String filter) {
     if (_activeFilter == filter) return;
     _activeFilter = filter;
@@ -36,9 +62,7 @@ class TicketListService with ChangeNotifier {
   bool get shouldAutoFetch => _ticketListModel == null || token.isInvalid;
 
   String _buildUrl({int page = 1}) {
-    final base = '${AppUrls.ticketListListUrl}?page=$page&limit=15';
-    if (_activeFilter == "all") return base;
-    return '$base&status=$_activeFilter';
+    return '${AppUrls.ticketListListUrl}?page=$page&limit=15';
   }
 
   fetchTicketList() async {

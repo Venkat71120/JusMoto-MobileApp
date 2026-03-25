@@ -144,22 +144,33 @@ class _FranchiseServicesViewState extends State<FranchiseServicesView> {
 
   List<FranchiseTicketItem> _applyFilter(List<FranchiseTicketItem> all) {
     if (_filter == 'all') return all;
-    
+
     final target = _filter.toLowerCase();
     return all.where((t) {
       final status = t.status.toString().toLowerCase();
-      final targetMapped = target == 'closed' ? 'close' : target;
-      
-      // Explicit mapping for common values
-      if (target == 'pending') return status == 'pending' || status == '0';
-      if (target == 'open') return status == 'open' || status == '1';
-      if (target == 'accepted') return status == 'accepted';
-      if (target == 'in_progress') return status == 'in_progress' || status == 'progress' || status == '3';
-      if (target == 'completed') return status == 'completed' || status == 'complete';
-      if (target == 'cancelled') return status == 'cancelled' || status == 'canceled';
-      if (target == 'closed') return status == 'closed' || status == 'close' || status == '2';
-      
-      return status == targetMapped;
+
+      // Mapping logic aligned with string_extension.dart and User login fix
+      switch (target) {
+        case 'pending':
+          return status == 'pending' || status == '0';
+        case 'accepted':
+          return status == 'accepted' || status == 'open' || status == '1';
+        case 'in_progress':
+          return status == 'in_progress' || status == 'progress' || status == '3';
+        case 'completed':
+        case 'closed':
+          // Franchise UI has both "Completed" and "Closed" chips, 
+          // but they generally map to the same backend states.
+          return status == 'completed' ||
+              status == 'complete' ||
+              status == 'closed' ||
+              status == 'close' ||
+              status == '2';
+        case 'cancelled':
+          return status == 'cancelled' || status == 'canceled' || status == '4';
+        default:
+          return status == target;
+      }
     }).toList();
   }
 

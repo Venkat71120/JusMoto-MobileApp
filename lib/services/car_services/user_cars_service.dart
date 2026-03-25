@@ -11,6 +11,7 @@ class UserSelectedCarModel {
   final dynamic brandId;
   final dynamic carId;
   final dynamic variantId;
+  final String? variantName;
   final String? registrationNumber;
   final dynamic isDefault;
   final dynamic status;
@@ -24,6 +25,7 @@ class UserSelectedCarModel {
     this.brandId,
     this.carId,
     this.variantId,
+    this.variantName,
     this.registrationNumber,
     this.isDefault,
     this.status,
@@ -39,6 +41,7 @@ class UserSelectedCarModel {
         brandId: json["brand_id"],
         carId: json["car_id"],
         variantId: json["variant_id"],
+        variantName: json["variant_name"]?.toString() ?? json["variant"]?["name"]?.toString(),
         registrationNumber: json["registration_number"]?.toString(),
         isDefault: json["is_default"],
         status: json["status"],
@@ -53,6 +56,7 @@ class UserSelectedCarModel {
         "brand_id": brandId,
         "car_id": carId,
         "variant_id": variantId,
+        "variant_name": variantName,
         "registration_number": registrationNumber,
         "is_default": isDefault,
         "status": status,
@@ -111,6 +115,7 @@ class UserCarsService with ChangeNotifier {
     dynamic brandId,
     dynamic carId,
     dynamic variantId,
+    String? variantName,
     String? registrationNumber,
     bool isDefault = true,
   }) async {
@@ -127,6 +132,10 @@ class UserCarsService with ChangeNotifier {
 
     if (variantId != null) {
       data["variant_id"] = variantId.toString();
+    }
+
+    if (variantName != null && variantName.isNotEmpty) {
+      data["variant_name"] = variantName;
     }
 
     if (registrationNumber != null && registrationNumber.isNotEmpty) {
@@ -148,6 +157,7 @@ class UserCarsService with ChangeNotifier {
     dynamic brandId,
     dynamic carId,
     dynamic variantId,
+    String? variantName,
     String? registrationNumber,
     bool isDefault = true,
   }) async {
@@ -164,6 +174,10 @@ class UserCarsService with ChangeNotifier {
 
     if (variantId != null) {
       data["variant_id"] = variantId.toString();
+    }
+
+    if (variantName != null && variantName.isNotEmpty) {
+      data["variant_name"] = variantName;
     }
 
     if (registrationNumber != null && registrationNumber.isNotEmpty) {
@@ -210,5 +224,12 @@ class UserCarsService with ChangeNotifier {
       return true;
     }
     return false;
+  }
+
+  void reset() {
+    _userCarsModel = null;
+    token = "";
+    isLoading = false;
+    notifyListeners();
   }
 }

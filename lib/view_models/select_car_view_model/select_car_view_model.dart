@@ -13,7 +13,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/car_services/user_cars_service.dart';
-import '../../services/car_services/variant_list_service.dart';
 import '../../views/splash_view/splash_view.dart';
 
 class SelectCarViewModel {
@@ -25,9 +24,11 @@ class SelectCarViewModel {
   PageController pageController = PageController(initialPage: 0);
   final ValueNotifier<List<ModelVariant>> variantsList = ValueNotifier([]);
   final TextEditingController regNoController = TextEditingController();
+  final TextEditingController customVariantController = TextEditingController();
   
   dynamic editingCarId;
   bool get isEditing => editingCarId != null;
+  bool get isCustomVariant => selectedVariant.value?.id == -1;
 
   SelectCarViewModel._init();
   static SelectCarViewModel? _instance;
@@ -71,12 +72,13 @@ class SelectCarViewModel {
         break;
       default:
         // Variant Page (Index 2)
-        final variants = Provider.of<VariantListService>(context, listen: false)
-            .variantListModel
-            .allVariants ?? [];
-        if (variants.isNotEmpty && selectedVariant.value == null) {
-           "Please select variant type".showToast();
-           return;
+        if (selectedVariant.value == null) {
+          "Please select a variant".showToast();
+          return;
+        }
+        if (isCustomVariant && customVariantController.text.trim().isEmpty) {
+          "Please enter your custom variant name".showToast();
+          return;
         }
 
         // Save to backend garage
@@ -86,7 +88,8 @@ class SelectCarViewModel {
             id: editingCarId,
             brandId: selectedBrand.value?.id,
             carId: selectedCar.value?.id,
-            variantId: selectedVariant.value?.id,
+            variantId: isCustomVariant ? null : selectedVariant.value?.id,
+            variantName: isCustomVariant ? customVariantController.text.trim() : null,
             registrationNumber: regNoController.text.trim().isEmpty ? null : regNoController.text.trim(),
             isDefault: true,
           );
@@ -94,7 +97,8 @@ class SelectCarViewModel {
           success = await Provider.of<UserCarsService>(context, listen: false).addUserCar(
             brandId: selectedBrand.value?.id,
             carId: selectedCar.value?.id,
-            variantId: selectedVariant.value?.id,
+            variantId: isCustomVariant ? null : selectedVariant.value?.id,
+            variantName: isCustomVariant ? customVariantController.text.trim() : null,
             registrationNumber: regNoController.text.trim().isEmpty ? null : regNoController.text.trim(),
             isDefault: true,
           );
@@ -112,11 +116,22 @@ class SelectCarViewModel {
         final tempCar = CarModel.fromJson(selectedCar.value?.toJson() ?? {});
         LandingViewModel.instance.selectedCar.value = tempCar;
         sPref?.setString("car", jsonEncode(tempCar.toJson()));
+
+        ModelVariant? variantToSave = selectedVariant.value;
+        if (isCustomVariant) {
+          variantToSave = ModelVariant(
+            id: -1,
+            name: customVariantController.text.trim(),
+          );
+        }
+
+        LandingViewModel.instance.selectedVariant.value = variantToSave;
+        
         sPref?.setString(
           "vId",
-          selectedVariant.value?.id?.toString() ?? "",
+          variantToSave?.id?.toString() ?? "",
         );
-        sPref?.setString("selectedVariant", jsonEncode(selectedVariant.value?.toJson() ?? {}));
+        sPref?.setString("selectedVariant", jsonEncode(variantToSave?.toJson() ?? {}));
         Provider.of<CartService>(context, listen: false).clearCart();
         context.pop;
     }
@@ -151,6 +166,16 @@ class SelectCarViewModel {
     
     selectedBrand.value = BrandModel(id: car.brandId, name: car.brandName);
     selectedCar.value = CarModel(id: car.carId, name: car.carName, image: car.carImage);
-    selectedVariant.value = ModelVariant(id: car.variantId);
+
+    if (car.variantId != null && car.variantId.toString() != "-1") {
+      selectedVariant.value = ModelVariant(id: car.variantId);
+      customVariantController.clear();
+    } else if (car.variantName != null && car.variantName!.isNotEmpty) {
+      selectedVariant.value = ModelVariant(id: -1, name: "Custom");
+      customVariantController.text = car.variantName!;
+    } else {
+      selectedVariant.value = null;
+      customVariantController.clear();
+    }
   }
 }

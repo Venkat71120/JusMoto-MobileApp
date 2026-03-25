@@ -91,7 +91,7 @@ class SupportTicketView extends StatelessWidget {
                 shimmer: const TicketListSkeleton(),
                 child:
                     Consumer<TicketListService>(builder: (context, tl, child) {
-                  return tl.ticketListModel.tickets.isEmpty
+                  return tl.filteredTickets.isEmpty
                       ? EmptyWidget(title: LocalKeys.noTicketsFound)
                       : CustomScrollView(
                           slivers: [
@@ -99,11 +99,11 @@ class SupportTicketView extends StatelessWidget {
                             SliverList.separated(
                               itemBuilder: (context, index) {
                                 final ticket =
-                                    tl.ticketListModel.tickets[index];
+                                    tl.filteredTickets[index];
                                 return TicketTile(ticket: ticket);
                               },
                               separatorBuilder: (context, index) => 12.toHeight,
-                              itemCount: tl.ticketListModel.tickets.length,
+                              itemCount: tl.filteredTickets.length,
                             ),
                             24.toHeight.toSliver,
                             if (tl.nextPage != null && !tl.nexLoadingFailed)

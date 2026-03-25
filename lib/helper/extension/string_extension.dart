@@ -592,23 +592,25 @@ extension RefundStatusExtension on String {
 extension TicketStatusExtension on String {
   String get getTicketStatus {
     switch (toLowerCase()) {
-      case "open":
-      case "accepted":
       case "pending":
       case "0":
+        return LocalKeys.pending;
+      case "open":
+      case "accepted":
       case "1":
         return LocalKeys.accepted; // Label: "Accepted"
       case "in_progress":
       case "3":
         return "In Progress";
-      case "closed":
-      case "close":
       case "completed":
+      case "close":
+      case "closed":
+      case "2":
+        return LocalKeys.complete; // Label: "Completed"
       case "cancelled":
       case "canceled":
-      case "2":
       case "4":
-        return LocalKeys.complete; // Label: "Completed"
+        return LocalKeys.canceled; // Label: "Cancelled"
       default:
         return capitalize;
     }

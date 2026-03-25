@@ -109,6 +109,16 @@ class ModelVariant {
     "engineType": engineType?.toJson(),
     "fuelType": fuelType?.toJson(),
   };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ModelVariant &&
+          runtimeType == other.runtimeType &&
+          id.toString() == other.id.toString();
+
+  @override
+  int get hashCode => id.toString().hashCode;
 }
 
 class VariantTypes {

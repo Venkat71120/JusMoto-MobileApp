@@ -67,4 +67,12 @@ class VariantListService with ChangeNotifier {
     nextPageLoading = false;
     notifyListeners();
   }
+
+  void reset() {
+    _variantListModel = null;
+    token = "";
+    carId = "";
+    nextPage = null;
+    notifyListeners();
+  }
 }

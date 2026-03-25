@@ -60,4 +60,11 @@ class BrandListService with ChangeNotifier {
     nextPageLoading = false;
     notifyListeners();
   }
+
+  void reset() {
+    _myBrandsModel = null;
+    token = "";
+    nextPage = null;
+    notifyListeners();
+  }
 }

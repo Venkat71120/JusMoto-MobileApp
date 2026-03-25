@@ -254,6 +254,7 @@ class DefaultThemes {
       ThemeData(
         useMaterial3: true,
         primaryColor: primaryColor,
+        fontFamily: 'Plus Jakarta Sans',
         textTheme: textTheme(context),
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor,

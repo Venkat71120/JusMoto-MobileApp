@@ -69,6 +69,14 @@ class MyCarCard extends StatelessWidget {
                             car.carName ?? "Unknown Model",
                             style: context.titleMedium?.bold,
                           ),
+                          if (car.variantName != null &&
+                              car.variantName!.isNotEmpty)
+                            Text(
+                              car.variantName!,
+                              style: context.bodySmall?.copyWith(
+                                color: context.color.secondaryContrastColor,
+                              ),
+                            ),
                         ],
                       ),
                     ),
