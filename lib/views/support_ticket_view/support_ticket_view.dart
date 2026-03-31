@@ -56,12 +56,6 @@ class SupportTicketView extends StatelessWidget {
                         ),
                         8.toWidth,
                         _FilterChip(
-                          label: "Accepted",
-                          isSelected: tl.activeFilter == "accepted",
-                          onTap: () => tl.setFilter("accepted"),
-                        ),
-                        8.toWidth,
-                        _FilterChip(
                           label: "In Progress",
                           isSelected: tl.activeFilter == "in_progress",
                           onTap: () => tl.setFilter("in_progress"),

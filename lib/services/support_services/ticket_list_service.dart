@@ -32,9 +32,8 @@ class TicketListService with ChangeNotifier {
       final status = ticket.status?.toLowerCase() ?? "";
       switch (_activeFilter) {
         case "pending":
-          return status == "pending" || status == "0";
-        case "accepted":
-          return status == "accepted" || status == "open" || status == "1";
+          return status == "pending" || status == "0" ||
+              status == "accepted" || status == "open" || status == "1";
         case "in_progress":
           return status == "in_progress" || status == "3";
         case "completed":

@@ -5,8 +5,9 @@ import 'package:car_service/helper/extension/widget_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/utils/components/navigation_pop_icon.dart';
 import 'package:car_service/view_models/Franchise_sign_in_Model/FranchiseLoginViewModel.dart';
-import 'package:car_service/view_models/sign_in_with_otp_view_model/sign_in_with_otp_view_model.dart';
+import 'package:car_service/view_models/Admin_sign_in_Model/AdminLoginViewModel.dart';
 import 'package:car_service/views/Franchise_sign_in_view/FranchiseLoginView.dart';
+import 'package:car_service/views/Admin_sign_in_view/AdminLoginView.dart';
 import 'package:car_service/views/sign_in_view/components/email_sign_in.dart';
 import 'package:car_service/views/sign_in_view/components/social_sign_in_button.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,19 @@ class SignInView extends StatelessWidget {
                   FocusScope.of(context).unfocus();
                   FranchiseLoginViewModel.dispose;
                   context.toPage(const FranchiseLoginView());
+                },
+              ),
+              
+              12.toHeight,
+
+              // ✅ Admin Login Button
+              SocialSignInButton(
+                title: 'Admin Login',
+                image: 'lock',
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  AdminLoginViewModel.dispose;
+                  context.toPage(const AdminLoginView());
                 },
               ),
               

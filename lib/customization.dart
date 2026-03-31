@@ -1,8 +1,4 @@
-String siteLink = 'https://16.112.128.19.nip.io';
-// String siteLink = 'https://jusmoto.blackitechs.in';
-// String siteLink = 'https://fk2hvkfk-4200.inc1.devtunnels.ms';
-
-
+String siteLink = 'https://jusmoto.blackitechs.in';
 
 String appLabel = 'JusMoto';
 String storeLabel = "JusMoto";

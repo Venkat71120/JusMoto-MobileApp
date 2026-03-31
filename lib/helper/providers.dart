@@ -16,9 +16,14 @@ import '../services/auth_services/email_otp_service.dart';
 import '../services/auth_services/phone_manage_service.dart';
 import '../services/auth_services/sign_in_service.dart';
 import '../services/auth_services/sign_up_service.dart';
+import '../services/auth_services/AdminLoginService.dart';
+import '../services/admin_services/AdminDashboardService.dart';
 import '../services/auth_services/FranchiseLoginService.dart';
-// ✅ ADD THIS IMPORT
+import '../services/admin_services/AdminUsersService.dart';
+import '../services/admin_services/AdminOrdersService.dart';
+import '../services/admin_services/AdminTicketsService.dart';
 import '../services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
+
 import '../services/booking_services/booking_addons_service.dart';
 import '../services/booking_services/booking_schedule_service.dart';
 import '../services/booking_services/hire_provider_from_offer_service.dart';
@@ -77,8 +82,11 @@ class Providers {
     ChangeNotifierProvider(create: (context) => ChatListService()),
     ChangeNotifierProvider(create: (context) => SignInService()),
     ChangeNotifierProvider(create: (context) => SignUpService()),
-    ChangeNotifierProvider(create: (context) => FranchiseLoginService()),
-    // ✅ ADD THIS LINE
+    ChangeNotifierProvider(create: (context) => AdminLoginService()),
+    ChangeNotifierProvider(create: (context) => AdminDashboardService()),
+    ChangeNotifierProvider(create: (context) => AdminUsersService()),
+    ChangeNotifierProvider(create: (context) => AdminOrdersService()),
+    ChangeNotifierProvider(create: (context) => AdminTicketsService()),
     ChangeNotifierProvider(create: (context) => FranchiseDashboardService()),
     ChangeNotifierProvider(create: (context) => RatingAndReviewsService()),
     ChangeNotifierProvider(create: (context) => ProfileInfoService()),

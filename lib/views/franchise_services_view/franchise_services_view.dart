@@ -152,15 +152,11 @@ class _FranchiseServicesViewState extends State<FranchiseServicesView> {
       // Mapping logic aligned with string_extension.dart and User login fix
       switch (target) {
         case 'pending':
-          return status == 'pending' || status == '0';
-        case 'accepted':
-          return status == 'accepted' || status == 'open' || status == '1';
+          return status == 'pending' || status == '0' ||
+              status == 'accepted' || status == 'open' || status == '1';
         case 'in_progress':
           return status == 'in_progress' || status == 'progress' || status == '3';
         case 'completed':
-        case 'closed':
-          // Franchise UI has both "Completed" and "Closed" chips, 
-          // but they generally map to the same backend states.
           return status == 'completed' ||
               status == 'complete' ||
               status == 'closed' ||
@@ -528,12 +524,7 @@ class _FilterBarDelegate extends SliverPersistentHeaderDelegate {
                   onTap: () => onChanged('pending')),
               SizedBoxExtension(10).toWidth,
               _FilterChip(
-                  label: 'Accepted',
-                  selected: filter == 'accepted',
-                  onTap: () => onChanged('accepted')),
-              SizedBoxExtension(10).toWidth,
-              _FilterChip(
-                  label: 'Progress (${stats.inProgress})',
+                  label: 'In Progress',
                   selected: filter == 'in_progress',
                   onTap: () => onChanged('in_progress')),
               SizedBoxExtension(10).toWidth,
@@ -546,11 +537,6 @@ class _FilterBarDelegate extends SliverPersistentHeaderDelegate {
                   label: 'Cancelled',
                   selected: filter == 'cancelled',
                   onTap: () => onChanged('cancelled')),
-              SizedBoxExtension(10).toWidth,
-              _FilterChip(
-                  label: 'Closed (${stats.closed})',
-                  selected: filter == 'closed',
-                  onTap: () => onChanged('closed')),
             ],
           ),
         ),

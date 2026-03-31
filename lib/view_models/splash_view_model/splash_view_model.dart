@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
 import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
+import 'package:car_service/services/auth_services/AdminLoginService.dart';
 import 'package:car_service/services/dynamics/cancellation_policy_service.dart';
 import 'package:car_service/services/home_services/home_category_service.dart';
 import 'package:car_service/services/home_services/home_featured_services_service.dart';
@@ -12,8 +13,10 @@ import 'package:car_service/services/home_services/home_slider_service.dart';
 import 'package:car_service/services/service/cart_service.dart';
 import 'package:car_service/services/service/favorite_services_service.dart';
 import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
+import 'package:car_service/view_models/Admin_landing_view_model/AdminLandingViewModel.dart';
 import 'package:car_service/view_models/landding_view_model/landding_view_model.dart';
 import 'package:car_service/views/Franchise_landing_nav_view/FranchiseLandingView.dart';
+import 'package:car_service/views/Admin_landing_nav_view/AdminLandingView.dart';
 import 'package:car_service/views/landing_view/landing_view.dart';
 import 'package:car_service/views/select_car_view/select_car_view.dart';
 import 'package:car_service/views/sign_in_view/sign_in_view.dart';
@@ -79,6 +82,24 @@ class SplashViewModel {
       CancellationPolicyService.instance.fetchCancellationPolicy();
       context.toUntilPage(const IntroView());
     } else {
+      // ✅ CRITICAL: Check Admin session first (higher privilege than franchise)
+      final alService = Provider.of<AdminLoginService>(context, listen: false);
+      await alService.initAdminData();
+
+      final isAdmin = alService.isAdminUser;
+      final hasAdminToken = alService.token.isNotEmpty;
+
+      debugPrint("🔍 isAdmin: $isAdmin, hasAdminToken: $hasAdminToken");
+
+      if (isAdmin && hasAdminToken) {
+        // ✅ ADMIN USER FLOW
+        debugPrint("🛡️ Admin user detected - navigating to AdminLandingView");
+        PushNotificationService().updateDeviceToken();
+        Provider.of<ChatCredentialService>(context, listen: false).initLocal();
+        AdminLandingViewModel.instance.currentIndex.value = 0;
+        context.toUntilPage(const AdminLandingView());
+
+      } else {
       // ✅ CRITICAL: Initialize franchise data from SharedPreferences FIRST
       final flService = Provider.of<FranchiseLoginService>(context, listen: false);
       await flService.initFranchiseData();
@@ -128,7 +149,8 @@ class SplashViewModel {
           context.toUntilPage(const LandingView());
         }
       }
-    }
+      } // closes the admin else block
+    } // closes the gotoIntro else block
     
     try {
       await NotificationHelper().notificationsSetup();

@@ -1,6 +1,7 @@
 import '/customization.dart';
 
-const String _otpBaseUrl = 'https://16.112.128.19.nip.io/api/v1';
+// OTP and Auth now use the same base domain as the rest of the application
+String get _otpBaseUrl => baseEndPoint;
 
 class AppUrls {
   static String get statesUrl => '$baseEndPoint/general/states';
@@ -56,8 +57,19 @@ class AppUrls {
   static String get emailSignUpUrl => '$baseEndPoint/auth/register';
   static String get socialSignInUrl => '$baseEndPoint/auth/social/login';
 
-  // ✅ NEW: Franchise login endpoint
+  // ✅ CORRECTED: Franchise/Admin login endpoint (proven by Franchise success)
   static String get franchiseLoginUrl => '$baseEndPoint/auth/admin/login';
+
+  // ✅ CORRECTED: Admin endpoint (proven by Franchise success)
+  static String get adminLoginUrl => '$baseEndPoint/auth/admin/login';
+  static String get adminDashboardUrl => '$baseEndPoint/admin/dashboard';
+  static String get adminUsersUrl => '$baseEndPoint/admin/users';
+  static String get adminStaffUrl => '$baseEndPoint/admin/staff';
+  static String get adminFranchisesUrl => '$baseEndPoint/admin/franchises';
+  static String get adminOrdersUrl => '$baseEndPoint/admin/orders';
+  static String get adminOrderDetailsUrl => '$baseEndPoint/admin/orders';
+  static String get adminTicketsUrl => '$baseEndPoint/admin/tickets';
+  static String get adminTicketDetailsUrl => '$baseEndPoint/admin/tickets';
 
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';

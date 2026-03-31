@@ -119,10 +119,24 @@ class AddEditAddressView extends StatelessWidget {
                             },
                           ),
                           FieldWithLabel(
-                            label: LocalKeys.zipCode,
-                            hintText: LocalKeys.enterZipCode,
+                            label: "Pincode",
+                            hintText: "Enter 6-digit pincode",
                             isRequired: true,
                             controller: aea.zipCodeController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 6,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: (value) {
+                              if ((value ?? "").isEmpty) {
+                                return "Pincode is required";
+                              }
+                              if ((value ?? "").length != 6) {
+                                return "Please enter a valid 6-digit pincode";
+                              }
+                              return null;
+                            },
                           ),
                           FieldWithLabel(
                             label: LocalKeys.phone,
