@@ -79,15 +79,24 @@ class SplashViewModel {
       CancellationPolicyService.instance.fetchCancellationPolicy();
       context.toUntilPage(const IntroView());
     } else {
+      // ✅ Check if login session has expired (6 months)
+      if (isSessionExpired()) {
+        debugPrint("⏰ Session expired (older than $sessionDurationDays days) — logging out");
+        setToken("");
+        clearLoginTimestamp();
+        sPref?.remove("is_franchise");
+        LocalKeys.sessionExpired.showToast();
+      }
+
       // ✅ CRITICAL: Initialize franchise data from SharedPreferences FIRST
       final flService = Provider.of<FranchiseLoginService>(context, listen: false);
       await flService.initFranchiseData();
-      
+
       final isFranchise = flService.isFranchiseUser;
       final hasToken = flService.token.isNotEmpty;
-      
+
       debugPrint("🔍 Checking user type - isFranchise: $isFranchise, hasToken: $hasToken");
-      
+
       if (isFranchise && hasToken) {
         // ✅ FRANCHISE USER FLOW
         debugPrint("👤 Franchise user detected - navigating to FranchiseLandingView");

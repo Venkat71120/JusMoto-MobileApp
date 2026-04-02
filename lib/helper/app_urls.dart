@@ -52,7 +52,7 @@ class AppUrls {
   static String get conversationUrl => '$baseEndPoint/client/chat/fetch-record';
   static String get messageSendUrl => '$baseEndPoint/client/chat/message-send';
   static String get signInUrl => '$_otpBaseUrl/auth/login';
-  static String get otpSignInUrl => "$baseEndPoint/login-otp/verification";
+  static String get otpSignInUrl => "$baseEndPoint/auth/verify-otp";
   static String get emailSignUpUrl => '$baseEndPoint/auth/register';
   static String get socialSignInUrl => '$baseEndPoint/auth/social/login';
 
@@ -130,7 +130,7 @@ class AppUrls {
       '$baseEndPoint/user/settings/account-delete';
   static String get changeEmailUrl => '$_otpBaseUrl/user/change-email';
   static String get verifyEmailOtpUrl => '$_otpBaseUrl/user/verify-email-otp';
-  static String get sentOtpToPhoneUrl => '$baseEndPoint/login-otp/send';
+  static String get sentOtpToPhoneUrl => '$baseEndPoint/auth/send-otp';
   static String get verifyPhoneUrl => '$baseEndPoint/login-otp/verification';
   static String get changePhoneUrl => '$baseEndPoint/user/change-phone-number';
   static String get completeRequestHistoryUrl =>
@@ -150,6 +150,12 @@ class AppUrls {
       '$baseEndPoint/notifications/unread-count';
   static String get chatCredentialUrl => '$baseEndPoint/live-chat/credentials';
   static String get editJobUrl => '$baseEndPoint/client/job/edit';
+
+  // Custom Service Requests (user side)
+  static String get customServiceRequestsUrl =>
+      '$baseEndPoint/user/service-requests';
+  static String get createCustomServiceRequestUrl =>
+      '$baseEndPoint/user/service-requests';
 
   // ✅ NEW: Active offers endpoint
   static String get activeOffersUrl => '$baseEndPoint/general/offers';

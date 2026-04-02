@@ -281,6 +281,7 @@ abstract class LocalKeys {
   static const String _doNotHaveAccount = "Don't have an account?";
   static const String _signUp = "Sign up";
   static const String _otpSignIn = "Sign In with OTP";
+  static const String _signInWithMobileNumber = "Sign in with Mobile Number";
   static const String _signInFailed = "Sign In Failed";
   static const String _signInWithGoogle = "Sign in with Google";
   static const String _signInWithFacebook = "Sign in with Facebook";
@@ -877,6 +878,7 @@ abstract class LocalKeys {
   static String get signInWithGoogle => _signInWithGoogle.tr();
   static String get signInFailed => _signInFailed.tr();
   static String get otpSignIn => _otpSignIn.tr();
+  static String get signInWithMobileNumber => _signInWithMobileNumber.tr();
   static String get signUp => _signUp.tr();
   static String get doNotHaveAccount => _doNotHaveAccount.tr();
   static String get rememberMe => _rememberMe.tr();

@@ -70,6 +70,7 @@ class ProfileInfoService with ChangeNotifier {
     _profileInfoModel = null;
     sPref?.remove("profile");
     setToken(null);
+    clearLoginTimestamp();
     notifyListeners();
     debugPrint('🔄 Profile reset');
   }

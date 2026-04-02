@@ -2,6 +2,7 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/utils/components/custom_button.dart';
+import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:car_service/utils/components/field_with_label.dart';
 import 'package:car_service/utils/components/navigation_pop_icon.dart';
 import 'package:car_service/view_models/sign_in_with_otp_view_model/sign_in_with_otp_view_model.dart';
@@ -14,47 +15,64 @@ class SignInWithOtpView extends StatelessWidget {
   Widget build(BuildContext context) {
     final sio = SignInWithOtpViewModel.instance;
     return Scaffold(
-      backgroundColor: context.color.accentContrastColor,
       appBar: AppBar(
         leading: const NavigationPopIcon(),
+        title: Text(LocalKeys.signInWithMobileNumber),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Form(
           key: sio.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                LocalKeys.otpSignIn,
-                style: context.titleLarge?.bold,
-              ),
-              32.toHeight,
-              FieldWithLabel(
-                label: LocalKeys.phone,
-                hintText: "+8801938000000",
-                isRequired: true,
-                keyboardType: TextInputType.number,
-                controller: sio.phoneController,
-                validator: (value) {
-                  if (value.toString().length < 5) {
-                    return LocalKeys.enterAValidPhoneNumber;
-                  }
-                  return null;
-                },
-              ),
-              12.toHeight,
-              ValueListenableBuilder(
-                valueListenable: sio.isLoading,
-                builder: (context, value, child) => CustomButton(
-                  onPressed: () {
-                    sio.trySignIn(context);
-                  },
-                  btText: LocalKeys.continueO,
-                  isLoading: value,
+          child: SquircleContainer(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            color: context.color.accentContrastColor,
+            radius: 12,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                16.toHeight,
+                Text(
+                  LocalKeys.verificationCodeWillBeSentToTheNewPhone,
+                  style: context.bodyMedium,
                 ),
-              )
-            ],
+                24.toHeight,
+                FieldWithLabel(
+                  label: LocalKeys.phone,
+                  hintText: LocalKeys.phoneNumberHint,
+                  controller: sio.phoneController,
+                  keyboardType: TextInputType.phone,
+                  maxLength: 10,
+                  isRequired: true,
+                  validator: (value) {
+                    if (value.toString().length < 5) {
+                      return LocalKeys.enterAValidPhoneNumber;
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          color: context.color.accentContrastColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: ValueListenableBuilder(
+          valueListenable: sio.isLoading,
+          builder: (context, value, child) => CustomButton(
+            onPressed: () {
+              sio.trySignIn(context);
+            },
+            btText: LocalKeys.sendVerificationCode,
+            isLoading: value,
           ),
         ),
       ),

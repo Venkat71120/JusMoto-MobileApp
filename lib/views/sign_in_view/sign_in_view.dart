@@ -65,16 +65,7 @@ class SignInView extends StatelessWidget {
               ),
               
               12.toHeight,
-              
-              // Optional: Uncomment if you want OTP sign-in
-              // SocialSignInButton(
-              //     title: LocalKeys.otpSignIn,
-              //     image: null,
-              //     onTap: () {
-              //       SignInWithOtpViewModel.dispose;
-              //       context.toPage(const SignInWithOtpView());
-              //     }),
-              
+
               24.toHeight,
               const CreateAccount(),
               24.toHeight,

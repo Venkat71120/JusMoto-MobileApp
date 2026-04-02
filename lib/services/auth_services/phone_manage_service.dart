@@ -28,7 +28,7 @@ class PhoneManageService with ChangeNotifier {
     final responseData = await NetworkApiServices().postApi(
       data,
       AppUrls.sentOtpToPhoneUrl,
-      LocalKeys.signUp,
+      LocalKeys.signIn,
     );
 
     if (responseData != null) {
@@ -146,6 +146,7 @@ class PhoneManageService with ChangeNotifier {
       phoneVerifyLoading = false;
       final token = responseData["token"];
       setToken(token);
+      setLoginTimestamp();
       notifyListeners();
       return true;
     } else if (responseData != null && responseData.containsKey("message")) {

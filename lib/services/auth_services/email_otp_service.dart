@@ -121,6 +121,7 @@ class EmailManageService with ChangeNotifier {
     if (responseData != null && responseData['success'] == true) {
       if (responseData['data'] != null && responseData['data']['token'] != null) {
         setToken(responseData['data']['token'].toString());
+        setLoginTimestamp();
         debugPrint('✅ Token updated after email verification');
       }
       return true;

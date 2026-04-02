@@ -57,6 +57,7 @@ import '../services/service/favorite_services_service.dart';
 import '../services/service/service_by_category_service.dart';
 import '../services/service/service_by_offer_service.dart';
 import '../services/service/services_search_service.dart';
+import '../services/custom_service_request_service.dart';
 import '../services/support_services/ticket_conversation_service.dart';
 import '../services/support_services/ticket_list_service.dart';
 import '../services/socket_service.dart';
@@ -126,6 +127,7 @@ class Providers {
     ChangeNotifierProvider(create: (context) => FranchiseOrdersService()),
     ChangeNotifierProvider(create: (context) => FranchiseTicketsService()),
     ChangeNotifierProvider(create: (context) => SocketService()),
+    ChangeNotifierProvider(create: (context) => CustomServiceRequestService()),
     
   ];
 }

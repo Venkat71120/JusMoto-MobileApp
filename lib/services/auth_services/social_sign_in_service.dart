@@ -92,7 +92,8 @@ class SignInService with ChangeNotifier {
       
       // ✅ THEN save to SharedPreferences
       setToken(token);
-      
+      setLoginTimestamp();
+
       print('✅ Token saved to SharedPreferences');
       
       return true;

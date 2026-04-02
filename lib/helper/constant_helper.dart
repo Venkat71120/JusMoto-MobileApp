@@ -35,6 +35,32 @@ setToken(token) {
   sPref?.setString("token", token ?? "");
 }
 
+/// Session duration: 6 months (180 days)
+const int sessionDurationDays = 180;
+
+/// Save the login timestamp when user logs in
+setLoginTimestamp() {
+  sPref?.setString("login_timestamp", DateTime.now().toIso8601String());
+}
+
+/// Clear the login timestamp on logout
+clearLoginTimestamp() {
+  sPref?.remove("login_timestamp");
+}
+
+/// Check if the login session has expired (older than 6 months)
+bool isSessionExpired() {
+  final timestamp = sPref?.getString("login_timestamp");
+  if (timestamp == null) {
+    // No timestamp means old session before this feature — treat as expired
+    return getToken.isNotEmpty;
+  }
+  final loginDate = DateTime.tryParse(timestamp);
+  if (loginDate == null) return true;
+  final now = DateTime.now();
+  return now.difference(loginDate).inDays >= sessionDurationDays;
+}
+
 get commonAuthHeader => {'Authorization': 'Bearer $getToken'};
 get acceptJsonHeader => {'Accept': 'application/json'};
 get acceptJsonAuthHeader =>

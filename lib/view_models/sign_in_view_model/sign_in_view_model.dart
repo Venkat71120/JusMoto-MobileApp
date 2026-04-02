@@ -103,6 +103,7 @@ class SignInViewModel {
       // ── Fully authenticated ──
       setUserInfo();
       setToken(siService.token);
+      setLoginTimestamp();
 
       if (siService.firstName == null) {
         // Profile incomplete — send to name/date setup

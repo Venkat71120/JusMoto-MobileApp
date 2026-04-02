@@ -1,9 +1,13 @@
 import 'package:car_service/helper/extension/int_extension.dart';
+import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/utils/components/custom_button.dart';
 import 'package:car_service/view_models/sign_in_view_model/sign_in_view_model.dart';
+import 'package:car_service/view_models/sign_in_with_otp_view_model/sign_in_with_otp_view_model.dart';
 import 'package:car_service/views/sign_in_view/components/remember_password.dart';
+import 'package:car_service/views/sign_in_with_otp_view/sign_in_with_otp_view.dart';
 import 'package:flutter/material.dart';
 
+import '../../../customizations/colors.dart';
 import '../../../helper/local_keys.g.dart';
 import '../../../utils/components/field_with_label.dart';
 import '../../../utils/components/pass_field_with_label.dart';
@@ -21,8 +25,44 @@ class EmailSignIn extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      text: LocalKeys.email,
+                      style: context.titleMedium!.copyWith(fontWeight: FontWeight.w600),
+                      children: [
+                        TextSpan(
+                          text: " *",
+                          style: context.titleMedium?.copyWith(
+                            color: context.color.primaryWarningColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                      SignInWithOtpViewModel.dispose;
+                      context.toPage(const SignInWithOtpView());
+                    },
+                    child: Text(
+                      LocalKeys.signInWithMobileNumber,
+                      style: context.bodySmall?.copyWith(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             FieldWithLabel(
-              label: LocalKeys.email,
+              label: null,
               hintText: LocalKeys.enterEmail,
               isRequired: true,
               controller: sim.emailController,

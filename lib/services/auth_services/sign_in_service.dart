@@ -101,6 +101,7 @@ class SignInService with ChangeNotifier {
       final dataObj = responseData['data'];
       token = dataObj['token'] ?? "";
       setToken(token); // persist to SharedPreferences
+      setLoginTimestamp();
       return true;
     } else if (responseData != null && responseData.containsKey("message")) {
       responseData["message"]?.toString().showToast();

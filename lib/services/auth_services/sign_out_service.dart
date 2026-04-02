@@ -27,11 +27,13 @@ class SignOutService {
       // ✅ Always clear local token regardless of response,
       //    since backend has no token blacklisting anyway.
       setToken("");
+      clearLoginTimestamp();
       return true;
     }
 
     // Fallback: clear local token even if the API call fails
     setToken("");
+    clearLoginTimestamp();
     return true;
   }
 }

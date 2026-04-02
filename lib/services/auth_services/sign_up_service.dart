@@ -59,6 +59,7 @@ class SignUpService with ChangeNotifier {
       // so acceptJsonAuthHeader is populated when profile setup is called.
       if (token.isNotEmpty) {
         setToken(token);
+        setLoginTimestamp();
         debugPrint('✅ Token set globally after registration');
       } else {
         debugPrint('❌ Token missing from registration response!');

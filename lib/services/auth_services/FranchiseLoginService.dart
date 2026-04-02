@@ -118,6 +118,7 @@ class FranchiseLoginService with ChangeNotifier {
         // ── Persist ──
         await sPref?.setString("token", token);
         setToken(token);
+        setLoginTimestamp();
         await sPref?.setBool("is_franchise", true);
         await sPref?.setString("franchise_username", this.username);
         await sPref?.setString("franchise_code", franchiseCode);
@@ -166,6 +167,7 @@ class FranchiseLoginService with ChangeNotifier {
     _isInitialized = false;
 
     setToken("");
+    clearLoginTimestamp();
     notifyListeners();
   }
 }

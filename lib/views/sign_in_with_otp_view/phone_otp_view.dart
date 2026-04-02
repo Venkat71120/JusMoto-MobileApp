@@ -194,7 +194,7 @@ class PhoneOtpView extends StatelessWidget {
                     ..onTap = () {
                       controller!.clear();
                       Provider.of<PhoneManageService>(context, listen: false)
-                          .trySendingOtpToNewPhone();
+                          .tryOtpToPhone();
                     },
                   text: LocalKeys.sendAgain,
                   style: const TextStyle(
