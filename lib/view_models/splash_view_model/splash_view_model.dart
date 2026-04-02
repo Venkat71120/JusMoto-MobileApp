@@ -89,7 +89,13 @@ class SplashViewModel {
       final isAdmin = alService.isAdminUser;
       final hasAdminToken = alService.token.isNotEmpty;
 
-      debugPrint("🔍 isAdmin: $isAdmin, hasAdminToken: $hasAdminToken");
+      // Debug: also check raw SharedPreferences directly
+      debugPrint("🔍 SPLASH DECISION:");
+      debugPrint("   is_admin (SP): ${sPref?.getBool('is_admin')}");
+      debugPrint("   admin_token (SP): ${(sPref?.getString('admin_token') ?? '').isNotEmpty}");
+      debugPrint("   is_franchise (SP): ${sPref?.getBool('is_franchise')}");
+      debugPrint("   token (SP/global): ${getToken.isNotEmpty}");
+      debugPrint("   alService.isAdmin: $isAdmin, hasAdminToken: $hasAdminToken");
 
       if (isAdmin && hasAdminToken) {
         // ✅ ADMIN USER FLOW
@@ -123,15 +129,21 @@ class SplashViewModel {
         
       } else {
         // ✅ REGULAR USER FLOW
-        debugPrint("👤 Regular user detected - navigating to LandingView");
-        
+        // Double-check: if admin/franchise flags exist in SharedPreferences but
+        // the token was empty above, clear the stale flags to avoid confusion
+        final isAdminFlag = sPref?.getBool("is_admin") ?? false;
+        final isFranchiseFlag = sPref?.getBool("is_franchise") ?? false;
+
+        if (isAdminFlag || isFranchiseFlag) {
+          // Stale admin/franchise flag with no token — clear it
+          debugPrint("⚠️ Stale session flag detected (admin=$isAdminFlag, franchise=$isFranchiseFlag) but no token. Clearing.");
+          if (isAdminFlag) await sPref?.remove("is_admin");
+          if (isFranchiseFlag) await sPref?.remove("is_franchise");
+        }
+
+        debugPrint("👤 Regular user flow - token exists: ${getToken.isNotEmpty}");
+
         initLocalData(context);
-        
-        // ✅ Only fetch profile for regular users
-        await Provider.of<ProfileInfoService>(
-          context,
-          listen: false,
-        ).fetchProfileInfo(trySkip: true);
 
         if (getToken.isEmpty) {
           // Not signed in — show sign-in page
@@ -139,14 +151,24 @@ class SplashViewModel {
             const SignInView(),
             then: (_) {
               if (!context.mounted) return;
+              // Only navigate to LandingView if user logged in as regular user
+              // (admin/franchise login handles its own navigation)
+              final alService = Provider.of<AdminLoginService>(context, listen: false);
+              final flService = Provider.of<FranchiseLoginService>(context, listen: false);
+              if (alService.isAdminUser || flService.isFranchiseUser) return;
               context.toUntilPage(const LandingView());
             },
           );
         } else {
-          // Signed in — go to home
+          // Signed in — go to home immediately, fetch profile in background
           final lm = LandingViewModel.instance;
           lm.initCar();
           context.toUntilPage(const LandingView());
+
+          Provider.of<ProfileInfoService>(
+            context,
+            listen: false,
+          ).fetchProfileInfo(trySkip: true);
         }
       }
       } // closes the admin else block
