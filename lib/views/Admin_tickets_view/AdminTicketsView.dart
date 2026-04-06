@@ -3,6 +3,7 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/view_models/admin_view_models/AdminTicketsViewModel.dart';
 import 'package:car_service/services/admin_services/AdminTicketsService.dart';
+import 'package:car_service/views/Admin_tickets_view/AdminTicketDetailView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +21,7 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
   void initState() {
     super.initState();
     _viewModel = AdminTicketsViewModel(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _viewModel.init();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _viewModel.init());
   }
 
   @override
@@ -30,38 +29,145 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
     return Scaffold(
       backgroundColor: context.color.backgroundColor,
       appBar: AppBar(
-        title: const Text('Service Requests', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Service Requests',
+            style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: context.color.primaryContrastColor)),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: context.color.accentContrastColor,
+        surfaceTintColor: context.color.accentContrastColor,
       ),
       body: Column(
         children: [
-          _buildFilters(),
+          // ── Search & Filter ────────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            color: context.color.accentContrastColor,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: context.color.backgroundColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextField(
+                      controller: _viewModel.searchController,
+                      style: context.bodySmall,
+                      decoration: InputDecoration(
+                        hintText: 'Search tickets...',
+                        hintStyle: context.bodySmall?.copyWith(
+                            color: context.color.tertiaryContrastColo),
+                        prefixIcon: Icon(Icons.search_rounded,
+                            size: 20,
+                            color: context.color.tertiaryContrastColo),
+                        border: InputBorder.none,
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      textInputAction: TextInputAction.search,
+                      onChanged: _viewModel.onSearchChanged,
+                      onSubmitted: (_) => _viewModel.fetchTickets(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    height: 42,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: context.color.backgroundColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _viewModel.statusFilter.isEmpty
+                            ? null
+                            : _viewModel.statusFilter,
+                        hint: Text('Status',
+                            style: context.bodySmall?.copyWith(
+                                color: context.color.tertiaryContrastColo)),
+                        isExpanded: true,
+                        icon: Icon(Icons.keyboard_arrow_down_rounded,
+                            size: 20,
+                            color: context.color.tertiaryContrastColo),
+                        style: context.bodySmall?.copyWith(
+                            color: context.color.primaryContrastColor),
+                        items: const [
+                          DropdownMenuItem(value: '', child: Text('All')),
+                          DropdownMenuItem(value: 'open', child: Text('Open')),
+                          DropdownMenuItem(value: 'closed', child: Text('Closed')),
+                        ],
+                        onChanged: (val) {
+                          _viewModel.onStatusFilterChanged(val);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Ticket List ────────────────────────────────────────────
           Expanded(
             child: Consumer<AdminTicketsService>(
-              builder: (context, service, child) {
+              builder: (context, service, _) {
                 if (service.loading && service.ticketList.tickets.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: primaryColor));
                 }
 
                 if (service.ticketList.tickets.isEmpty) {
-                  return const Center(child: Text('No service requests found'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.support_agent_rounded,
+                            size: 56,
+                            color: context.color.tertiaryContrastColo),
+                        12.toHeight,
+                        Text('No service requests found',
+                            style: context.bodyMedium?.copyWith(
+                                color: context.color.tertiaryContrastColo)),
+                      ],
+                    ),
+                  );
                 }
 
                 return RefreshIndicator(
+                  color: primaryColor,
                   onRefresh: () async => _viewModel.fetchTickets(),
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: service.ticketList.tickets.length + (service.ticketList.pagination.hasNextPage ? 1 : 0),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    itemCount: service.ticketList.tickets.length +
+                        (service.ticketList.pagination.hasNextPage ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == service.ticketList.tickets.length) {
-                        _viewModel.fetchTickets(page: service.ticketList.pagination.currentPage + 1);
-                        return const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()));
+                        _viewModel.fetchTickets(
+                            page: service.ticketList.pagination.currentPage + 1);
+                        return const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Center(
+                              child: CircularProgressIndicator(
+                                  color: primaryColor, strokeWidth: 2)),
+                        );
                       }
-
                       final ticket = service.ticketList.tickets[index];
-                      return _buildTicketCard(ticket);
+                      return _TicketCard(
+                        ticket: ticket,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AdminTicketDetailView(ticketId: ticket.id),
+                          ),
+                        ),
+                        onStatusChange: (status) => _viewModel.updateTicketStatus(ticket.id, status),
+                      );
                     },
                   ),
                 );
@@ -73,151 +179,144 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
     );
   }
 
-  Widget _buildFilters() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.white,
-      child: Column(
-        children: [
-          TextField(
-            controller: _viewModel.searchController,
-            decoration: InputDecoration(
-              hintText: 'Search service requests...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TICKET CARD
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _TicketCard extends StatelessWidget {
+  final dynamic ticket;
+  final VoidCallback onTap;
+  final Function(String) onStatusChange;
+
+  const _TicketCard({
+    required this.ticket,
+    required this.onTap,
+    required this.onStatusChange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final sColor = _statusColor(ticket.status);
+    final pColor = _priorityColor(ticket.priority);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: context.color.accentContrastColor,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-            onChanged: _viewModel.onSearchChanged,
-          ),
-          12.toHeight,
-          Row(
-            children: [
-              const Text('Status: ', style: TextStyle(fontWeight: FontWeight.w600)),
-              8.toWidth,
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
+          ],
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: pColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.flag_rounded, size: 18, color: pColor),
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _viewModel.statusFilter.isEmpty ? null : _viewModel.statusFilter,
-                      hint: const Text('All Statuses'),
-                      isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(value: '', child: Text('All Statuses')),
-                        DropdownMenuItem(value: 'pending', child: Text('Pending')),
-                        DropdownMenuItem(value: 'in_progress', child: Text('In Progress')),
-                        DropdownMenuItem(value: 'completed', child: Text('Completed')),
-                        DropdownMenuItem(value: 'cancelled', child: Text('Cancelled')),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ticket.title,
+                          style: context.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        4.toHeight,
+                        Row(
+                          children: [
+                            Icon(Icons.person_outline_rounded,
+                                size: 13, color: context.color.tertiaryContrastColo),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                ticket.customerName,
+                                style: context.bodySmall?.copyWith(
+                                    color: context.color.secondaryContrastColor),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
-                      onChanged: (val) {
-                        _viewModel.onStatusFilterChanged(val);
-                        setState(() {});
-                      },
                     ),
                   ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '#${ticket.id}',
+                        style: context.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w700, color: primaryColor),
+                      ),
+                      4.toHeight,
+                      Text(
+                        (ticket.createdAt as String).split('T')[0],
+                        style: context.bodySmall?.copyWith(
+                            color: context.color.tertiaryContrastColo, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: context.color.mutedContrastColor.withOpacity(0.4),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(14),
+                  bottomRight: Radius.circular(14),
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTicketCard(ticket) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    ticket.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              child: Row(
+                children: [
+                  _Chip(label: ticket.status.toUpperCase(), color: sColor),
+                  const SizedBox(width: 8),
+                  _Chip(label: ticket.priority.toUpperCase(), color: pColor),
+                  const Spacer(),
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_horiz_rounded,
+                        size: 20, color: context.color.tertiaryContrastColo),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    itemBuilder: (_) => [
+                      const PopupMenuItem(
+                          enabled: false,
+                          child: Text('Change Status',
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
+                      const PopupMenuItem(value: 'open', child: Text('Open', style: TextStyle(fontSize: 13))),
+                      const PopupMenuItem(value: 'closed', child: Text('Closed', style: TextStyle(fontSize: 13))),
+                    ],
+                    onSelected: onStatusChange,
                   ),
-                ),
-                PopupMenuButton<String>(
-                  child: _buildBadge(ticket.status, _getStatusColor(ticket.status)),
-                  itemBuilder: (context) => <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      enabled: false,
-                      child: Text('Change Status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[800])),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'pending',
-                      child: Text('Mark Pending'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'in_progress',
-                      child: Text('Mark In Progress'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'completed',
-                      child: Text('Mark Completed'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'cancelled',
-                      child: Text('Mark Cancelled'),
-                    ),
-                  ],
-                  onSelected: (val) {
-                    _viewModel.updateTicketStatus(ticket.id, val);
-                  },
-                ),
-              ],
-            ),
-            8.toHeight,
-            Row(
-              children: [
-                const Icon(Icons.person_outline, size: 14, color: Colors.grey),
-                4.toWidth,
-                Text(ticket.customerName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                const Spacer(),
-                const Icon(Icons.priority_high, size: 14, color: Colors.grey),
-                4.toWidth,
-                Text(
-                  ticket.priority.toUpperCase(),
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: _getPriorityColor(ticket.priority)),
-                ),
-              ],
-            ),
-            12.toHeight,
-            Row(
-              children: [
-                _buildInfoTag(Icons.business, ticket.departmentName),
-                12.toWidth,
-                _buildInfoTag(Icons.assignment_ind, ticket.assignedTo ?? 'Unassigned'),
-              ],
-            ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'ID: #${ticket.id}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  ticket.createdAt.split('T')[0],
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -225,71 +324,45 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
     );
   }
 
-  Widget _buildInfoTag(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: Colors.grey[600]),
-          6.toWidth,
-          Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[700])),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Color _getStatusColor(String status) {
+  Color _statusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return Colors.orange;
-      case 'in_progress':
-        return Colors.blue;
-      case 'completed':
-        return Colors.green;
-      case 'cancelled':
-        return Colors.red;
-      case 'open':
-        return Colors.blue; // Legacy
-      case 'closed':
-        return Colors.grey; // Legacy
-      default:
-        return Colors.orange;
+      case 'open': return Colors.green;
+      case 'in_progress': return Colors.orange;
+      case 'closed': return Colors.grey;
+      default: return Colors.blue;
     }
   }
 
-  Color _getPriorityColor(String priority) {
+  Color _priorityColor(String priority) {
     switch (priority.toLowerCase()) {
-      case 'urgent':
-      case 'high': return Colors.red;
-      case 'medium': return Colors.orange;
+      case 'urgent': return Colors.red;
+      case 'high': return Colors.orange;
+      case 'medium': return Colors.amber.shade700;
+      case 'normal': return Colors.blue;
       case 'low': return Colors.green;
       default: return Colors.grey;
     }
   }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _Chip({required this.label, required this.color});
 
   @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }

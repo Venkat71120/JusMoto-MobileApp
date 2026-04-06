@@ -35,9 +35,10 @@ class FranchiseLoginService with ChangeNotifier {
   // ─── Restore session from SharedPreferences on app start ─────────────────
 
   Future<void> initFranchiseData() async {
-    if (_isInitialized) return;
-
+    // Always re-read from SharedPreferences to ensure fresh state on app restart
     isFranchise = sPref?.getBool("is_franchise") ?? false;
+
+    debugPrint("initFranchiseData: is_franchise=$isFranchise");
 
     if (isFranchise) {
       token = sPref?.getString("token") ?? "";
@@ -45,6 +46,8 @@ class FranchiseLoginService with ChangeNotifier {
       franchiseCode = sPref?.getString("franchise_code") ?? "";
       franchiseLocation = sPref?.getString("franchise_location") ?? "";
       userId = sPref?.getString("user_id") ?? "";
+
+      debugPrint("initFranchiseData: token=${token.isNotEmpty ? 'EXISTS' : 'EMPTY'}");
 
       if (token.isNotEmpty) setToken(token);
     }

@@ -31,16 +31,19 @@ class AdminLoginService with ChangeNotifier {
   // ─── Restore session from SharedPreferences on app start ─────────────────
 
   Future<void> initAdminData() async {
-    if (_isInitialized) return;
-
+    // Always re-read from SharedPreferences to ensure fresh state on app restart
     isAdmin = sPref?.getBool("is_admin") ?? false;
+
+    debugPrint("initAdminData: is_admin=$isAdmin");
 
     if (isAdmin) {
       token = sPref?.getString("admin_token") ?? "";
       username = sPref?.getString("admin_username") ?? "";
       userId = sPref?.getString("admin_user_id") ?? "";
 
-      if (token.isNotEmpty) setToken(token); // Caution: this overrides global token. We may need to manage this if franchise and admin tokens clash. But typically they are separate runtimes.
+      debugPrint("initAdminData: token=${token.isNotEmpty ? 'EXISTS' : 'EMPTY'}");
+
+      if (token.isNotEmpty) setToken(token);
     }
 
     _isInitialized = true;
