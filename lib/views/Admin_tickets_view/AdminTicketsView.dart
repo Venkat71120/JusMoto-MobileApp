@@ -108,8 +108,10 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
                       isExpanded: true,
                       items: const [
                         DropdownMenuItem(value: '', child: Text('All Statuses')),
-                        DropdownMenuItem(value: 'open', child: Text('Open')),
-                        DropdownMenuItem(value: 'closed', child: Text('Closed')),
+                        DropdownMenuItem(value: 'pending', child: Text('Pending')),
+                        DropdownMenuItem(value: 'in_progress', child: Text('In Progress')),
+                        DropdownMenuItem(value: 'completed', child: Text('Completed')),
+                        DropdownMenuItem(value: 'cancelled', child: Text('Cancelled')),
                       ],
                       onChanged: (val) {
                         _viewModel.onStatusFilterChanged(val);
@@ -158,12 +160,20 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
                       child: Text('Change Status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[800])),
                     ),
                     const PopupMenuItem<String>(
-                      value: 'open',
-                      child: Text('Mark Open'),
+                      value: 'pending',
+                      child: Text('Mark Pending'),
                     ),
                     const PopupMenuItem<String>(
-                      value: 'closed',
-                      child: Text('Mark Closed'),
+                      value: 'in_progress',
+                      child: Text('Mark In Progress'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'completed',
+                      child: Text('Mark Completed'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'cancelled',
+                      child: Text('Mark Cancelled'),
                     ),
                   ],
                   onSelected: (val) {
@@ -250,9 +260,20 @@ class _AdminTicketsViewState extends State<AdminTicketsView> {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'open': return Colors.blue;
-      case 'closed': return Colors.grey;
-      default: return Colors.orange;
+      case 'pending':
+        return Colors.orange;
+      case 'in_progress':
+        return Colors.blue;
+      case 'completed':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      case 'open':
+        return Colors.blue; // Legacy
+      case 'closed':
+        return Colors.grey; // Legacy
+      default:
+        return Colors.orange;
     }
   }
 

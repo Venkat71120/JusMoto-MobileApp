@@ -1,28 +1,22 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:car_service/helper/extension/context_extension.dart';
-
 import 'package:car_service/services/home_services/home_popular_services_service.dart';
 import 'package:car_service/services/home_services/home_slider_service.dart';
 import 'package:car_service/services/home_services/unread_count_service.dart';
 import 'package:car_service/services/theme_service.dart';
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
 import 'package:car_service/view_models/home_view_model/home_view_model.dart';
-import 'package:car_service/views/home_view/components/HomeRecentOrders.dart' show HomeRecentOrders;
+import 'package:car_service/views/home_view/components/home_quick_actions.dart';
 import 'package:car_service/views/home_view/components/home_popular_products.dart';
-import 'package:car_service/views/home_view/components/home_popular_services.dart';
 import 'package:car_service/views/home_view/components/home_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/home_services/home_featured_services_service.dart';
 import '../../services/home_services/home_popular_products_service.dart';
-
-import '../../services/home_services/landing_offer_service.dart';
 import 'components/home_app_bar.dart';
-
 import 'components/home_featured_services.dart';
-import 'components/home_product_categories.dart';
 import 'components/home_view_header.dart';
 
 class HomeView extends StatelessWidget {
@@ -90,7 +84,7 @@ class HomeView extends StatelessWidget {
                       
                       SliverList(
                         delegate: SliverChildListDelegate([
-                          const HomeRecentOrders(),
+                          const HomeQuickActions(),
                            const HomeSlider(),
                           const HomeFeaturedServices(),
                          

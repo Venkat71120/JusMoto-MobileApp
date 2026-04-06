@@ -330,6 +330,7 @@ class FranchiseTicketServiceRequest {
       items: (json['items'] as List? ?? [])
           .map((i) =>
               FranchiseTicketOrderItem.fromJson(i as Map<String, dynamic>))
+          .where((item) => item.type.toLowerCase() != 'accessory')
           .toList(),
     );
   }

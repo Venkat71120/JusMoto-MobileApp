@@ -70,6 +70,18 @@ class AppUrls {
   static String get adminOrderDetailsUrl => '$baseEndPoint/admin/orders';
   static String get adminTicketsUrl => '$baseEndPoint/admin/tickets';
   static String get adminTicketDetailsUrl => '$baseEndPoint/admin/tickets';
+  static String get adminServicesUrl => '$baseEndPoint/admin/services';
+  static String get adminCategoriesUrl => '$baseEndPoint/admin/categories';
+  static String get adminBrandsUrl => '$baseEndPoint/admin/brands';
+  static String get adminCarsUrl => '$baseEndPoint/admin/cars';
+  static String get adminCouponsUrl => '$baseEndPoint/admin/coupons';
+  static String get adminOffersUrl => '$baseEndPoint/admin/offers';
+  static String get adminReviewsUrl => '$baseEndPoint/admin/reviews';
+  static String get adminOutletLocationsUrl => '$baseEndPoint/admin/outlet-locations';
+  static String get adminReportsRevenueUrl => '$baseEndPoint/admin/reports/revenue';
+  static String get adminReportsOrdersUrl => '$baseEndPoint/admin/reports/orders';
+  static String get adminRefundedOrdersUrl => '$baseEndPoint/admin/refunded-orders';
+  static String get adminNotificationsUrl => '$baseEndPoint/admin/notifications';
 
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';

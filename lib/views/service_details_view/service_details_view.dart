@@ -26,12 +26,15 @@ import '../../utils/components/custom_button.dart';
 import '../../utils/components/custom_future_widget.dart';
 import '../../utils/components/custom_refresh_indicator.dart';
 import '../../view_models/service_booking_view_model/service_booking_view_model.dart';
+import 'components/service_details_brand_selection.dart';
 import 'components/service_details_basics.dart';
 import 'components/service_details_cancellation_policy.dart';
 import 'components/service_details_favorite_Icon.dart';
 import 'components/service_details_images.dart';
 import 'components/service_details_skeleton.dart';
 import 'components/service_details_tabs_titles.dart';
+import '../create_ticekt_view/create_ticket_view.dart';
+import '../../view_models/create_ticket_view_model/create_ticket_view_model.dart';
 
 class ServiceDetailsView extends StatelessWidget {
   final dynamic id;
@@ -100,6 +103,8 @@ class ServiceDetailsView extends StatelessWidget {
                     serviceDetails: sd.serviceDetailsModel(id),
                     id: id,
                   ).toSliver,
+                  16.toHeight.toSliver,
+                  const ServiceDetailsBrandSelection().toSliver,
                   SliverToBoxAdapter(
                     child: Container(
                       height: 12,
@@ -251,65 +256,107 @@ class ServiceDetailsView extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(
                     20, 10, 20, Platform.isIOS ? 26 : 14),
                 color: context.color.accentContrastColor,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: isAdded
-                      ? ElevatedButton.icon(
-                          onPressed: () =>
-                              context.toPage(CartView()),
-                          icon: const Icon(
-                              Icons.check_circle_rounded,
-                              size: 18),
-                          label: Text(
-                            LocalKeys.added,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 46,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (sdm.selectedBrand.value == null) {
+                              "Please select a brand first".showToast();
+                              return;
+                            }
+                            final serviceName = sd.serviceDetailsModel(id).allServices?.title ?? "Service";
+                            final brandName = sdm.selectedBrand.value?.name ?? "Unknown Brand";
+                            
+                            final ctm = CreateTicketViewModel.instance;
+                            ctm.titleController.text = "Quote Request: $serviceName";
+                            ctm.descriptionController.text = "I would like to get a quote for $serviceName for my $brandName vehicle.";
+                            
+                            context.toPage(const CreateTicketView());
+                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                context.color.mutedContrastColor,
-                            foregroundColor:
-                                context.color.primaryContrastColor,
+                            backgroundColor: context.color.secondaryContrastColor,
+                            foregroundColor: context.color.accentContrastColor,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                        )
-                      : ElevatedButton.icon(
-                          onPressed: () {
-                            cartService.addToCart(
-                              id.toString(),
-                              sd
-                                  .serviceDetailsModel(id)
-                                  .allServices!
-                                  .toMinimizedJson(),
-                            );
-                          },
-                          icon: const Icon(
-                              Icons.add_shopping_cart_rounded,
-                              size: 18),
-                          label: Text(
-                            LocalKeys.addToCart,
-                            style: const TextStyle(
+                          child: const Text(
+                            "Get Quote",
+                            style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12),
-                            ),
-                          ),
                         ),
+                      ),
+                    ),
+                    12.toWidth,
+                    Expanded(
+                      child: SizedBox(
+                        height: 46,
+                        child: isAdded
+                            ? ElevatedButton.icon(
+                                onPressed: () =>
+                                    context.toPage(CartView()),
+                                icon: const Icon(
+                                    Icons.check_circle_rounded,
+                                    size: 18),
+                                label: Text(
+                                  LocalKeys.added,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      context.color.mutedContrastColor,
+                                  foregroundColor:
+                                      context.color.primaryContrastColor,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(12),
+                                  ),
+                                ),
+                              )
+                            : ElevatedButton.icon(
+                                onPressed: () {
+                                  cartService.addToCart(
+                                    id.toString(),
+                                    sd
+                                        .serviceDetailsModel(id)
+                                        .allServices!
+                                        .toMinimizedJson(),
+                                  );
+                                },
+                                icon: const Icon(
+                                    Icons.add_shopping_cart_rounded,
+                                    size: 18),
+                                label: Text(
+                                  LocalKeys.addToCart,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },

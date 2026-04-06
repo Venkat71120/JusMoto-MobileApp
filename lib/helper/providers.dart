@@ -22,6 +22,16 @@ import '../services/auth_services/FranchiseLoginService.dart';
 import '../services/admin_services/AdminUsersService.dart';
 import '../services/admin_services/AdminOrdersService.dart';
 import '../services/admin_services/AdminTicketsService.dart';
+import 'package:car_service/services/admin_services/AdminFranchiseService.dart';
+import 'package:car_service/services/admin_services/AdminCatalogService.dart';
+import 'package:car_service/services/admin_services/AdminVehicleService.dart';
+import 'package:car_service/services/admin_services/AdminMarketingService.dart';
+import 'package:car_service/services/admin_services/AdminReviewService.dart';
+import 'package:car_service/services/admin_services/AdminOutletService.dart';
+import 'package:car_service/services/admin_services/AdminReportService.dart';
+import 'package:car_service/services/admin_services/AdminNotificationService.dart';
+import 'package:car_service/services/admin_services/AdminRefundService.dart';
+import 'package:car_service/services/admin_services/AdminUserManagementService.dart';
 import '../services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
 
 import '../services/booking_services/booking_addons_service.dart';
@@ -87,6 +97,16 @@ class Providers {
     ChangeNotifierProvider(create: (context) => AdminUsersService()),
     ChangeNotifierProvider(create: (context) => AdminOrdersService()),
     ChangeNotifierProvider(create: (context) => AdminTicketsService()),
+    ChangeNotifierProvider(create: (context) => AdminFranchiseService()),
+    ChangeNotifierProvider(create: (context) => AdminCatalogService()),
+    ChangeNotifierProvider(create: (context) => AdminVehicleService()),
+    ChangeNotifierProvider(create: (context) => AdminMarketingService()),
+    ChangeNotifierProvider(create: (context) => AdminReviewService()),
+    ChangeNotifierProvider(create: (context) => AdminOutletService()),
+    ChangeNotifierProvider(create: (context) => AdminReportService()),
+    ChangeNotifierProvider(create: (context) => AdminNotificationService()),
+    ChangeNotifierProvider(create: (context) => AdminRefundService()),
+    ChangeNotifierProvider(create: (context) => AdminUserManagementService()),
     ChangeNotifierProvider(create: (context) => FranchiseDashboardService()),
     ChangeNotifierProvider(create: (context) => RatingAndReviewsService()),
     ChangeNotifierProvider(create: (context) => ProfileInfoService()),
@@ -133,7 +153,7 @@ class Providers {
     ChangeNotifierProvider(create: (context) => WalletService()),
     ChangeNotifierProvider(create: (context) => FranchiseOrdersService()),
     ChangeNotifierProvider(create: (context) => FranchiseTicketsService()),
+    ChangeNotifierProvider(create: (context) => FranchiseLoginService()),
     ChangeNotifierProvider(create: (context) => SocketService()),
-    
   ];
 }

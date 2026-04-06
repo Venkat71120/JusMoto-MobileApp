@@ -5,6 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/admin_services/AdminDashboardService.dart';
 import '../../helper/extension/int_extension.dart';
+import '../Admin_franchise_view/AdminFranchiseListView.dart';
+import '../Admin_catalog_view/AdminServiceListView.dart';
+import '../Admin_catalog_view/AdminCategoryListView.dart';
+import '../Admin_vehicle_view/AdminBrandListView.dart';
+import '../Admin_vehicle_view/AdminCarListView.dart';
+import 'package:car_service/views/Admin_marketing_view/AdminCouponListView.dart';
+import 'package:car_service/views/Admin_marketing_view/AdminOfferListView.dart';
+import 'package:car_service/views/Admin_review_view/AdminReviewListView.dart';
+import 'package:car_service/views/Admin_outlet_view/AdminOutletListView.dart';
+import 'package:car_service/views/Admin_report_view/AdminReportListView.dart';
+import 'package:car_service/views/Admin_notification_view/AdminNotificationListView.dart';
+import 'package:car_service/views/Admin_refund_view/AdminRefundListView.dart';
+import 'package:car_service/views/Admin_user_view/AdminUserManagementView.dart';
 
 
 
@@ -149,7 +162,6 @@ class _AdminHomeViewState extends State<AdminHomeView> {
 
                   32.toHeight,
 
-                  // --- Seconday Stats ---
                   Row(
                     children: [
                       _buildSmallStat(context, 'Users', data.totalUsers, Icons.person, Colors.purple),
@@ -162,7 +174,38 @@ class _AdminHomeViewState extends State<AdminHomeView> {
 
                   32.toHeight,
 
-                  // --- Recent Activity ---
+                  const Text(
+                    'Quick Management',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  16.toHeight,
+                  GridView.count(
+                    crossAxisCount: 3,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
+                    children: [
+                      _buildManagementCard(context, 'Franchises', Icons.business_center, Colors.indigo, const AdminFranchiseListView()),
+                      _buildManagementCard(context, 'Services', Icons.engineering, Colors.amber, const AdminServiceListView(itemType: 0)),
+                      _buildManagementCard(context, 'Products', Icons.shopping_bag, Colors.teal, const AdminServiceListView(itemType: 1)),
+                      _buildManagementCard(context, 'Categories', Icons.category, Colors.orange, const AdminCategoryListView()),
+                      _buildManagementCard(context, 'Brands', Icons.stars, Colors.blue, const AdminBrandListView()),
+                      _buildManagementCard(context, 'Cars', Icons.directions_car, Colors.purple, const AdminCarListView()),
+                      _buildManagementCard(context, 'Coupons', Icons.confirmation_number, Colors.redAccent, const AdminCouponListView()),
+                      _buildManagementCard(context, 'Offers', Icons.local_offer, Colors.pink, const AdminOfferListView()),
+                      _buildManagementCard(context, 'Reviews', Icons.rate_review, Colors.amber, const AdminReviewListView()),
+                      _buildManagementCard(context, 'Outlets', Icons.store_mall_directory, Colors.teal, const AdminOutletListView()),
+                      _buildManagementCard(context, 'Reports', Icons.analytics, Colors.deepPurple, const AdminReportListView()),
+                      _buildManagementCard(context, 'Notifications', Icons.notifications_active, Colors.orange, const AdminNotificationListView()),
+                      _buildManagementCard(context, 'Refunds', Icons.currency_exchange, Colors.redAccent, const AdminRefundListView()),
+                      _buildManagementCard(context, 'Admins', Icons.admin_panel_settings, Colors.indigo, const AdminUserManagementView()),
+                      _buildManagementCard(context, 'Users', Icons.people, Colors.blue, const AdminUserManagementView()),
+                    ],
+                  ),
+
+                  32.toHeight,
                   const Text(
                     'Recent Orders',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -339,5 +382,42 @@ class _AdminHomeViewState extends State<AdminHomeView> {
       case 4: return Colors.red;
       default: return Colors.grey;
     }
+  }
+
+  Widget _buildManagementCard(BuildContext context, String title, IconData icon, Color color, Widget destination) {
+    return InkWell(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => destination)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            8.toHeight,
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: color.withAlpha(200),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

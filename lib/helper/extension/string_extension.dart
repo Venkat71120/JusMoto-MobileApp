@@ -598,15 +598,14 @@ extension TicketStatusExtension on String {
       case "open":
       case "accepted":
       case "1":
-        return LocalKeys.accepted; // Label: "Accepted"
       case "in_progress":
       case "3":
-        return "In Progress";
+        return "In Progress"; // Label: "In Progress" (Merging Open/Accepted/InProgress)
       case "completed":
       case "close":
       case "closed":
       case "2":
-        return LocalKeys.complete; // Label: "Completed"
+        return "Completed"; // Label: "Completed"
       case "cancelled":
       case "canceled":
       case "4":

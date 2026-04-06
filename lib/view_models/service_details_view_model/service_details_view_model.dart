@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../models/car_models/brand_list_model.dart';
 import '../../helper/local_keys.g.dart';
 import '../order_list_view_model/order_status_enums.dart';
 
@@ -11,6 +11,7 @@ class ServiceDetailsViewModel {
   ValueNotifier<String> selectedTab = ValueNotifier(LocalKeys.overview);
   ValueNotifier selectedFAQ = ValueNotifier(null);
   final ValueNotifier<bool> showVideo = ValueNotifier(true);
+  final ValueNotifier<BrandModel?> selectedBrand = ValueNotifier(null);
 
   ServiceDetailsViewModel._init();
   static ServiceDetailsViewModel? _instance;

@@ -417,6 +417,32 @@ class _LinkedOrderCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (sr.items.isNotEmpty) ...[
+                10.toHeight,
+                const Divider(height: 1, thickness: 0.5),
+                8.toHeight,
+                ...sr.items.map((item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle_outline_rounded, size: 12, color: Colors.green[400]),
+                      6.toWidth,
+                      Expanded(
+                        child: Text(
+                          '${item.name} (${item.quantity})',
+                          style: context.bodySmall?.copyWith(fontSize: 10, color: Colors.grey[700]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        '₹${item.total}',
+                        style: context.bodySmall?.copyWith(fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  )),
+                ),
+              ],
             ],
           ),
         ),
@@ -964,7 +990,4 @@ String _formatDateTime(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return 'N/A';
   return dateStr.toOrderTime;
 }
-
-extension _WidthExt on int {
-  Widget get toWidth => SizedBox(width: toDouble());
-}
+
