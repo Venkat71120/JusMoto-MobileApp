@@ -76,6 +76,7 @@ import '../services/support_services/ticket_conversation_service.dart';
 import '../services/support_services/ticket_list_service.dart';
 import '../services/socket_service.dart';
 import '../services/wallet_services/wallet_service.dart';
+import '../services/quote_services/quote_service.dart';
 
 class Providers {
   static List<SingleChildWidget> providers = [
@@ -154,6 +155,7 @@ class Providers {
     ChangeNotifierProvider(create: (context) => FranchiseOrdersService()),
     ChangeNotifierProvider(create: (context) => FranchiseTicketsService()),
     ChangeNotifierProvider(create: (context) => FranchiseLoginService()),
+    ChangeNotifierProvider(create: (context) => QuoteService()),
     ChangeNotifierProvider(create: (context) => SocketService()),
   ];
 }

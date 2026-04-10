@@ -17,9 +17,8 @@ import 'package:car_service/views/Admin_outlet_view/AdminOutletListView.dart';
 import 'package:car_service/views/Admin_report_view/AdminReportListView.dart';
 import 'package:car_service/views/Admin_notification_view/AdminNotificationListView.dart';
 import 'package:car_service/views/Admin_refund_view/AdminRefundListView.dart';
+import 'package:car_service/views/Admin_quotes_view/admin_quote_list_view.dart';
 import 'package:car_service/views/Admin_user_view/AdminUserManagementView.dart';
-
-
 
 class AdminHomeView extends StatefulWidget {
   const AdminHomeView({super.key});
@@ -40,7 +39,10 @@ class _AdminHomeViewState extends State<AdminHomeView> {
     return Scaffold(
       backgroundColor: context.color.backgroundColor,
       appBar: AppBar(
-        title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Admin Dashboard',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: context.color.backgroundColor,
         elevation: 0,
         centerTitle: true,
@@ -119,44 +121,51 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                           color: Colors.black.withOpacity(0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
-                        )
+                        ),
                       ],
                     ),
                     child: Column(
-                      children: data.ordersByStatus.map((status) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 100,
-                                child: Text(
-                                  _getStatusText(status.status),
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: LinearProgressIndicator(
-                                    value: data.totalOrders > 0 
-                                        ? status.count / data.totalOrders 
-                                        : 0,
-                                    backgroundColor: Colors.grey[200],
-                                    color: _getStatusColor(status.status),
-                                    minHeight: 10,
+                      children:
+                          data.ordersByStatus.map((status) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      _getStatusText(status.status),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: LinearProgressIndicator(
+                                        value:
+                                            data.totalOrders > 0
+                                                ? status.count /
+                                                    data.totalOrders
+                                                : 0,
+                                        backgroundColor: Colors.grey[200],
+                                        color: _getStatusColor(status.status),
+                                        minHeight: 10,
+                                      ),
+                                    ),
+                                  ),
+                                  12.toWidth,
+                                  Text(
+                                    '${status.count}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              12.toWidth,
-                              Text(
-                                '${status.count}',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                   ),
 
@@ -164,11 +173,29 @@ class _AdminHomeViewState extends State<AdminHomeView> {
 
                   Row(
                     children: [
-                      _buildSmallStat(context, 'Users', data.totalUsers, Icons.person, Colors.purple),
+                      _buildSmallStat(
+                        context,
+                        'Users',
+                        data.totalUsers,
+                        Icons.person,
+                        Colors.purple,
+                      ),
                       16.toWidth,
-                      _buildSmallStat(context, 'Services', data.totalServices, Icons.engineering, Colors.amber),
+                      _buildSmallStat(
+                        context,
+                        'Services',
+                        data.totalServices,
+                        Icons.engineering,
+                        Colors.amber,
+                      ),
                       16.toWidth,
-                      _buildSmallStat(context, 'Cars', data.totalCars, Icons.directions_car, Colors.cyan),
+                      _buildSmallStat(
+                        context,
+                        'Cars',
+                        data.totalCars,
+                        Icons.directions_car,
+                        Colors.cyan,
+                      ),
                     ],
                   ),
 
@@ -187,21 +214,118 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.9,
                     children: [
-                      _buildManagementCard(context, 'Franchises', Icons.business_center, Colors.indigo, const AdminFranchiseListView()),
-                      _buildManagementCard(context, 'Services', Icons.engineering, Colors.amber, const AdminServiceListView(itemType: 0)),
-                      _buildManagementCard(context, 'Products', Icons.shopping_bag, Colors.teal, const AdminServiceListView(itemType: 1)),
-                      _buildManagementCard(context, 'Categories', Icons.category, Colors.orange, const AdminCategoryListView()),
-                      _buildManagementCard(context, 'Brands', Icons.stars, Colors.blue, const AdminBrandListView()),
-                      _buildManagementCard(context, 'Cars', Icons.directions_car, Colors.purple, const AdminCarListView()),
-                      _buildManagementCard(context, 'Coupons', Icons.confirmation_number, Colors.redAccent, const AdminCouponListView()),
-                      _buildManagementCard(context, 'Offers', Icons.local_offer, Colors.pink, const AdminOfferListView()),
-                      _buildManagementCard(context, 'Reviews', Icons.rate_review, Colors.amber, const AdminReviewListView()),
-                      _buildManagementCard(context, 'Outlets', Icons.store_mall_directory, Colors.teal, const AdminOutletListView()),
-                      _buildManagementCard(context, 'Reports', Icons.analytics, Colors.deepPurple, const AdminReportListView()),
-                      _buildManagementCard(context, 'Notifications', Icons.notifications_active, Colors.orange, const AdminNotificationListView()),
-                      _buildManagementCard(context, 'Refunds', Icons.currency_exchange, Colors.redAccent, const AdminRefundListView()),
-                      _buildManagementCard(context, 'Admins', Icons.admin_panel_settings, Colors.indigo, const AdminUserManagementView()),
-                      _buildManagementCard(context, 'Users', Icons.people, Colors.blue, const AdminUserManagementView()),
+                      _buildManagementCard(
+                        context,
+                        'Franchises',
+                        Icons.business_center,
+                        Colors.indigo,
+                        const AdminFranchiseListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Services',
+                        Icons.engineering,
+                        Colors.amber,
+                        const AdminServiceListView(itemType: 0),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Products',
+                        Icons.shopping_bag,
+                        Colors.teal,
+                        const AdminServiceListView(itemType: 1),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Categories',
+                        Icons.category,
+                        Colors.orange,
+                        const AdminCategoryListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Brands',
+                        Icons.stars,
+                        Colors.blue,
+                        const AdminBrandListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Cars',
+                        Icons.directions_car,
+                        Colors.purple,
+                        const AdminCarListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Coupons',
+                        Icons.confirmation_number,
+                        Colors.redAccent,
+                        const AdminCouponListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Offers',
+                        Icons.local_offer,
+                        Colors.pink,
+                        const AdminOfferListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Reviews',
+                        Icons.rate_review,
+                        Colors.amber,
+                        const AdminReviewListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Outlets',
+                        Icons.store_mall_directory,
+                        Colors.teal,
+                        const AdminOutletListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Reports',
+                        Icons.analytics,
+                        Colors.deepPurple,
+                        const AdminReportListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Notifications',
+                        Icons.notifications_active,
+                        Colors.orange,
+                        const AdminNotificationListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Refunds',
+                        Icons.currency_exchange,
+                        Colors.redAccent,
+                        const AdminRefundListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Admins',
+                        Icons.admin_panel_settings,
+                        Colors.indigo,
+                        const AdminUserManagementView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Users',
+                        Icons.people,
+                        Colors.blue,
+                        const AdminUserManagementView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Quotes',
+                        Icons.request_quote,
+                        Colors.blueGrey,
+                        const AdminQuoteListView(),
+                      ),
                     ],
                   ),
 
@@ -231,8 +355,13 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                             leading: CircleAvatar(
                               backgroundColor: primaryColor.withOpacity(0.1),
                               child: Text(
-                                order.firstName.isNotEmpty ? order.firstName[0] : '?',
-                                style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                                order.firstName.isNotEmpty
+                                    ? order.firstName[0]
+                                    : '?',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             title: Text('${order.firstName} ${order.lastName}'),
@@ -243,7 +372,10 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                               children: [
                                 Text(
                                   '\u20B9${order.total.toStringAsFixed(0)}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
                                 Text(
                                   _getStatusText(order.status),
@@ -286,12 +418,15 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                           subtitle: Text(user.email),
                           trailing: Text(
                             user.createdAt.split('T')[0],
-                            style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 12,
+                            ),
                           ),
                         );
                       },
                     ),
-                  
+
                   32.toHeight,
                 ],
               ),
@@ -302,7 +437,13 @@ class _AdminHomeViewState extends State<AdminHomeView> {
     );
   }
 
-  Widget _buildStatCard(BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -313,7 +454,7 @@ class _AdminHomeViewState extends State<AdminHomeView> {
             color: color.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -326,16 +467,19 @@ class _AdminHomeViewState extends State<AdminHomeView> {
             value,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         ],
       ),
     );
   }
 
-  Widget _buildSmallStat(BuildContext context, String label, int value, IconData icon, Color color) {
+  Widget _buildSmallStat(
+    BuildContext context,
+    String label,
+    int value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -354,7 +498,11 @@ class _AdminHomeViewState extends State<AdminHomeView> {
             ),
             Text(
               label,
-              style: TextStyle(fontSize: 10, color: Colors.grey[600], fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -364,29 +512,51 @@ class _AdminHomeViewState extends State<AdminHomeView> {
 
   String _getStatusText(int status) {
     switch (status) {
-      case 0: return 'Pending';
-      case 1: return 'Confirmed';
-      case 2: return 'Completed';
-      case 3: return 'Delivered';
-      case 4: return 'Cancelled';
-      default: return 'Unknown';
+      case 0:
+        return 'Pending';
+      case 1:
+        return 'Confirmed';
+      case 2:
+        return 'Completed';
+      case 3:
+        return 'Delivered';
+      case 4:
+        return 'Cancelled';
+      default:
+        return 'Unknown';
     }
   }
 
   Color _getStatusColor(int status) {
     switch (status) {
-      case 0: return Colors.orange;
-      case 1: return Colors.blue;
-      case 2: return Colors.green;
-      case 3: return Colors.teal;
-      case 4: return Colors.red;
-      default: return Colors.grey;
+      case 0:
+        return Colors.orange;
+      case 1:
+        return Colors.blue;
+      case 2:
+        return Colors.green;
+      case 3:
+        return Colors.teal;
+      case 4:
+        return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 
-  Widget _buildManagementCard(BuildContext context, String title, IconData icon, Color color, Widget destination) {
+  Widget _buildManagementCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    Widget destination,
+  ) {
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => destination)),
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          ),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(

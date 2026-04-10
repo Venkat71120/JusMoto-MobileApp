@@ -46,7 +46,8 @@ class AppUrls {
   static String get homeSliderListUrl => '$baseEndPoint/general/sliders';
 
   static String get homeProvidersListUrl => '$baseEndPoint/provider-lists';
-  static String termsAndConditions = '$baseEndPoint/general/terms-and-conditions';
+  static String termsAndConditions =
+      '$baseEndPoint/general/terms-and-conditions';
   static String privacyPolicy = '$baseEndPoint/general/privacy-policy';
   static String contact = '$baseEndPoint/general/contact';
   static String get paymentGatewayUrl => '$baseEndPoint/payment-gateway-list';
@@ -77,11 +78,17 @@ class AppUrls {
   static String get adminCouponsUrl => '$baseEndPoint/admin/coupons';
   static String get adminOffersUrl => '$baseEndPoint/admin/offers';
   static String get adminReviewsUrl => '$baseEndPoint/admin/reviews';
-  static String get adminOutletLocationsUrl => '$baseEndPoint/admin/outlet-locations';
-  static String get adminReportsRevenueUrl => '$baseEndPoint/admin/reports/revenue';
-  static String get adminReportsOrdersUrl => '$baseEndPoint/admin/reports/orders';
-  static String get adminRefundedOrdersUrl => '$baseEndPoint/admin/refunded-orders';
-  static String get adminNotificationsUrl => '$baseEndPoint/admin/notifications';
+  static String get adminOutletLocationsUrl =>
+      '$baseEndPoint/admin/outlet-locations';
+  static String get adminReportsRevenueUrl =>
+      '$baseEndPoint/admin/reports/revenue';
+  static String get adminReportsOrdersUrl =>
+      '$baseEndPoint/admin/reports/orders';
+  static String get adminRefundedOrdersUrl =>
+      '$baseEndPoint/admin/refunded-orders';
+  static String get adminNotificationsUrl =>
+      '$baseEndPoint/admin/notifications';
+  static String get adminRolesUrl => '$baseEndPoint/admin/roles';
 
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';
@@ -160,6 +167,9 @@ class AppUrls {
   static String get completeRequestHistoryUrl =>
       '$baseEndPoint/provider/orders/complete-request/history?';
   static String get invoiceUrl => '$baseEndPoint/client/order/invoice-details';
+  static String get quotesUrl => '$baseEndPoint/quotes';
+  static String get myQuotesUrl => '$baseEndPoint/quotes/my';
+  static String quoteUpdateUrl(id) => '$baseEndPoint/quotes/$id';
 
   /// New invoice endpoint — returns HTML. Usage: `${orderInvoiceUrl}/<orderId>/invoice`
   static String get orderInvoiceUrl => '$baseEndPoint/orders';

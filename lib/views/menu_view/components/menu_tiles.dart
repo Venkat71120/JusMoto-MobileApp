@@ -16,6 +16,7 @@ import 'package:car_service/views/notification_list_view/notification_list_view.
 import 'package:car_service/views/sign_in_view/sign_in_view.dart';
 import 'package:car_service/views/support_ticket_view/support_ticket_view.dart';
 import 'package:car_service/views/tac_pp_view/tac_pp_view.dart';
+import 'package:car_service/views/quote_view/quote_list_view.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -65,6 +66,14 @@ class MenuTiles extends StatelessWidget {
                   svg: SvgAssets.refund,
                   onPress: () {
                     context.toPage(const RefundListView());
+                  },
+                  haveDivider: true,
+                ),
+                MenuTile(
+                  title: "My Quotes",
+                  svg: SvgAssets.fileText,
+                  onPress: () {
+                    context.toPage(const QuoteListView());
                   },
                   haveDivider: true,
                 ),
@@ -174,14 +183,29 @@ class MenuTiles extends StatelessWidget {
                         await SignOutService().trySignOut().then((result) {
                           if (result == true) {
                             context.pop;
-                            
+
                             // Reset core services to prevent data leakage between accounts
-                            Provider.of<ProfileInfoService>(context, listen: false).reset();
-                            Provider.of<BrandListService>(context, listen: false).reset();
-                            Provider.of<ModelListService>(context, listen: false).reset();
-                            Provider.of<VariantListService>(context, listen: false).reset();
-                            Provider.of<UserCarsService>(context, listen: false).reset();
-                            
+                            Provider.of<ProfileInfoService>(
+                              context,
+                              listen: false,
+                            ).reset();
+                            Provider.of<BrandListService>(
+                              context,
+                              listen: false,
+                            ).reset();
+                            Provider.of<ModelListService>(
+                              context,
+                              listen: false,
+                            ).reset();
+                            Provider.of<VariantListService>(
+                              context,
+                              listen: false,
+                            ).reset();
+                            Provider.of<UserCarsService>(
+                              context,
+                              listen: false,
+                            ).reset();
+
                             // Reset View Models
                             SelectCarViewModel.dispose;
                             SocialSignInViewModel.instance.signOut();

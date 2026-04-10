@@ -1,8 +1,10 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
+import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/view_models/admin_view_models/AdminUserManagementViewModel.dart';
 import 'package:car_service/services/admin_services/AdminUserManagementService.dart';
 import 'package:car_service/views/Admin_user_view/AdminFranchiseFormView.dart';
+import 'package:car_service/views/Admin_user_view/AdminUserEditFormView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -158,16 +160,75 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
             const SizedBox(height: 4),
             Text(user.email, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
             if (user.phone != null) Padding(padding: const EdgeInsets.only(top: 2), child: Text(user.phone!, style: TextStyle(fontSize: 12, color: Colors.grey[600]))),
+            if (user.outletName != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.location_on, size: 10, color: primaryColor.withOpacity(0.7)),
+                  4.toWidth,
+                  Text(user.outletName!, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue[700])),
+                ],
+              ),
+            ],
           ],
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _buildStatusBadge(user.status),
-            if (user.role != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(user.role!, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildStatusBadge(user.status),
+                if (user.role != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(user.role!, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
+              ],
+            ),
+            if (type != 'user') ...[
+              const SizedBox(width: 8),
+              _buildActionMenu(user, type),
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActionMenu(user, String type) {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
+      onSelected: (val) {
+        if (val == 'edit') {
+           Navigator.push(context, MaterialPageRoute(builder: (context) => AdminUserEditFormView(user: user, type: type)));
+        } else if (val == 'status') {
+          _viewModel.toggleStatus(user, type);
+        } else if (val == 'delete') {
+          _showDeleteConfirm(user, type);
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit Details')])),
+        PopupMenuItem(value: 'status', child: Row(children: [Icon(user.status == 1 ? Icons.block : Icons.check_circle, size: 18), const SizedBox(width: 8), Text(user.status == 1 ? 'Deactivate' : 'Activate')])),
+        const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete Account', style: TextStyle(color: Colors.red))])),
+      ],
+    );
+  }
+
+  void _showDeleteConfirm(user, String type) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to delete ${user.name}? This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _viewModel.deleteAccount(user, type);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

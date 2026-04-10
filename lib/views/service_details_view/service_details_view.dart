@@ -28,13 +28,12 @@ import '../../utils/components/custom_refresh_indicator.dart';
 import '../../view_models/service_booking_view_model/service_booking_view_model.dart';
 import 'components/service_details_brand_selection.dart';
 import 'components/service_details_basics.dart';
+import '../quote_view/create_quote_view.dart';
 import 'components/service_details_cancellation_policy.dart';
 import 'components/service_details_favorite_Icon.dart';
 import 'components/service_details_images.dart';
 import 'components/service_details_skeleton.dart';
 import 'components/service_details_tabs_titles.dart';
-import '../create_ticekt_view/create_ticket_view.dart';
-import '../../view_models/create_ticket_view_model/create_ticket_view_model.dart';
 
 class ServiceDetailsView extends StatelessWidget {
   final dynamic id;
@@ -124,9 +123,7 @@ class ServiceDetailsView extends StatelessWidget {
                     ),
                     flexibleSpace: SizedBox(),
                   ),
-                  SliverToBoxAdapter(
-                    child: Container(height: 8),
-                  ),
+                  SliverToBoxAdapter(child: Container(height: 8)),
                   // Overview section in card
                   SliverToBoxAdapter(
                     child: Container(
@@ -250,11 +247,14 @@ class ServiceDetailsView extends StatelessWidget {
               if (sd.serviceDetailsModel(id).allServices == null) {
                 return const SizedBox.shrink();
               }
-              final isAdded =
-                  cartService.cartList.containsKey(id.toString());
+              final isAdded = cartService.cartList.containsKey(id.toString());
               return Container(
                 padding: EdgeInsets.fromLTRB(
-                    20, 10, 20, Platform.isIOS ? 26 : 14),
+                  20,
+                  10,
+                  20,
+                  Platform.isIOS ? 26 : 14,
+                ),
                 color: context.color.accentContrastColor,
                 child: Row(
                   children: [
@@ -267,17 +267,24 @@ class ServiceDetailsView extends StatelessWidget {
                               "Please select a brand first".showToast();
                               return;
                             }
-                            final serviceName = sd.serviceDetailsModel(id).allServices?.title ?? "Service";
-                            final brandName = sdm.selectedBrand.value?.name ?? "Unknown Brand";
-                            
-                            final ctm = CreateTicketViewModel.instance;
-                            ctm.titleController.text = "Quote Request: $serviceName";
-                            ctm.descriptionController.text = "I would like to get a quote for $serviceName for my $brandName vehicle.";
-                            
-                            context.toPage(const CreateTicketView());
+                            final serviceName =
+                                sd.serviceDetailsModel(id).allServices?.title ??
+                                "Service";
+                            final brandName =
+                                sdm.selectedBrand.value?.name ??
+                                "Unknown Brand";
+
+                            context.toPage(
+                              CreateQuoteView(
+                                initialTitle: "Quote Request: $serviceName",
+                                initialDescription:
+                                    "I would like to get a quote for $serviceName for my $brandName vehicle.",
+                              ),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: context.color.secondaryContrastColor,
+                            backgroundColor:
+                                context.color.secondaryContrastColor,
                             foregroundColor: context.color.accentContrastColor,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -298,62 +305,62 @@ class ServiceDetailsView extends StatelessWidget {
                     Expanded(
                       child: SizedBox(
                         height: 46,
-                        child: isAdded
-                            ? ElevatedButton.icon(
-                                onPressed: () =>
-                                    context.toPage(CartView()),
-                                icon: const Icon(
+                        child:
+                            isAdded
+                                ? ElevatedButton.icon(
+                                  onPressed: () => context.toPage(CartView()),
+                                  icon: const Icon(
                                     Icons.check_circle_rounded,
-                                    size: 18),
-                                label: Text(
-                                  LocalKeys.added,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                                    size: 18,
                                   ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      context.color.mutedContrastColor,
-                                  foregroundColor:
-                                      context.color.primaryContrastColor,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12),
+                                  label: Text(
+                                    LocalKeys.added,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              )
-                            : ElevatedButton.icon(
-                                onPressed: () {
-                                  cartService.addToCart(
-                                    id.toString(),
-                                    sd
-                                        .serviceDetailsModel(id)
-                                        .allServices!
-                                        .toMinimizedJson(),
-                                  );
-                                },
-                                icon: const Icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        context.color.mutedContrastColor,
+                                    foregroundColor:
+                                        context.color.primaryContrastColor,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                )
+                                : ElevatedButton.icon(
+                                  onPressed: () {
+                                    cartService.addToCart(
+                                      id.toString(),
+                                      sd
+                                          .serviceDetailsModel(id)
+                                          .allServices!
+                                          .toMinimizedJson(),
+                                    );
+                                  },
+                                  icon: const Icon(
                                     Icons.add_shopping_cart_rounded,
-                                    size: 18),
-                                label: Text(
-                                  LocalKeys.addToCart,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 14,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    LocalKeys.addToCart,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
                                 ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
                       ),
                     ),
                   ],

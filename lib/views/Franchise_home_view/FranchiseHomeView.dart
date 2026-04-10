@@ -20,6 +20,7 @@ import 'package:car_service/views/Franchise_home_view/components/franchise_stats
 import 'package:car_service/views/Franchise_home_view/components/franchise_summary_stats.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../Admin_quotes_view/admin_quote_list_view.dart';
 
 class FranchiseHomeView extends StatelessWidget {
   const FranchiseHomeView({super.key});
@@ -64,8 +65,7 @@ class FranchiseHomeView extends StatelessWidget {
                       builder: (context, ds, child) {
                         // ── Auto-fetch on first render ────────────────
                         if (ds.shouldAutoFetch) {
-                          WidgetsBinding.instance
-                              .addPostFrameCallback((_) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
                             ds.fetchDashboard();
                           });
                         }
@@ -79,9 +79,7 @@ class FranchiseHomeView extends StatelessWidget {
                         return Column(
                           children: [
                             // 1 — Summary stat cards (orders + tickets + earnings)
-                            FranchiseSummaryStats(
-                              statistics: ds.statistics,
-                            ),
+                            FranchiseSummaryStats(statistics: ds.statistics),
 
                             // 2 — Order breakdown (paid/unpaid/active/delivered)
                             FranchiseOrderBreakdown(
@@ -103,6 +101,14 @@ class FranchiseHomeView extends StatelessWidget {
                               hvm: hvm,
                             ),
 
+                            const SizedBox(height: 16),
+                            _buildManagementCard(
+                              context,
+                              'Quotes',
+                              Icons.request_quote,
+                              Colors.blueGrey,
+                              const AdminQuoteListView(),
+                            ),
                             const SizedBox(height: 32),
                           ],
                         );
@@ -115,6 +121,53 @@ class FranchiseHomeView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildManagementCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    Widget destination,
+  ) {
+    return InkWell(
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: color.withAlpha(200),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

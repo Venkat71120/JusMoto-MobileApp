@@ -23,8 +23,11 @@ class AdminBaseUserItem {
   final String name;
   final String email;
   final String? phone;
+  final String? username;
   final String? role;
   final int status;
+  final int? outletId;
+  final String? outletName;
   final DateTime? createdAt;
   final String? type; // 'franchise', 'user', 'staff'
 
@@ -33,14 +36,17 @@ class AdminBaseUserItem {
     required this.name,
     required this.email,
     this.phone,
+    this.username,
     this.role,
     required this.status,
+    this.outletId,
+    this.outletName,
     this.createdAt,
     this.type,
   });
 
   factory AdminBaseUserItem.fromJson(Map<String, dynamic> json) {
-    // Handle name field variations (some have first_name, some just name)
+    // Handle name field variations
     String fullName = json['name'] ?? '';
     if (fullName.isEmpty) {
       final fName = json['first_name'] ?? '';
@@ -49,17 +55,42 @@ class AdminBaseUserItem {
     }
     if (fullName.isEmpty) fullName = 'Unnamed';
 
+    // Handle nested outlet location
+    int? oId;
+    String? oName;
+    if (json['outletLocation'] != null) {
+      oId = json['outletLocation']['id'];
+      oName = json['outletLocation']['name'];
+    } else if (json['outlet_location_id'] != null) {
+      oId = _toInt(json['outlet_location_id']);
+    }
+
     return AdminBaseUserItem(
       id: json['id'] ?? 0,
       name: fullName,
       email: json['email'] ?? '',
+      username: json['username'],
       phone: json['phone'] ?? json['mobile_number'],
       role: json['role']?['name'] ?? json['role'],
-      status: _toInt(json['status']),
+      // ROBUST STATUS PARSING: Some APIs return boolean, some string "1"/"0", some int
+      status: _toStatusInt(json['status']),
+      outletId: oId,
+      outletName: oName,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      type: json['account_type'], // May be added by service locally or in API
+      type: json['account_type'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'email': email,
+    'mobile_number': phone,
+    'username': username,
+    'role': role,
+    'outlet_location_id': outletId,
+    'status': status,
+  };
 }
 
 class AdminUserPagination {
@@ -96,5 +127,16 @@ int _toInt(dynamic value) {
   if (value == null) return 0;
   if (value is int) return value;
   if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
+int _toStatusInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is bool) return value ? 1 : 0;
+  if (value is int) return value;
+  if (value is String) {
+    if (value.toLowerCase() == "active" || value == "1") return 1;
+    return 0;
+  }
   return 0;
 }

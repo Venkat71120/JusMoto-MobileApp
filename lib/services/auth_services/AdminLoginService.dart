@@ -61,6 +61,7 @@ class AdminLoginService with ChangeNotifier {
     final data = {
       'email': username,
       'password': password,
+      '_is_json': true, // Trigger JSON encoding in NetworkApiServices
     };
 
     try {
