@@ -102,13 +102,7 @@ class FranchiseHomeView extends StatelessWidget {
                             ),
 
                             const SizedBox(height: 16),
-                            _buildManagementCard(
-                              context,
-                              'Quotes',
-                              Icons.request_quote,
-                              Colors.blueGrey,
-                              const AdminQuoteListView(),
-                            ),
+                            _buildQuotesCard(context),
                             const SizedBox(height: 32),
                           ],
                         );
@@ -121,6 +115,129 @@ class FranchiseHomeView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildQuotesCard(BuildContext context) {
+    const color = Colors.indigo;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminQuoteListView()),
+        ),
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                color.withOpacity(0.12),
+                color.withOpacity(0.04),
+                context.color.backgroundColor,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: color.withOpacity(0.15), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.06),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // Decorative background circle
+                Positioned(
+                  right: -30,
+                  top: -30,
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.05),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    children: [
+                      // Icon with complex container
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.request_quote_rounded,
+                          color: color,
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      // Text content
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Quotes Management',
+                              style: context.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: context.color.primaryContrastColor,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Review and respond to custom service requests',
+                              style: context.bodySmall?.copyWith(
+                                color: context.color.secondaryContrastColor.withOpacity(0.6),
+                                fontWeight: FontWeight.w500,
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Arrow button
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: color,
+                          size: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:car_service/services/admin_services/AdminCatalogService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'AdminServiceFormView.dart';
+import 'AdminServiceDetailView.dart';
 
 class AdminServiceListView extends StatefulWidget {
   final int itemType; // 0=Service, 1=Product
@@ -254,13 +255,19 @@ class _AdminServiceListViewState extends State<AdminServiceListView> {
               ),
               trailing: PopupMenuButton<String>(
                 itemBuilder: (context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(value: 'view', child: Row(children: [Icon(Icons.visibility, size: 18), SizedBox(width: 8), Text('View Details')])),
                   const PopupMenuItem<String>(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit Item')])),
                   PopupMenuItem<String>(value: 'status', child: Row(children: [Icon(item.status == 1 ? Icons.block : Icons.check_circle, size: 18), const SizedBox(width: 8), Text(item.status == 1 ? 'Mark Inactive' : 'Mark Active')])),
                   PopupMenuItem<String>(value: 'featured', child: Row(children: [Icon(item.isFeatured == 1 ? Icons.star_border : Icons.star, size: 18), const SizedBox(width: 8), Text(item.isFeatured == 1 ? 'Remove Featured' : 'Mark Featured')])),
                   const PopupMenuItem<String>(value: 'delete', child: Row(children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete Item', style: TextStyle(color: Colors.red))])),
                 ],
                 onSelected: (val) {
-                  if (val == 'edit') {
+                  if (val == 'view') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AdminServiceDetailView(item: item, itemType: widget.itemType)),
+                    );
+                  } else if (val == 'edit') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => AdminServiceFormView(itemType: widget.itemType, item: item)),

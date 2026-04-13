@@ -114,7 +114,7 @@ class FranchiseLoginViewModel {
         signInSuccess = true;
 
         await PushNotificationService().updateDeviceToken(forceUpdate: true);
-        await piProvider.fetchProfileInfo();
+        // await piProvider.fetchProfileInfo();
 
         loading.value = false;
 

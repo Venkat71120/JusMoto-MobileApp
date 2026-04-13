@@ -202,6 +202,8 @@ class OrderItem {
   final num qty;
   final num price;
   final List<dynamic>? reviewsAll;
+  final String? carName;
+  final String? variantName;
   final OrderItemService? service;
 
   OrderItem({
@@ -213,6 +215,8 @@ class OrderItem {
     this.qty = 0,
     this.price = 0,
     this.reviewsAll,
+    this.carName,
+    this.variantName,
     this.service,
   });
 
@@ -240,6 +244,12 @@ class OrderItem {
         service: serviceData == null
             ? null
             : OrderItemService.fromJson(serviceData),
+        carName: json["car_name"]?.toString() ??
+            json["car"]?["name"]?.toString() ??
+            serviceData?["car_name"]?.toString(),
+        variantName: json["variant_name"]?.toString() ??
+            json["variant"]?["name"]?.toString() ??
+            serviceData?["variant_name"]?.toString(),
       );
   }
 

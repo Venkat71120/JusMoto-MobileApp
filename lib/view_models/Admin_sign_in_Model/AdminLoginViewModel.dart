@@ -111,7 +111,8 @@ class AdminLoginViewModel {
         signInSuccess = true;
 
         await PushNotificationService().updateDeviceToken(forceUpdate: true);
-        await piProvider.fetchProfileInfo();
+        // User profile fetch skipped for admin accounts
+        // await piProvider.fetchProfileInfo();
 
         loading.value = false;
 

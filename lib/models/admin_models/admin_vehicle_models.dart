@@ -178,6 +178,150 @@ class AdminVehiclePagination {
       );
 }
 
+class AdminVariantListModel {
+  final List<AdminVariantItem> variants;
+  final AdminVehiclePagination pagination;
+
+  AdminVariantListModel({
+    required this.variants,
+    required this.pagination,
+  });
+
+  factory AdminVariantListModel.fromJson(Map<String, dynamic> json) {
+    return AdminVariantListModel(
+      variants: (json['data'] as List? ?? [])
+          .map((v) => AdminVariantItem.fromJson(v as Map<String, dynamic>))
+          .toList(),
+      pagination: AdminVehiclePagination.fromJson(
+        json['pagination'] as Map<String, dynamic>? ?? {},
+      ),
+    );
+  }
+
+  factory AdminVariantListModel.empty() => AdminVariantListModel(
+        variants: [],
+        pagination: AdminVehiclePagination.empty(),
+      );
+}
+
+class AdminVariantItem {
+  final int id;
+  final String name;
+  final int carId;
+  final int status;
+  final AdminCarItem? car;
+
+  AdminVariantItem({
+    required this.id,
+    required this.name,
+    required this.carId,
+    required this.status,
+    this.car,
+  });
+
+  factory AdminVariantItem.fromJson(Map<String, dynamic> json) {
+    return AdminVariantItem(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      carId: _toInt(json['car_id']),
+      status: _toInt(json['status']),
+      car: json['car'] != null ? AdminCarItem.fromJson(json['car']) : null,
+    );
+  }
+}
+
+class AdminEngineTypeListModel {
+  final List<AdminEngineTypeItem> engineTypes;
+  final AdminVehiclePagination pagination;
+
+  AdminEngineTypeListModel({
+    required this.engineTypes,
+    required this.pagination,
+  });
+
+  factory AdminEngineTypeListModel.fromJson(Map<String, dynamic> json) {
+    return AdminEngineTypeListModel(
+      engineTypes: (json['data'] as List? ?? [])
+          .map((e) => AdminEngineTypeItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      pagination: AdminVehiclePagination.fromJson(
+        json['pagination'] as Map<String, dynamic>? ?? {},
+      ),
+    );
+  }
+
+  factory AdminEngineTypeListModel.empty() => AdminEngineTypeListModel(
+        engineTypes: [],
+        pagination: AdminVehiclePagination.empty(),
+      );
+}
+
+class AdminEngineTypeItem {
+  final int id;
+  final String name;
+  final int status;
+
+  AdminEngineTypeItem({
+    required this.id,
+    required this.name,
+    required this.status,
+  });
+
+  factory AdminEngineTypeItem.fromJson(Map<String, dynamic> json) {
+    return AdminEngineTypeItem(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      status: _toInt(json['status']),
+    );
+  }
+}
+
+class AdminFuelTypeListModel {
+  final List<AdminFuelTypeItem> fuelTypes;
+  final AdminVehiclePagination pagination;
+
+  AdminFuelTypeListModel({
+    required this.fuelTypes,
+    required this.pagination,
+  });
+
+  factory AdminFuelTypeListModel.fromJson(Map<String, dynamic> json) {
+    return AdminFuelTypeListModel(
+      fuelTypes: (json['data'] as List? ?? [])
+          .map((f) => AdminFuelTypeItem.fromJson(f as Map<String, dynamic>))
+          .toList(),
+      pagination: AdminVehiclePagination.fromJson(
+        json['pagination'] as Map<String, dynamic>? ?? {},
+      ),
+    );
+  }
+
+  factory AdminFuelTypeListModel.empty() => AdminFuelTypeListModel(
+        fuelTypes: [],
+        pagination: AdminVehiclePagination.empty(),
+      );
+}
+
+class AdminFuelTypeItem {
+  final int id;
+  final String name;
+  final int status;
+
+  AdminFuelTypeItem({
+    required this.id,
+    required this.name,
+    required this.status,
+  });
+
+  factory AdminFuelTypeItem.fromJson(Map<String, dynamic> json) {
+    return AdminFuelTypeItem(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      status: _toInt(json['status']),
+    );
+  }
+}
+
 // Helpers
 int _toInt(dynamic value) {
   if (value == null) return 0;

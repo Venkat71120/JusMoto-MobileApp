@@ -776,6 +776,28 @@ class OrderSummeryView extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: context.titleSmall?.bold,
                 ),
+                if (item.carName != null) ...[
+                  2.toHeight,
+                  Row(
+                    children: [
+                      Icon(Icons.directions_car_filled_rounded,
+                          size: 12, color: context.color.tertiaryContrastColo),
+                      4.toWidth,
+                      Expanded(
+                        child: Text(
+                          "${item.carName}${item.variantName != null ? ' (${item.variantName})' : ''}",
+                          style: context.bodySmall?.copyWith(
+                            fontSize: 11,
+                            color: context.color.tertiaryContrastColo,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 2.toHeight,
                 Text(
                   "Qty: ${item.qty}",

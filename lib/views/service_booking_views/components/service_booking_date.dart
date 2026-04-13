@@ -134,7 +134,7 @@ class ServiceBookingDate extends StatelessWidget {
         ),
         20.toHeight,
 
-        // Time selector
+        // Time selector row
         Row(
           children: [
             Icon(
@@ -154,53 +154,68 @@ class ServiceBookingDate extends StatelessWidget {
         ),
         12.toHeight,
 
-        // Time slot grid
+        // Time slot grid - Depends on selectedDate for filtering same-day past slots
         ValueListenableBuilder(
-          valueListenable: svm.selectedTime,
-          builder: (context, selectedTime, child) {
-            return Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _generateTimeSlots().map((time) {
-                final isSelected = selectedTime != null &&
-                    selectedTime.hour == time.hour &&
-                    selectedTime.minute == time.minute;
-
-                return GestureDetector(
-                  onTap: () {
-                    svm.selectedTime.value = time;
-                    // Auto-set date to today if not selected
-                    svm.selectedDate.value ??= DateTime.now();
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? primaryColor
-                          : context.color.mutedContrastColor,
-                      borderRadius: BorderRadius.circular(10),
-                      border: isSelected
-                          ? null
-                          : Border.all(
-                              color: context.color.primaryBorderColor,
-                            ),
-                    ),
+          valueListenable: svm.selectedDate,
+          builder: (context, selectedDate, child) {
+            return ValueListenableBuilder(
+              valueListenable: svm.selectedTime,
+              builder: (context, selectedTime, child) {
+                final slots = _generateTimeSlots(selectedDate);
+                if (slots.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
-                      _formatTime(time),
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected
-                            ? Colors.white
-                            : context.color.primaryContrastColor,
-                      ),
+                      "No slots available for today. Please select another date.",
+                      style: context.bodySmall?.copyWith(color: context.color.primaryWarningColor),
                     ),
-                  ),
+                  );
+                }
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: slots.map((time) {
+                    final isSelected = selectedTime != null &&
+                        selectedTime.hour == time.hour &&
+                        selectedTime.minute == time.minute;
+
+                    return GestureDetector(
+                      onTap: () {
+                        svm.selectedTime.value = time;
+                        // Auto-set date to today if not selected
+                        svm.selectedDate.value ??= DateTime.now();
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? primaryColor
+                              : context.color.mutedContrastColor,
+                          borderRadius: BorderRadius.circular(10),
+                          border: isSelected
+                              ? null
+                              : Border.all(
+                                  color: context.color.primaryBorderColor,
+                                ),
+                        ),
+                        child: Text(
+                          _formatTime(time),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected
+                                ? Colors.white
+                                : context.color.primaryContrastColor,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             );
           },
         ),
@@ -215,6 +230,18 @@ class ServiceBookingDate extends StatelessWidget {
                 if (date == null || time == null) {
                   return const SizedBox.shrink();
                 }
+                // Double check if selected time is still valid for selected date
+                final slots = _generateTimeSlots(date);
+                final isValid = slots.any((s) => s.hour == time.hour && s.minute == time.minute);
+                
+                if (!isValid) {
+                   // Clear invalid time selection if user switches to today and previous time was in the past
+                   WidgetsBinding.instance.addPostFrameCallback((_) {
+                     svm.selectedTime.value = null;
+                   });
+                   return const SizedBox.shrink();
+                }
+
                 return Container(
                   margin: const EdgeInsets.only(top: 16),
                   padding: const EdgeInsets.all(12),
@@ -253,12 +280,29 @@ class ServiceBookingDate extends StatelessWidget {
     );
   }
 
-  List<TimeOfDay> _generateTimeSlots() {
+  List<TimeOfDay> _generateTimeSlots(DateTime? selectedDate) {
     final slots = <TimeOfDay>[];
+    final now = DateTime.now();
+    final isToday = selectedDate != null &&
+        selectedDate.year == now.year &&
+        selectedDate.month == now.month &&
+        selectedDate.day == now.day;
+
     for (int hour = 8; hour <= 20; hour++) {
-      slots.add(TimeOfDay(hour: hour, minute: 0));
-      if (hour < 20) {
-        slots.add(TimeOfDay(hour: hour, minute: 30));
+      for (int minute in [0, 30]) {
+        if (hour == 20 && minute == 30) continue; // End at 8:00 PM
+
+        final slotTime = TimeOfDay(hour: hour, minute: minute);
+
+        if (isToday) {
+          // Add 30 minutes buffer for same day booking
+          final compareTime = now.add(const Duration(minutes: 30));
+          if (hour < compareTime.hour ||
+              (hour == compareTime.hour && minute < compareTime.minute)) {
+            continue;
+          }
+        }
+        slots.add(slotTime);
       }
     }
     return slots;

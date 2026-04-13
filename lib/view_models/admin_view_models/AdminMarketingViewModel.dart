@@ -42,4 +42,25 @@ class AdminMarketingViewModel extends ChangeNotifier {
     final service = Provider.of<AdminMarketingService>(context, listen: false);
     await service.deleteOffer(id);
   }
+
+  // --- Sliders ---
+
+  void initSliders() {
+    fetchSliders();
+  }
+
+  void fetchSliders() {
+    final service = Provider.of<AdminMarketingService>(context, listen: false);
+    service.fetchSliders();
+  }
+
+  Future<void> toggleSliderStatus(AdminSliderItem slider) async {
+    final service = Provider.of<AdminMarketingService>(context, listen: false);
+    await service.updateSlider(slider.id, {'status': slider.status == 1 ? '0' : '1'}, null);
+  }
+
+  Future<void> deleteSlider(int id) async {
+    final service = Provider.of<AdminMarketingService>(context, listen: false);
+    await service.deleteSlider(id);
+  }
 }

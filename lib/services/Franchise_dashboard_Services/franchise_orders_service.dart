@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
+import '../../helper/extension/string_extension.dart';
 import '../../models/franchise_models/franchise_order_model.dart';
 
 class FranchiseOrdersService with ChangeNotifier {
@@ -22,6 +23,8 @@ class FranchiseOrdersService with ChangeNotifier {
 
   String? _dateFrom;
   String? _dateTo;
+  String? _status;
+  String? _paymentStatus;
 
   // ── Public Getters ─────────────────────────────────────────────────────────
   FranchiseOrderListModel get orderList =>
@@ -36,16 +39,26 @@ class FranchiseOrdersService with ChangeNotifier {
 
   String? get dateFrom => _dateFrom;
   String? get dateTo => _dateTo;
+  String? get status => _status;
+  String? get paymentStatus => _paymentStatus;
 
-  void setFilters({String? from, String? to}) {
+  void setFilters({String? from, String? to, String? status}) {
     _dateFrom = from;
     _dateTo = to;
+    _status = status;
+    notifyListeners();
+  }
+
+  void setPaymentFilter(String? pStatus) {
+    _paymentStatus = pStatus;
     notifyListeners();
   }
 
   void clearFilters() {
     _dateFrom = null;
     _dateTo = null;
+    _status = null;
+    _paymentStatus = null;
     notifyListeners();
   }
 
@@ -68,6 +81,12 @@ class FranchiseOrdersService with ChangeNotifier {
         // ✅ FIX: If date_to is just YYYY-MM-DD, append end of day to make it inclusive
         final toParam = _dateTo!.length == 10 ? '$_dateTo 23:59:59' : _dateTo;
         query += '&date_to=$toParam';
+      }
+      if (_status != null && _status!.isNotEmpty) {
+        query += '&status=$_status';
+      }
+      if (_paymentStatus != null && _paymentStatus!.isNotEmpty) {
+        query += '&payment_status=$_paymentStatus';
       }
 
       final url = '${AppUrls.franchiseOrdersUrl}?$query';
@@ -153,5 +172,60 @@ class FranchiseOrdersService with ChangeNotifier {
     _orderDetail = null;
     _hasDetailError = false;
     notifyListeners();
+  }
+
+  // ── Update Order Status ───────────────────────────────────────────────────
+  Future<bool> updateOrderStatus(int orderId, int newStatus) async {
+    try {
+      final response = await NetworkApiServices().putApi(
+        {'status': newStatus},
+        '${AppUrls.franchiseOrdersUrl}/$orderId/status',
+        "Update Order Status",
+        headers: acceptJsonAuthHeader,
+      );
+
+      if (response != null && response['success'] == true) {
+        "Order status updated".showToast();
+        // If we are viewing this order's details, refresh them
+        if (_orderDetail?.id == orderId) {
+          await fetchOrderDetail(orderId);
+        }
+        return true;
+      } else {
+        "Failed to update status".showToast();
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating status: $e');
+      "Error: $e".showToast();
+      return false;
+    }
+  }
+
+  // ── Update Payment Status ──────────────────────────────────────────────────
+  Future<bool> updatePaymentStatus(int orderId, int newStatus) async {
+    try {
+      final response = await NetworkApiServices().putApi(
+        {'payment_status': newStatus},
+        '${AppUrls.franchiseOrdersUrl}/$orderId/payment-status',
+        "Update Payment Status",
+        headers: acceptJsonAuthHeader,
+      );
+
+      if (response != null && response['success'] == true) {
+        "Payment status updated".showToast();
+        if (_orderDetail?.id == orderId) {
+          await fetchOrderDetail(orderId);
+        }
+        return true;
+      } else {
+        "Failed to update payment status".showToast();
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating payment: $e');
+      "Error: $e".showToast();
+      return false;
+    }
   }
 }

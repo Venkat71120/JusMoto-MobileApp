@@ -14,6 +14,16 @@ class ProfileInfoService with ChangeNotifier {
       _profileInfoModel ?? ProfileInfoModel();
 
   fetchProfileInfo({trySkip = false}) async {
+    // ── Skip for Admin / Franchise users ──────────────────────────────────
+    // They have their own profile data and are not authorized for this endpoint
+    final isFranchise = sPref?.getBool("is_franchise") ?? false;
+    final isAdmin = sPref?.getBool("is_admin") ?? false;
+
+    if (isFranchise || isAdmin) {
+      debugPrint('ℹ️ Skipping ProfileInfoService.fetchProfileInfo for admin/franchise user');
+      return true;
+    }
+
     // ── Try returning cached profile first ────────────────────────────────
     if (trySkip) {
       final localProfile = sPref?.getString("profile");

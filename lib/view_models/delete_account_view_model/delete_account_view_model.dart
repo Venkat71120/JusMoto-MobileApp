@@ -1,4 +1,5 @@
 import 'package:car_service/helper/extension/context_extension.dart';
+import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/services/profile_services/delete_account_service.dart';
 import 'package:car_service/services/profile_services/profile_info_service.dart';
@@ -31,6 +32,11 @@ class DeleteAccountViewModel {
   void tryDeletingAccount(BuildContext context) async {
     final valid = formKey.currentState?.validate();
     if (valid != true) return;
+    
+    if (selectedReason.value == null) {
+      LocalKeys.selectAReason.showToast();
+      return;
+    }
     Alerts().confirmationAlert(
         context: context,
         title: LocalKeys.areYouSure,

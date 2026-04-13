@@ -13,6 +13,7 @@ import '../../utils/components/custom_network_image.dart';
 import '../../helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../invoice_view/invoice_view.dart' show downloadInvoicePdf;
 
 class FranchiseOrderDetailView extends StatefulWidget {
   final int orderId;
@@ -46,7 +47,10 @@ class _FranchiseOrderDetailViewState extends State<FranchiseOrderDetailView> {
                       onRetry: () =>
                           os.fetchOrderDetail(widget.orderId),
                     )
-                  : _DetailContent(order: os.orderDetail!),
+                  : _DetailContent(os: os, order: os.orderDetail!),
+          bottomNavigationBar: os.orderDetail != null 
+              ? _DetailBottomActions(os: os, order: os.orderDetail!) 
+              : null,
         );
       },
     );
@@ -56,8 +60,9 @@ class _FranchiseOrderDetailViewState extends State<FranchiseOrderDetailView> {
 // ── Detail Content ────────────────────────────────────────────────────────────
 
 class _DetailContent extends StatelessWidget {
+  final FranchiseOrdersService os;
   final FranchiseOrderDetailModel order;
-  const _DetailContent({required this.order});
+  const _DetailContent({required this.os, required this.order});
 
   Color _statusColor(int code) {
     switch (code) {
@@ -389,6 +394,242 @@ class _DetailContent extends StatelessWidget {
     );
   }
 }
+
+// ── Bottom Actions ────────────────────────────────────────────────────────────
+
+class _DetailBottomActions extends StatelessWidget {
+  final FranchiseOrdersService os;
+  final FranchiseOrderDetailModel order;
+
+  const _DetailBottomActions({required this.os, required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, context.mediaQuery.viewPadding.bottom + 12),
+      decoration: BoxDecoration(
+        color: context.color.accentContrastColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _ActionButton(
+                  label: 'Update Status',
+                  icon: Icons.edit_note_rounded,
+                  color: primaryColor,
+                  onTap: () => _showStatusSheet(context),
+                ),
+              ),
+              12.toWidth,
+              Expanded(
+                child: _ActionButton(
+                  label: 'Update Payment',
+                  icon: Icons.payments_outlined,
+                  color: Colors.indigo,
+                  onTap: () => _showPaymentSheet(context),
+                ),
+              ),
+            ],
+          ),
+          12.toHeight,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                downloadInvoicePdf(
+                  context,
+                  orderId: order.id,
+                  invoiceNumber: order.invoiceNumber,
+                );
+              },
+              icon: const Icon(Icons.download_rounded, size: 20),
+              label: const Text('Download Invoice'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.color.primaryContrastColor,
+                foregroundColor: context.color.accentContrastColor,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showStatusSheet(BuildContext context) {
+    final List<Map<String, dynamic>> options = [
+      {'label': 'Pending', 'value': 0, 'color': Colors.orange},
+      {'label': 'Accepted', 'value': 1, 'color': Colors.blue},
+      {'label': 'In Progress', 'value': 2, 'color': Colors.indigo},
+      {'label': 'Completed', 'value': 3, 'color': Colors.green},
+      {'label': 'Cancelled', 'value': 4, 'color': Colors.red},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _OptionSheet(
+        title: 'Update Order Status',
+        options: options,
+        currentValue: order.statusCode,
+        onSelect: (val) => os.updateOrderStatus(order.id, val),
+      ),
+    );
+  }
+
+  void _showPaymentSheet(BuildContext context) {
+    final List<Map<String, dynamic>> options = [
+      {'label': 'Unpaid', 'value': 0, 'color': Colors.red},
+      {'label': 'Paid', 'value': 1, 'color': Colors.green},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _OptionSheet(
+        title: 'Update Payment Status',
+        options: options,
+        currentValue: order.paymentStatusCode,
+        onSelect: (val) => os.updatePaymentStatus(order.id, val),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: color.withOpacity(0.2)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 20),
+              4.toHeight,
+              Text(
+                label,
+                style: context.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OptionSheet extends StatelessWidget {
+  final String title;
+  final List<Map<String, dynamic>> options;
+  final int currentValue;
+  final Function(int) onSelect;
+
+  const _OptionSheet({
+    required this.title,
+    required this.options,
+    required this.currentValue,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.color.accentContrastColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          20.toHeight,
+          Text(
+            title,
+            style: context.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          20.toHeight,
+          ...options.map((opt) {
+            final isSelected = opt['value'] == currentValue;
+            final color = opt['color'] as Color;
+
+            return ListTile(
+              onTap: () {
+                onSelect(opt['value']);
+                Navigator.pop(context);
+              },
+              leading: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              title: Text(
+                opt['label'],
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? color : null,
+                ),
+              ),
+              trailing: isSelected
+                  ? Icon(Icons.check_circle_rounded, color: color, size: 20)
+                  : null,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
 
@@ -766,8 +1007,4 @@ class _DetailError extends StatelessWidget {
     );
   }
 }
-
-// ── Width extension ───────────────────────────────────────────────────────────
-extension _WidthExt on int {
-  Widget get toWidth => SizedBox(width: toDouble());
-}
+

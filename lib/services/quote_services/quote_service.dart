@@ -87,10 +87,11 @@ class QuoteService extends ChangeNotifier {
         LocalKeys.supportTicket,
         headers: Map<String, String>.from(commonAuthHeader),
       );
-      if (response != null && response['success'] == true) {
-        _quoteDetail = QuoteModel.fromJson(
-          Map<String, dynamic>.from(response['data']),
-        );
+      if (response != null) {
+        final data = response['data'] ?? response['quote'] ?? response;
+        if (data is Map<String, dynamic>) {
+           _quoteDetail = QuoteModel.fromJson(data);
+        }
       }
     } catch (e) {
       debugPrint("Error fetching quote details: $e");

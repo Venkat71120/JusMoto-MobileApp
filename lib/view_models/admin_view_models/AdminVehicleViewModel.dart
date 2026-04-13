@@ -89,6 +89,62 @@ class AdminVehicleViewModel extends ChangeNotifier {
     await service.deleteCar(id);
   }
 
+  // --- Variants ---
+
+  void initVariants() {
+    fetchCars(); // For car filter
+    fetchVariants();
+  }
+
+  void fetchVariants({int page = 1}) {
+    final service = Provider.of<AdminVehicleService>(context, listen: false);
+    service.fetchVariants(page: page, carId: carFilterForVariant);
+  }
+
+  int? carFilterForVariant;
+  void onCarFilterForVariantChanged(int? val) {
+    carFilterForVariant = val;
+    fetchVariants();
+    notifyListeners();
+  }
+
+  Future<void> deleteVariant(int id) async {
+    final service = Provider.of<AdminVehicleService>(context, listen: false);
+    await service.deleteVariant(id);
+  }
+
+  // --- Engine Types ---
+
+  void initEngineTypes() {
+    fetchEngineTypes();
+  }
+
+  void fetchEngineTypes({int page = 1}) {
+    final service = Provider.of<AdminVehicleService>(context, listen: false);
+    service.fetchEngineTypes(page: page);
+  }
+
+  Future<void> deleteEngineType(int id) async {
+    final service = Provider.of<AdminVehicleService>(context, listen: false);
+    await service.deleteEngineType(id);
+  }
+
+  // --- Fuel Types ---
+
+  void initFuelTypes() {
+    fetchFuelTypes();
+  }
+
+  void fetchFuelTypes({int page = 1}) {
+    final service = Provider.of<AdminVehicleService>(context, listen: false);
+    service.fetchFuelTypes(page: page);
+  }
+
+  Future<void> deleteFuelType(int id) async {
+    final service = Provider.of<AdminVehicleService>(context, listen: false);
+    await service.deleteFuelType(id);
+  }
+
   @override
   void dispose() {
     brandSearchController.dispose();

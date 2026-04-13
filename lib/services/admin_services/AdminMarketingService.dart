@@ -14,6 +14,9 @@ class AdminMarketingService extends ChangeNotifier {
   AdminOfferListModel _offerList = AdminOfferListModel.empty();
   AdminOfferListModel get offerList => _offerList;
 
+  AdminSliderListModel _sliderList = AdminSliderListModel.empty();
+  AdminSliderListModel get sliderList => _sliderList;
+
   bool _loading = false;
   bool get loading => _loading;
 
@@ -170,6 +173,85 @@ class AdminMarketingService extends ChangeNotifier {
       return false;
     } catch (e) {
       debugPrint('❌ Error deleting offer: $e');
+      return false;
+    }
+  }
+
+  // --- Sliders ---
+
+  Future<void> fetchSliders() async {
+    _loading = true;
+    notifyListeners();
+    try {
+      final response = await NetworkApiServices().getApi(AppUrls.adminSlidersUrl, "Admin Sliders List", headers: acceptJsonAuthHeader);
+      if (response != null && response['success'] == true) {
+        _sliderList = AdminSliderListModel.fromJson(Map<String, dynamic>.from(response));
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching sliders: $e');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> createSlider(Map<String, String> data, File? image) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminSlidersUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Create Slider");
+      if (response != null && response['success'] == true) {
+        "Slider created successfully".showToast();
+        fetchSliders();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('❌ Error creating slider: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateSlider(int id, Map<String, String> data, File? image) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminSlidersUrl}/$id'));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields['_method'] = 'PUT';
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Update Slider");
+      if (response != null && response['success'] == true) {
+        "Slider updated successfully".showToast();
+        fetchSliders();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('❌ Error updating slider: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteSlider(int id) async {
+    try {
+      final response = await NetworkApiServices().deleteApi('${AppUrls.adminSlidersUrl}/$id', "Delete Slider", headers: acceptJsonAuthHeader);
+      if (response != null && response['success'] == true) {
+        _sliderList.sliders.removeWhere((s) => s.id == id);
+        notifyListeners();
+        "Slider deleted successfully".showToast();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('❌ Error deleting slider: $e');
       return false;
     }
   }

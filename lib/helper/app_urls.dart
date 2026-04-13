@@ -90,6 +90,12 @@ class AppUrls {
       '$baseEndPoint/admin/notifications';
   static String get adminRolesUrl => '$baseEndPoint/admin/roles';
   static String get adminQuotesUrl => '$baseEndPoint/admin/quotes';
+  static String get adminVariantsUrl => '$baseEndPoint/admin/variants';
+  static String get adminEngineTypesUrl => '$baseEndPoint/admin/engine-types';
+  static String get adminFuelTypesUrl => '$baseEndPoint/admin/fuel-types';
+  static String get adminSlidersUrl => '$baseEndPoint/admin/sliders';
+  static String get adminMediaUrl => '$baseEndPoint/admin/media';
+  static String get adminMediaUploadUrl => '$baseEndPoint/admin/media/upload';
 
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';

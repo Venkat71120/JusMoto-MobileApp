@@ -59,6 +59,12 @@ class NotificationListService with ChangeNotifier {
         data: oldNotification.data,
         createdAt: oldNotification.createdAt,
       );
+
+      // Decrement global unread count
+      if (UnreadCountService.instance.notificationCount.value > 0) {
+        UnreadCountService.instance.notificationCount.value--;
+      }
+
       notifyListeners();
     }
   }

@@ -160,6 +160,64 @@ class AdminOfferItem {
   }
 }
 
+class AdminSliderListModel {
+  final List<AdminSliderItem> sliders;
+
+  AdminSliderListModel({required this.sliders});
+
+  factory AdminSliderListModel.fromJson(Map<String, dynamic> json) {
+    return AdminSliderListModel(
+      sliders: (json['data'] as List? ?? [])
+          .map((s) => AdminSliderItem.fromJson(s as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  factory AdminSliderListModel.empty() => AdminSliderListModel(sliders: []);
+}
+
+class AdminSliderItem {
+  final int id;
+  final String title;
+  final String? image;
+  final String? link;
+  final int status;
+
+  AdminSliderItem({
+    required this.id,
+    required this.title,
+    this.image,
+    this.link,
+    required this.status,
+  });
+
+  factory AdminSliderItem.fromJson(Map<String, dynamic> json) {
+    return AdminSliderItem(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      image: json['image'],
+      link: json['link'],
+      status: _toInt(json['status']),
+    );
+  }
+
+  AdminSliderItem copyWith({
+    int? id,
+    String? title,
+    String? image,
+    String? link,
+    int? status,
+  }) {
+    return AdminSliderItem(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      image: image ?? this.image,
+      link: link ?? this.link,
+      status: status ?? this.status,
+    );
+  }
+}
+
 // Helpers
 int _toInt(dynamic value) {
   if (value == null) return 0;

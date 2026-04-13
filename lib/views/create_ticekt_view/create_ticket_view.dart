@@ -1,5 +1,6 @@
 import 'package:car_service/app_static_values.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
+import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/utils/components/custom_dropdown.dart';
 import 'package:car_service/utils/components/field_label.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/support_services/ticket_list_service.dart';
 import '../../utils/components/custom_button.dart';
+import 'package:car_service/customizations/colors.dart';
 
 import '../../utils/components/custom_preloader.dart';
 import '../../view_models/create_ticket_view_model/create_ticket_view_model.dart';
@@ -147,6 +149,28 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                       return LocalKeys.enterDescription;
                     }
                     return null;
+                  },
+                ),
+                16.toHeight,
+                ValueListenableBuilder(
+                  valueListenable: ctm.notifyViaEmail,
+                  builder: (context, value, child) {
+                    return SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: value,
+                      onChanged: (newValue) {
+                        ctm.notifyViaEmail.value = newValue;
+                      },
+                      title: Text(
+                        "Notify via email",
+                        style: context.titleSmall?.bold6,
+                      ),
+                      subtitle: Text(
+                        "Get updates about your ticket status on your registered email",
+                        style: context.bodySmall?.copyWith(fontSize: 11),
+                      ),
+                      activeColor: primaryColor,
+                    );
                   },
                 ),
               ],

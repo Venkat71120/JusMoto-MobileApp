@@ -10,7 +10,7 @@ class QuoteListModel {
   });
 
   factory QuoteListModel.fromJson(Map<String, dynamic> json) => QuoteListModel(
-    success: json["success"] ?? false,
+    success: (json["success"] ?? false).toString() == "true",
     data: List<QuoteModel>.from(
       (json["data"] ?? []).map((x) => QuoteModel.fromJson(x)),
     ),
@@ -47,16 +47,16 @@ class QuoteModel {
   });
 
   factory QuoteModel.fromJson(Map<String, dynamic> json) => QuoteModel(
-    id: json["id"] ?? 0,
-    userId: json["user_id"] ?? 0,
-    title: json["title"] ?? "",
-    description: json["description"] ?? "",
-    type: json["type"] ?? "",
-    status: json["status"] ?? "",
-    adminNote: json["admin_note"],
-    quotedPrice: json["quoted_price"],
-    createdAt: json["created_at"] ?? "",
-    updatedAt: json["updated_at"] ?? "",
+    id: int.tryParse(json["id"]?.toString() ?? '') ?? 0,
+    userId: int.tryParse(json["user_id"]?.toString() ?? '') ?? 0,
+    title: json["title"]?.toString() ?? "",
+    description: json["description"]?.toString() ?? "",
+    type: json["type"]?.toString() ?? "",
+    status: json["status"]?.toString() ?? "",
+    adminNote: json["admin_note"]?.toString(),
+    quotedPrice: json["quoted_price"]?.toString(),
+    createdAt: json["created_at"]?.toString() ?? "",
+    updatedAt: json["updated_at"]?.toString() ?? "",
   );
 
   Map<String, dynamic> toJson() => {

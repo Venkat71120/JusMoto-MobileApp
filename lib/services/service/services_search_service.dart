@@ -106,6 +106,23 @@ class ServicesSearchService with ChangeNotifier {
     try {
       if (responseData != null) {
         final tempData = ServiceListModel.fromJson(responseData);
+
+        // Fallback: If no services found for specific variant, try searching without variant filter
+        if (tempData.allServices.isEmpty && getFilter.containsKey('variant_id')) {
+           final fallbackFilter = Map<String, String>.from(getFilter)..remove('variant_id');
+           final fallbackUrl = Uri.parse(AppUrls.serviceListUrl)
+               .replace(queryParameters: fallbackFilter)
+               .toString();
+           
+           final fallbackResponse = await NetworkApiServices().getApi(fallbackUrl, LocalKeys.searchService);
+           if (fallbackResponse != null) {
+              final fallbackData = ServiceListModel.fromJson(fallbackResponse);
+              _searchResultModel = fallbackData;
+              nextPage = fallbackData.pagination?.nextPageUrl;
+              return;
+           }
+        }
+
         _searchResultModel = tempData;
         nextPage = tempData.pagination?.nextPageUrl;
       } else {

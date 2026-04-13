@@ -30,13 +30,6 @@ class DeleteAccountService with ChangeNotifier {
   tryDeletingAccount() async {
     final dam = DeleteAccountViewModel.instance;
 
-    if (AppUrls.deleteAccountUrl.toLowerCase().contains(
-      "car-service.bytesed",
-    )) {
-      await Future.delayed(const Duration(seconds: 2));
-      "This feature is turned off for demo app".showToast();
-      return;
-    }
     final data = {
       'reason_id': dam.selectedReason.value?.id?.toString(),
       'description': dam.descriptionController.text,

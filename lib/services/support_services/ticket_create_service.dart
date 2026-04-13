@@ -11,12 +11,14 @@ class TicketCreateService {
       {title,
       priority,
       description,
+      notifyViaEmail,
       required Department selectedDepartment}) async {
     final body = {
       'title': title,
       'priority': priority,
       'description': description,
-      'department_id': selectedDepartment.id.toString()
+      'department_id': selectedDepartment.id.toString(),
+      'notify_via_email': notifyViaEmail?.toString() ?? "0"
     };
 
     final responseData = await NetworkApiServices().postApi(

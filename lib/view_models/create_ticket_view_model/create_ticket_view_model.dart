@@ -13,6 +13,7 @@ class CreateTicketViewModel {
   TextEditingController descriptionController = TextEditingController();
   ValueNotifier<Department?> selectedDepartment = ValueNotifier(null);
   ValueNotifier<String?> selectedPriority = ValueNotifier("High");
+  ValueNotifier<bool> notifyViaEmail = ValueNotifier(false);
   ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -54,6 +55,7 @@ class CreateTicketViewModel {
             title: titleController.text,
             description: descriptionController.text,
             priority: selectedPriority.value.toString(),
+            notifyViaEmail: notifyViaEmail.value ? 1 : 0,
             selectedDepartment: selectedDepartment.value!)
         .then((v) async {
       if (v == true) {

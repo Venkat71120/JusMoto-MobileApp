@@ -34,7 +34,8 @@ class UnreadCountService {
     if (responseData != null) {
       debugPrint(responseData.toString());
       if (responseData["data"] != null && responseData["data"] is Map) {
-        notificationCount.value = responseData["data"]["count"] ?? 0;
+        notificationCount.value =
+            responseData["data"]["count"].toString().tryToParse;
       } else {
         notificationCount.value =
             responseData["unread_notifications"].toString().tryToParse;
@@ -43,6 +44,9 @@ class UnreadCountService {
                 .toString()
                 .tryToParse;
       }
+      // Safety check: ensure count is never negative
+      if (notificationCount.value < 0) notificationCount.value = 0;
+      if (messageCount.value < 0) messageCount.value = 0;
       return true;
     }
   }

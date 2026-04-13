@@ -19,6 +19,11 @@ import 'package:car_service/views/Admin_notification_view/AdminNotificationListV
 import 'package:car_service/views/Admin_refund_view/AdminRefundListView.dart';
 import 'package:car_service/views/Admin_quotes_view/admin_quote_list_view.dart';
 import 'package:car_service/views/Admin_user_view/AdminUserManagementView.dart';
+import 'package:car_service/views/Admin_vehicle_view/AdminVariantListView.dart';
+import 'package:car_service/views/Admin_vehicle_view/AdminEngineTypeListView.dart';
+import 'package:car_service/views/Admin_vehicle_view/AdminFuelTypeListView.dart';
+import 'package:car_service/views/Admin_marketing_view/AdminSliderListView.dart';
+import 'package:car_service/views/Admin_marketing_view/AdminMediaLibraryView.dart';
 
 class AdminHomeView extends StatefulWidget {
   const AdminHomeView({super.key});
@@ -326,6 +331,41 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                         Colors.blueGrey,
                         const AdminQuoteListView(),
                       ),
+                      _buildManagementCard(
+                        context,
+                        'Media',
+                        Icons.image,
+                        Colors.orange,
+                        const AdminMediaLibraryView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Sliders',
+                        Icons.slideshow,
+                        Colors.blue,
+                        const AdminSliderListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Variants',
+                        Icons.layers,
+                        Colors.deepOrange,
+                        const AdminVariantListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Engines',
+                        Icons.settings_input_component,
+                        Colors.brown,
+                        const AdminEngineTypeListView(),
+                      ),
+                      _buildManagementCard(
+                        context,
+                        'Fuels',
+                        Icons.local_gas_station,
+                        Colors.green,
+                        const AdminFuelTypeListView(),
+                      ),
                     ],
                   ),
 
@@ -552,37 +592,47 @@ class _AdminHomeViewState extends State<AdminHomeView> {
     Widget destination,
   ) {
     return InkWell(
-      onTap:
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => destination),
-          ),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => destination),
+      ),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          color: context.color.backgroundColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.12), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: 22),
             ),
-            8.toHeight,
+            const SizedBox(height: 12),
             Text(
               title,
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: color.withAlpha(200),
+                fontWeight: FontWeight.w800,
+                fontSize: 11,
+                color: context.color.primaryContrastColor.withOpacity(0.8),
+                letterSpacing: -0.1,
               ),
             ),
           ],

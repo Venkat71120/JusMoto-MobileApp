@@ -106,6 +106,27 @@ class OrderListTile extends StatelessWidget {
                           ],
                         ),
                         8.toHeight,
+                        // Placed on (Creation time)
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.history_toggle_off_rounded,
+                              size: 12,
+                              color: context.color.tertiaryContrastColo,
+                            ),
+                            4.toWidth,
+                            Text(
+                              order.createdAt == null
+                                  ? ""
+                                  : "Ordered: ${DateFormat("dd MMM, hh:mm a").format(order.createdAt!)}",
+                              style: context.bodySmall?.copyWith(
+                                fontSize: 10,
+                                color: context.color.tertiaryContrastColo,
+                              ),
+                            ),
+                          ],
+                        ),
+                        8.toHeight,
                         // Price + payment status
                         Row(
                           children: [

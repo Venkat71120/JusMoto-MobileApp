@@ -11,10 +11,10 @@ import 'package:car_service/models/franchise_models/franchise_order_model.dart';
 import 'package:car_service/services/Franchise_dashboard_Services/franchise_orders_service.dart';
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
 import 'package:car_service/views/franchise_order_detail_view/franchise_order_detail_view.dart';
-// import 'package:car_service/views/franchise_orders_view/franchise_order_detail_view.dart';
 import '../../helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../invoice_view/invoice_view.dart' show downloadInvoicePdf;
 
 class FranchiseOrdersView extends StatelessWidget {
   const FranchiseOrdersView({super.key});
@@ -47,6 +47,7 @@ class FranchiseOrdersView extends StatelessWidget {
           body: Column(
             children: [
               _FilterSection(os: os),
+              _StatusFilterSection(os: os),
               Expanded(
                 child: CustomRefreshIndicator(
                   onRefresh: () => os.refreshOrders(),
@@ -98,6 +99,55 @@ class FranchiseOrdersView extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => FranchiseOrderDetailView(orderId: orderId),
+      ),
+    );
+  }
+
+  // ── Helper Sheets (Shared with _OrderCard via context) ───────────────────────
+
+  static void showStatusSheet(BuildContext context, FranchiseOrderItem order,
+      FranchiseOrdersService os) {
+    final List<Map<String, dynamic>> options = [
+      {'label': 'Pending', 'value': 0, 'color': Colors.orange},
+      {'label': 'Accepted', 'value': 1, 'color': Colors.blue},
+      {'label': 'In Progress', 'value': 2, 'color': Colors.indigo},
+      {'label': 'Completed', 'value': 3, 'color': Colors.green},
+      {'label': 'Cancelled', 'value': 4, 'color': Colors.red},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _OptionSheet(
+        title: 'Update Order Status',
+        options: options,
+        currentValue: order.statusCode,
+        onSelect: (val) async {
+          final success = await os.updateOrderStatus(order.id, val);
+          if (success) os.refreshOrders();
+        },
+      ),
+    );
+  }
+
+  static void showPaymentSheet(BuildContext context, FranchiseOrderItem order,
+      FranchiseOrdersService os) {
+    final List<Map<String, dynamic>> options = [
+      {'label': 'Unpaid', 'value': 0, 'color': Colors.red},
+      {'label': 'Paid', 'value': 1, 'color': Colors.green},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _OptionSheet(
+        title: 'Update Payment Status',
+        options: options,
+        currentValue: order.paymentStatusCode,
+        onSelect: (val) async {
+          final success = await os.updatePaymentStatus(order.id, val);
+          if (success) os.refreshOrders();
+        },
       ),
     );
   }
@@ -247,12 +297,11 @@ class _OrderCard extends StatelessWidget {
                           ],
                         ),
                         16.toHeight,
-                        const Spacer(),
 
                         // Footer Row: Metadata Chips & Status Badges
                         Wrap(
                           alignment: WrapAlignment.spaceBetween,
-                          runSpacing: 8,
+                          runSpacing: 10,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             // Metadata Group
@@ -286,6 +335,54 @@ class _OrderCard extends StatelessWidget {
                               ],
                             ),
                           ],
+                        ),
+
+                        16.toHeight,
+                        const Divider(height: 1),
+                        12.toHeight,
+
+                        // Quick Actions
+                        Consumer<FranchiseOrdersService>(
+                          builder: (context, os, _) => Row(
+                            children: [
+                              Expanded(
+                                child: _QuickActionButton(
+                                  label: 'Status',
+                                  icon: Icons.edit_note_rounded,
+                                  color: primaryColor,
+                                  onTap: () => FranchiseOrdersView.showStatusSheet(context, order, os),
+                                ),
+                              ),
+                              8.toWidth,
+                              Expanded(
+                                child: _QuickActionButton(
+                                  label: 'Payment',
+                                  icon: Icons.payments_outlined,
+                                  color: Colors.indigo,
+                                  onTap: () => FranchiseOrdersView.showPaymentSheet(context, order, os),
+                                ),
+                              ),
+                              8.toWidth,
+                              Material(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(10),
+                                child: InkWell(
+                                  onTap: () {
+                                    downloadInvoicePdf(
+                                      context,
+                                      orderId: order.id,
+                                      invoiceNumber: order.invoiceNumber,
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    child: const Icon(Icons.download_rounded, size: 18, color: Colors.blueGrey),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -362,6 +459,130 @@ class _V2Badge extends StatelessWidget {
           color: isSolid ? Colors.white : color,
           letterSpacing: 0.6,
         ),
+      ),
+    );
+  }
+}
+
+class _QuickActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: color.withOpacity(0.15)),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 14),
+              6.toWidth,
+              Text(
+                label,
+                style: context.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OptionSheet extends StatelessWidget {
+  final String title;
+  final List<Map<String, dynamic>> options;
+  final int currentValue;
+  final Function(int) onSelect;
+
+  const _OptionSheet({
+    required this.title,
+    required this.options,
+    required this.currentValue,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.color.accentContrastColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          20.toHeight,
+          Text(
+            title,
+            style: context.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          20.toHeight,
+          ...options.map((opt) {
+            final isSelected = opt['value'] == currentValue;
+            final color = opt['color'] as Color;
+
+            return ListTile(
+              onTap: () {
+                onSelect(opt['value']);
+                Navigator.pop(context);
+              },
+              leading: Icon(
+                isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                color: isSelected ? color : Colors.grey[300],
+              ),
+              title: Text(
+                opt['label'],
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? color : context.color.primaryContrastColor,
+                ),
+              ),
+              trailing: isSelected
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('Current', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                    )
+                  : null,
+            );
+          }),
+        ],
       ),
     );
   }
@@ -512,12 +733,37 @@ class _FilterSection extends StatelessWidget {
     );
 
     if (selectedDate != null) {
+      if (isFrom) {
+        // Validation: Start Date cannot be in the future (relative to today or end date)
+        if (selectedDate.isAfter(DateTime.now())) {
+          "Start date cannot be in the future".showToast();
+          return;
+        }
+
+        if (os.dateTo != null) {
+          final toDate = DateTime.tryParse(os.dateTo!);
+          if (toDate != null && selectedDate.isAfter(toDate)) {
+            "Start date cannot be after end date".showToast();
+            return;
+          }
+        }
+      } else {
+        // Validation: End Date cannot be before Start Date
+        if (os.dateFrom != null) {
+          final fromDate = DateTime.tryParse(os.dateFrom!);
+          if (fromDate != null && selectedDate.isBefore(fromDate)) {
+            "End date cannot be before start date".showToast();
+            return;
+          }
+        }
+      }
+
       final formattedDate =
           "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
       if (isFrom) {
-        os.setFilters(from: formattedDate, to: os.dateTo);
+        os.setFilters(from: formattedDate, to: os.dateTo, status: os.status);
       } else {
-        os.setFilters(from: os.dateFrom, to: formattedDate);
+        os.setFilters(from: os.dateFrom, to: formattedDate, status: os.status);
       }
       os.refreshOrders();
     }
@@ -630,6 +876,72 @@ class _FilterItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _StatusFilterSection extends StatelessWidget {
+  final FranchiseOrdersService os;
+
+  const _StatusFilterSection({required this.os});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> statuses = [
+      {'label': 'All', 'value': null},
+      {'label': 'Pending', 'value': '0', 'color': Colors.orange},
+      {'label': 'Accepted', 'value': '1', 'color': Colors.blue},
+      {'label': 'In Progress', 'value': '2', 'color': Colors.indigo},
+      {'label': 'Completed', 'value': '3', 'color': Colors.green},
+      {'label': 'Cancelled', 'value': '4', 'color': Colors.red},
+    ];
+
+    return Container(
+      height: 48,
+      margin: const EdgeInsets.only(top: 8, bottom: 4),
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        scrollDirection: Axis.horizontal,
+        itemCount: statuses.length,
+        separatorBuilder: (_, __) => 8.toWidth,
+        itemBuilder: (context, i) {
+          final item = statuses[i];
+          final isSelected = os.status == item['value'];
+          final color = item['color'] as Color? ?? primaryColor;
+
+          return ChoiceChip(
+            label: Text(
+              item['label'],
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Colors.white : color,
+              ),
+            ),
+            selected: isSelected,
+            onSelected: (selected) {
+              if (selected) {
+                os.setFilters(
+                  status: item['value'],
+                  from: os.dateFrom,
+                  to: os.dateTo,
+                );
+                os.refreshOrders();
+              }
+            },
+            selectedColor: color,
+            backgroundColor: color.withOpacity(0.05),
+            checkmarkColor: Colors.white,
+            side: BorderSide(
+              color: isSelected ? color : color.withOpacity(0.2),
+              width: 1,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100),
+            ),
+          );
+        },
       ),
     );
   }
