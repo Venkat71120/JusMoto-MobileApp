@@ -1,6 +1,7 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/services/admin_services/AdminOutletService.dart';
+import 'package:car_service/views/choose_location_view/choose_location_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,12 +30,28 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
   void initState() {
     super.initState();
     if (isEdit) {
-      _nameController.text = widget.outlet.name;
-      _addressController.text = widget.outlet.address;
+      _nameController.text = widget.outlet.name ?? '';
+      _addressController.text = widget.outlet.address ?? '';
       _postCodeController.text = widget.outlet.postCode ?? '';
-      _latController.text = widget.outlet.latitude ?? '';
-      _lngController.text = widget.outlet.longitude ?? '';
+      _latController.text = widget.outlet.latitude?.toString() ?? '';
+      _lngController.text = widget.outlet.longitude?.toString() ?? '';
       _status = widget.outlet.status == 1;
+    }
+  }
+
+  Future<void> _pickLocationOnMap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChooseLocationView()),
+    );
+
+    if (result != null && result is List && result.isNotEmpty) {
+      final loc = result[0]; // Assuming ChooseLocationView returns [gl.geoLoc]
+      setState(() {
+        _addressController.text = loc.description ?? _addressController.text;
+        _latController.text = loc.lat?.toString() ?? _latController.text;
+        _lngController.text = loc.lng?.toString() ?? _lngController.text;
+      });
     }
   }
 
@@ -69,6 +86,7 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(isEdit ? 'Edit Outlet' : 'Add Outlet', style: const TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
@@ -76,7 +94,7 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
         foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
@@ -85,14 +103,27 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
               _buildTextField(
                 controller: _nameController,
                 label: 'Outlet Name',
-                hint: 'e.g. Downtown Service Center',
+                hint: 'e.g. JusMoto - Dubai Hill',
                 validator: (v) => v!.isEmpty ? 'Name is required' : null,
               ),
-              20.toHeight,
+              24.toHeight,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                   const Text('Location Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                   TextButton.icon(
+                      onPressed: _pickLocationOnMap,
+                      icon: const Icon(Icons.map_outlined, size: 18),
+                      label: const Text('Pick on Map'),
+                      style: TextButton.styleFrom(foregroundColor: primaryColor),
+                   ),
+                ],
+              ),
+              8.toHeight,
               _buildTextField(
                 controller: _addressController,
                 label: 'Full Address',
-                hint: 'e.g. 123 Main St, Area, City',
+                hint: 'e.g. Street, Area, City',
                 maxLines: 3,
                 validator: (v) => v!.isEmpty ? 'Address is required' : null,
               ),
@@ -110,7 +141,7 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
                       controller: _latController,
                       label: 'Latitude',
                       hint: '0.000000',
-                      keyboardType: TextInputType.number,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     ),
                   ),
                   16.toWidth,
@@ -119,16 +150,17 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
                       controller: _lngController,
                       label: 'Longitude',
                       hint: '0.000000',
-                      keyboardType: TextInputType.number,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     ),
                   ),
                 ],
               ),
-              24.toHeight,
+              32.toHeight,
               const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Active Status', style: TextStyle(fontSize: 14)),
+                subtitle: const Text('Enable or disable this outlet across the platform', style: TextStyle(fontSize: 11)),
                 value: _status,
                 activeColor: primaryColor,
                 onChanged: (v) => setState(() => _status = v),
@@ -136,15 +168,16 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
               40.toHeight,
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : Text(isEdit ? 'Update Outlet' : 'Create Outlet', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                 ),
               ),
@@ -166,7 +199,7 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
         8.toHeight,
         TextFormField(
           controller: controller,
@@ -175,7 +208,9 @@ class _AdminOutletFormViewState extends State<AdminOutletFormView> {
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[300]!)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[300]!)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: primaryColor)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
         ),

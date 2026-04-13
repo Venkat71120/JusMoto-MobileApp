@@ -1,3 +1,4 @@
+import 'AdminOutletModels.dart';
 
 class AdminFranchiseListModel {
   final List<AdminFranchiseItem> franchises;
@@ -66,15 +67,19 @@ class AdminFranchiseItem {
   final int id;
   final String name;
   final String email;
+  final String? phone;
   final int status;
   final String createdAt;
+  final AdminOutletItem? outlet;
 
   AdminFranchiseItem({
     required this.id,
     required this.name,
     required this.email,
+    this.phone,
     required this.status,
     required this.createdAt,
+    this.outlet,
   });
 
   factory AdminFranchiseItem.fromJson(Map<String, dynamic> json) {
@@ -82,8 +87,10 @@ class AdminFranchiseItem {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       email: json['email'] ?? '',
+      phone: json['phone'],
       status: _toInt(json['status']),
       createdAt: json['created_at'] ?? '',
+      outlet: json['outlet'] != null ? AdminOutletItem.fromJson(json['outlet']) : null,
     );
   }
 
@@ -91,15 +98,19 @@ class AdminFranchiseItem {
     int? id,
     String? name,
     String? email,
+    String? phone,
     int? status,
     String? createdAt,
+    AdminOutletItem? outlet,
   }) {
     return AdminFranchiseItem(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
+      phone: phone ?? this.phone,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
+      outlet: outlet ?? this.outlet,
     );
   }
 

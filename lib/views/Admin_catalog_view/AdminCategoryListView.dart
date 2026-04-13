@@ -86,16 +86,36 @@ class _AdminCategoryListViewState extends State<AdminCategoryListView> {
   Widget _buildFilters() {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.white,
-      child: TextField(
-        controller: _viewModel.categorySearchController,
-        decoration: InputDecoration(
-          hintText: 'Search categories...',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-        onChanged: _viewModel.onCategorySearchChanged,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey[100]!)),
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: _viewModel.categorySearchController,
+            decoration: InputDecoration(
+              hintText: 'Search categories...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              filled: true,
+              fillColor: Colors.grey[50],
+            ),
+            onChanged: _viewModel.onCategorySearchChanged,
+          ),
+          if (_viewModel.categorySearchController.text.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _FilterChip(label: 'Search: ${_viewModel.categorySearchController.text}', onClear: () {
+                   _viewModel.categorySearchController.clear();
+                   _viewModel.fetchCategories();
+                }),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -198,7 +218,8 @@ class _AdminCategoryListViewState extends State<AdminCategoryListView> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Provider.of<AdminCatalogService>(context, listen: false).updateCategory(category.id, {'status': category.status == 1 ? 0 : 1});
+              final status = category.status == 1 ? '0' : '1';
+              Provider.of<AdminCatalogService>(context, listen: false).updateCategory(category.id, {'status': status}, null);
             },
             child: const Text('Confirm'),
           ),
@@ -232,5 +253,33 @@ class _AdminCategoryListViewState extends State<AdminCategoryListView> {
   void dispose() {
     _viewModel.dispose();
     super.dispose();
+  }
+}
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onClear;
+  const _FilterChip({required this.label, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: primaryColor.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: TextStyle(color: primaryColor, fontSize: 11, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: onClear,
+            child: Icon(Icons.close, size: 14, color: primaryColor),
+          ),
+        ],
+      ),
+    );
   }
 }

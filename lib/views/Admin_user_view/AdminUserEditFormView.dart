@@ -2,15 +2,14 @@ import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/models/admin_models/AdminUserModels.dart';
 import 'package:car_service/services/admin_services/AdminOutletService.dart';
 import 'package:car_service/services/admin_services/AdminUserManagementService.dart';
-import 'package:car_service/view_models/admin_view_models/AdminUserManagementViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AdminUserEditFormView extends StatefulWidget {
-  final AdminBaseUserItem user;
+  final AdminBaseUserItem? user;
   final String type;
 
-  const AdminUserEditFormView({super.key, required this.user, required this.type});
+  const AdminUserEditFormView({super.key, this.user, required this.type});
 
   @override
   State<AdminUserEditFormView> createState() => _AdminUserEditFormViewState();
@@ -27,17 +26,19 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
   int? _selectedOutletId;
   String? _selectedRole;
 
+  bool get isEdit => widget.user != null;
+
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user.name);
-    _emailController = TextEditingController(text: widget.user.email);
-    _phoneController = TextEditingController(text: widget.user.phone);
-    _usernameController = TextEditingController(text: widget.user.username);
+    _nameController = TextEditingController(text: widget.user?.name);
+    _emailController = TextEditingController(text: widget.user?.email);
+    _phoneController = TextEditingController(text: widget.user?.phone);
+    _usernameController = TextEditingController(text: widget.user?.username);
     _passwordController = TextEditingController();
 
-    _selectedOutletId = widget.user.outletId;
-    _selectedRole = widget.user.role;
+    _selectedOutletId = widget.user?.outletId;
+    _selectedRole = widget.user?.role;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AdminUserManagementService>(context, listen: false).fetchRoles();
@@ -50,7 +51,7 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Edit ${widget.type == 'franchise' ? 'Franchise' : 'Staff'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(isEdit ? 'Edit ${widget.type.toUpperCase()}' : 'Add New ${widget.type.toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -62,9 +63,9 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Update Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(isEdit ? 'Update Details' : 'Account Details', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text('Modify account information below. Leave password blank to keep current.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              Text(isEdit ? 'Modify account information below. Leave password blank to keep current.' : 'Fill in the details below to create a new account.', style: const TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 24),
               
               _buildLabel('Full Name'),
@@ -105,7 +106,7 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
               ],
 
               if (widget.type == 'staff') ...[
-                _buildLabel('Outlet Assignment'),
+                _buildLabel('Outlet Assignment (Optional)'),
                 Consumer<AdminOutletService>(
                   builder: (context, outletService, _) {
                     return DropdownButtonFormField<int>(
@@ -113,7 +114,6 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
                       items: outletService.outletList.outlets.map((o) => DropdownMenuItem(value: o.id, child: Text(o.name))).toList(),
                       onChanged: (val) => setState(() => _selectedOutletId = val),
                       decoration: _inputDecoration('Select Outlet', Icons.location_on_outlined),
-                      hint: const Text('No Outlet Filter'),
                     );
                   },
                 ),
@@ -127,17 +127,19 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
                       items: userService.roles.map((r) => DropdownMenuItem(value: r['name'].toString(), child: Text(r['name'].toString()))).toList(),
                       onChanged: (val) => setState(() => _selectedRole = val),
                       decoration: _inputDecoration('Select Role', Icons.security_outlined),
+                      validator: (v) => v == null ? 'Role is required' : null,
                     );
                   },
                 ),
                 const SizedBox(height: 16),
               ],
 
-              _buildLabel('New Password (Optional)'),
+              _buildLabel(isEdit ? 'New Password (Optional)' : 'Account Password'),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: _inputDecoration('Leave blank to keep current', Icons.lock_outline),
+                decoration: _inputDecoration(isEdit ? 'Leave blank to keep current' : 'Enter password', Icons.lock_outline),
+                validator: (v) => !isEdit && v!.isEmpty ? 'Password is required for new accounts' : null,
               ),
               const SizedBox(height: 32),
 
@@ -151,7 +153,7 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
-                  child: const Text('Update Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(isEdit ? 'Update Account' : 'Create Account', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
             ],
@@ -191,8 +193,8 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
       if (widget.type == 'staff') {
         data['username'] = _usernameController.text;
         data['role'] = _selectedRole;
-        data['outlet_location_id'] = _selectedOutletId;
-      } else {
+        if (_selectedOutletId != null) data['outlet_location_id'] = _selectedOutletId;
+      } else if (widget.type == 'franchise') {
         data['mobile_number'] = _phoneController.text;
       }
 
@@ -200,9 +202,22 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
         data['password'] = _passwordController.text;
       }
 
-      final viewModel = Provider.of<AdminUserManagementViewModel>(context, listen: false);
-      await viewModel.updateAccount(widget.user, widget.type, data);
-      if (mounted) Navigator.pop(context);
+      final service = Provider.of<AdminUserManagementService>(context, listen: false);
+      
+      bool success;
+      if (isEdit) {
+        success = await service.updateUserDetail(widget.user!.id, widget.type, data);
+      } else {
+        if (widget.type == 'staff') {
+          success = await service.createStaff(data);
+        } else if (widget.type == 'franchise') {
+          success = await service.createFranchise(data);
+        } else {
+          success = await service.createUser(data);
+        }
+      }
+
+      if (success && mounted) Navigator.pop(context);
     }
   }
 

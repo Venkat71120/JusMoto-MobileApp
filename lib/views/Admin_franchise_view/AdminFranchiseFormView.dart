@@ -1,6 +1,7 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/services/admin_services/AdminFranchiseService.dart';
+import 'package:car_service/services/admin_services/AdminOutletService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +19,7 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
+  int? _selectedOutletId;
   bool _isLoading = false;
 
   bool get isEdit => widget.franchise != null;
@@ -28,8 +30,14 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
     if (isEdit) {
       _nameController.text = widget.franchise.name;
       _emailController.text = widget.franchise.email;
+      _phoneController.text = widget.franchise.phone ?? '';
+      _selectedOutletId = widget.franchise.outlet?.id;
       // Password is not shown for editing
     }
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AdminOutletService>(context, listen: false).fetchOutlets();
+    });
   }
 
   Future<void> _save() async {
@@ -42,6 +50,7 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'phone': _phoneController.text.trim(),
+      'outlet_id': _selectedOutletId?.toString(),
     };
 
     if (!isEdit) {
@@ -83,6 +92,9 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                 hint: 'Enter franchise partner name',
                 validator: (v) => v!.isEmpty ? 'Name is required' : null,
               ),
+              20.toHeight,
+              _buildOutletDropdown(),
+              20.toHeight,
               20.toHeight,
               _buildTextField(
                 controller: _emailController,
@@ -132,6 +144,41 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildOutletDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Assigned Outlet', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        8.toHeight,
+        Consumer<AdminOutletService>(
+          builder: (context, service, _) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[400]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _selectedOutletId,
+                  hint: const Text('Select Outlet (Optional)'),
+                  isExpanded: true,
+                  items: service.outletList.outlets.map((o) {
+                    return DropdownMenuItem<int>(
+                      value: o.id,
+                      child: Text(o.name),
+                    );
+                  }).toList(),
+                  onChanged: (val) => setState(() => _selectedOutletId = val),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

@@ -75,7 +75,8 @@ class AdminVehicleViewModel extends ChangeNotifier {
 
   Future<void> toggleCarStatus(AdminCarItem car) async {
     final service = Provider.of<AdminVehicleService>(context, listen: false);
-    await service.updateCar(car.id, {'status': car.status == 1 ? 0 : 1});
+    // updateCar expects Map<String, String> and File? image
+    await service.updateCar(car.id, {'status': car.status == 1 ? '0' : '1'}, null);
   }
 
   Future<void> deleteBrand(int id) async {

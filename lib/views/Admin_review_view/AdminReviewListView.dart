@@ -82,19 +82,24 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _buildFilterChip('', 'All Statuses'),
-            10.toWidth,
-            _buildFilterChip('pending', 'Pending'),
-            10.toWidth,
-            _buildFilterChip('approved', 'Approved'),
-            10.toWidth,
-            _buildFilterChip('rejected', 'Rejected'),
-          ],
-        ),
+      child: ListenableBuilder(
+        listenable: _viewModel,
+        builder: (context, _) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip('', 'All Statuses'),
+                10.toWidth,
+                _buildFilterChip('pending', 'Pending'),
+                10.toWidth,
+                _buildFilterChip('approved', 'Approved'),
+                10.toWidth,
+                _buildFilterChip('rejected', 'Rejected'),
+              ],
+            ),
+          );
+        }
       ),
     );
   }
@@ -108,12 +113,13 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
         decoration: BoxDecoration(
           color: isSelected ? primaryColor : Colors.grey[100],
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? primaryColor : Colors.grey[300]!),
         ),
         child: Text(
           label,
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.black87,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             fontSize: 13,
           ),
         ),
@@ -124,6 +130,8 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
   Widget _buildReviewCard(AdminReviewItem review) {
     final bool isPending = review.status == 'pending';
     final bool isApproved = review.status == 'approved';
+    final bool isRejected = review.status == 'rejected';
+    
     final Color statusColor = isApproved ? Colors.green : (isPending ? Colors.orange : Colors.red);
     final String date = DateFormat('dd MMM yyyy').format(DateTime.parse(review.createdAt));
 
@@ -159,7 +167,7 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
             const SizedBox(height: 12),
             Text(
               review.message,
-              style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
+              style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4, fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 16),
             Row(
@@ -187,15 +195,15 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (review.status != 'approved')
+                if (!isApproved)
                   _buildActionButton(
                     label: 'Approve',
                     icon: Icons.check_circle_outline,
                     color: Colors.green,
                     onTap: () => _viewModel.updateStatus(review, 'approved'),
                   ),
-                if (review.status != 'approved') 8.toWidth,
-                if (review.status != 'rejected')
+                if (!isApproved) 8.toWidth,
+                if (!isRejected)
                    _buildActionButton(
                     label: 'Reject',
                     icon: Icons.cancel_outlined,
@@ -222,7 +230,8 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          border: Border.all(color: color.withOpacity(0.5)),
+          color: color.withOpacity(0.05),
+          border: Border.all(color: color.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -242,9 +251,9 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         return Icon(
-          index < rating ? Icons.star : Icons.star_border,
-          color: index < rating ? Colors.amber : Colors.grey[300],
-          size: 18,
+          index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+          color: index < rating ? Colors.amber[700] : Colors.grey[400],
+          size: 20,
         );
       }),
     );

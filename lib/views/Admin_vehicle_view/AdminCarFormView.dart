@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/services/admin_services/AdminVehicleService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class AdminCarFormView extends StatefulWidget {
   final dynamic car;
@@ -20,6 +22,7 @@ class _AdminCarFormViewState extends State<AdminCarFormView> {
   int? _selectedBrandId;
   bool _status = true;
   bool _isLoading = false;
+  File? _selectedImage;
 
   bool get isEdit => widget.car != null;
 
@@ -32,9 +35,16 @@ class _AdminCarFormViewState extends State<AdminCarFormView> {
 
     if (isEdit) {
       _nameController.text = widget.car.name;
-      _yearController.text = widget.car.Year ?? '';
+      _yearController.text = widget.car.year ?? '';
       _selectedBrandId = widget.car.brandId;
       _status = widget.car.status == 1;
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result != null && result.files.single.path != null) {
+      setState(() => _selectedImage = File(result.files.single.path!));
     }
   }
 
@@ -49,19 +59,18 @@ class _AdminCarFormViewState extends State<AdminCarFormView> {
     setState(() => _isLoading = true);
     final service = Provider.of<AdminVehicleService>(context, listen: false);
 
-    final data = {
+    final Map<String, String> data = {
       'name': _nameController.text.trim(),
-      'brand_id': _selectedBrandId,
-      'Year': _yearController.text.trim(),
-      'status': _status ? 1 : 0,
-      'image': isEdit ? widget.car.image : null,
+      'brand_id': _selectedBrandId.toString(),
+      'year': _yearController.text.trim(),
+      'status': _status ? '1' : '0',
     };
 
     bool success;
     if (isEdit) {
-      success = await service.updateCar(widget.car.id, data);
+      success = await service.updateCar(widget.car.id, data, _selectedImage);
     } else {
-      success = await service.createCar(data);
+      success = await service.createCar(data, _selectedImage);
     }
 
     setState(() => _isLoading = false);
@@ -86,6 +95,8 @@ class _AdminCarFormViewState extends State<AdminCarFormView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildImagePicker(),
+              24.toHeight,
               _buildBrandDropdown(),
               20.toHeight,
               _buildTextField(
@@ -198,5 +209,39 @@ class _AdminCarFormViewState extends State<AdminCarFormView> {
     _nameController.dispose();
     _yearController.dispose();
     super.dispose();
+  }
+
+  Widget _buildImagePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Car Image', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        8.toHeight,
+        InkWell(
+          onTap: _pickImage,
+          child: Container(
+            width: double.infinity,
+            height: 150,
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: _selectedImage != null
+                ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                : isEdit && widget.car.image != null
+                    ? Image.network(widget.car.image!, fit: BoxFit.cover)
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_photo_alternate_outlined, size: 40, color: Colors.grey[400]),
+                          const SizedBox(height: 8),
+                          Text('Upload image', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                        ],
+                      ),
+          ),
+        ),
+      ],
+    );
   }
 }

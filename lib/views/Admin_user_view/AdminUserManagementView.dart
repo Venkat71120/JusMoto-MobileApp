@@ -28,6 +28,7 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         _loadCurrentTab();
+        setState(() {}); // Crucial for FAB update
       }
     });
 
@@ -71,15 +72,27 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
           _buildStaffTab(),
         ],
       ),
-      floatingActionButton: _tabController.index == 0 
-        ? FloatingActionButton.extended(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminFranchiseFormView())),
-            backgroundColor: primaryColor,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text('Add Franchise', style: TextStyle(color: Colors.white)),
-          )
-        : null,
+      floatingActionButton: _buildFab(),
     );
+  }
+
+  Widget? _buildFab() {
+    if (_tabController.index == 0) {
+      return FloatingActionButton.extended(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminFranchiseFormView())).then((_) => _viewModel.initFranchises()),
+        backgroundColor: primaryColor,
+        icon: const Icon(Icons.business, color: Colors.white),
+        label: const Text('Add Franchise', style: TextStyle(color: Colors.white)),
+      );
+    } else if (_tabController.index == 2) {
+      return FloatingActionButton.extended(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminUserEditFormView(type: 'staff'))).then((_) => _viewModel.initStaff()),
+        backgroundColor: Colors.orange[700],
+        icon: const Icon(Icons.person_add, color: Colors.white),
+        label: const Text('Add Staff', style: TextStyle(color: Colors.white)),
+      );
+    }
+    return null;
   }
 
   Widget _buildFranchiseTab() {
@@ -88,7 +101,10 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
         if (service.loading && service.franchiseList.data.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-        return _buildUserList(service.franchiseList.data, 'franchise');
+        return RefreshIndicator(
+          onRefresh: () async => _viewModel.initFranchises(),
+          child: _buildUserList(service.franchiseList.data, 'franchise')
+        );
       },
     );
   }
@@ -99,7 +115,10 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
         if (service.loading && service.userList.data.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-        return _buildUserList(service.userList.data, 'user');
+        return RefreshIndicator(
+           onRefresh: () async => _viewModel.initUsers(),
+           child: _buildUserList(service.userList.data, 'user')
+        );
       },
     );
   }
@@ -110,7 +129,10 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
         if (service.loading && service.staffList.data.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-        return _buildUserList(service.staffList.data, 'staff');
+        return RefreshIndicator(
+          onRefresh: () async => _viewModel.initStaff(),
+          child: _buildUserList(service.staffList.data, 'staff')
+        );
       },
     );
   }
@@ -198,7 +220,7 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
       icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
       onSelected: (val) {
         if (val == 'edit') {
-           Navigator.push(context, MaterialPageRoute(builder: (context) => AdminUserEditFormView(user: user, type: type)));
+           Navigator.push(context, MaterialPageRoute(builder: (context) => AdminUserEditFormView(user: user, type: type))).then((_) => _loadCurrentTab());
         } else if (val == 'status') {
           _viewModel.toggleStatus(user, type);
         } else if (val == 'delete') {

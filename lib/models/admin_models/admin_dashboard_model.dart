@@ -30,7 +30,7 @@ class AdminDashboardModel {
 
     return AdminDashboardModel(
       totalRevenue: _toNum(json['total_revenue']),
-      totalOrders: _toInt(json['total_orders']),
+      totalOrders: _toInt(json['total_orders'] ?? json['all_orders_count']),
       todayOrders: _toInt(json['today_orders']),
       pendingOrders: _toInt(json['pending_orders']),
       totalUsers: _toInt(json['total_users']),

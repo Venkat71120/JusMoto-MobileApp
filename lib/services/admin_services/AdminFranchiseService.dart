@@ -70,8 +70,12 @@ class AdminFranchiseService extends ChangeNotifier {
 
   Future<bool> updateFranchise(int id, Map<String, dynamic> data) async {
     try {
-      final response = await NetworkApiServices().putApi(
-        data,
+      // Use POST with _method: PUT for consistency with the app's standard update pattern
+      final payload = Map<String, dynamic>.from(data);
+      payload['_method'] = 'PUT';
+
+      final response = await NetworkApiServices().postApi(
+        payload,
         '${AppUrls.adminFranchisesUrl}/$id',
         "Update Franchise",
         headers: acceptJsonAuthHeader,

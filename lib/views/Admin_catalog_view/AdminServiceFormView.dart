@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/services/admin_services/AdminCatalogService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class AdminServiceFormView extends StatefulWidget {
   final int itemType; // 0=Service, 1=Product
@@ -25,6 +27,7 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
   bool _isFeatured = false;
   bool _status = true;
   bool _isLoading = false;
+  File? _selectedImage;
 
   bool get isEdit => widget.item != null;
 
@@ -38,7 +41,7 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
     if (isEdit) {
       _titleController.text = widget.item.title;
       _priceController.text = widget.item.price.toString();
-      _discountPriceController.text = widget.item.discountPrice?.toString() ?? '';
+      _discountPriceController.text = (widget.item.discountPrice != null && widget.item.discountPrice! > 0) ? widget.item.discountPrice.toString() : '';
       _durationController.text = widget.item.duration ?? '';
       _descriptionController.text = widget.item.description ?? '';
       _selectedCategoryId = widget.item.categoryId;
@@ -47,29 +50,49 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result != null && result.files.single.path != null) {
+      setState(() => _selectedImage = File(result.files.single.path!));
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a category')));
+      return;
+    }
+
+    final price = double.tryParse(_priceController.text) ?? 0.0;
+    final dPrice = _discountPriceController.text.isNotEmpty ? double.tryParse(_discountPriceController.text) : 0.0;
+
+    if (dPrice != null && dPrice >= price) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Discount price must be less than the regular price')));
+      return;
+    }
 
     setState(() => _isLoading = true);
     final service = Provider.of<AdminCatalogService>(context, listen: false);
 
-    final data = {
+    // Multipart fields must be Strings
+    final Map<String, String> data = {
       'title': _titleController.text.trim(),
-      'category_id': _selectedCategoryId,
-      'price': double.tryParse(_priceController.text) ?? 0.0,
-      'discount_price': _discountPriceController.text.isNotEmpty ? double.tryParse(_discountPriceController.text) : null,
+      'category_id': _selectedCategoryId.toString(),
+      'price': price.toString(),
+      'discount_price': dPrice?.toString() ?? '0',
       'duration': _durationController.text.trim(),
       'description': _descriptionController.text.trim(),
-      'is_featured': _isFeatured ? 1 : 0,
-      'status': _status ? 1 : 0,
-      'type': widget.itemType,
+      'is_featured': _isFeatured ? '1' : '0',
+      'status': _status ? '1' : '0',
+      'type': widget.itemType.toString(),
     };
 
     bool success;
     if (isEdit) {
-      success = await service.updateService(widget.item.id, data);
+      success = await service.updateService(widget.item.id, data, _selectedImage);
     } else {
-      success = await service.createService(data);
+      success = await service.createService(data, _selectedImage);
     }
 
     setState(() => _isLoading = false);
@@ -96,6 +119,8 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildImagePicker(),
+              24.toHeight,
               _buildTextField(
                 controller: _titleController,
                 label: 'Title',
@@ -112,8 +137,14 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
                       controller: _priceController,
                       label: 'Price (\u20B9)',
                       hint: '0.00',
-                      keyboardType: TextInputType.number,
-                      validator: (v) => v!.isEmpty ? 'Price is required' : null,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (v) {
+                        if (v!.isEmpty) return 'Price is required';
+                        final p = double.tryParse(v);
+                        if (p == null) return 'Invalid price';
+                        if (p <= 0) return 'Price must be greater than 0';
+                        return null;
+                      },
                     ),
                   ),
                   16.toWidth,
@@ -122,7 +153,11 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
                       controller: _discountPriceController,
                       label: 'Discount Price (\u20B9)',
                       hint: '0.00',
-                      keyboardType: TextInputType.number,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (v) {
+                        if (v != null && v.isNotEmpty && double.tryParse(v) == null) return 'Invalid format';
+                        return null;
+                      },
                     ),
                   ),
                 ],
@@ -130,8 +165,8 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
               20.toHeight,
               _buildTextField(
                 controller: _durationController,
-                label: 'Duration / Size',
-                hint: 'e.g. 30 mins or 500ml',
+                label: widget.itemType == 0 ? 'Duration' : 'Size / Specs',
+                hint: widget.itemType == 0 ? 'e.g. 30 mins' : 'e.g. 500ml or 1kg',
               ),
               20.toHeight,
               _buildTextField(
@@ -159,15 +194,16 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
               40.toHeight,
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : Text(isEdit ? 'Update $typeLabel' : 'Create $typeLabel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                 ),
               ),
@@ -176,6 +212,40 @@ class _AdminServiceFormViewState extends State<AdminServiceFormView> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Display Image', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        8.toHeight,
+        InkWell(
+          onTap: _pickImage,
+          child: Container(
+            width: double.infinity,
+            height: 150,
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: _selectedImage != null
+                ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                : isEdit && widget.item.image != null
+                    ? Image.network(widget.item.image!, fit: BoxFit.cover)
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_photo_alternate_outlined, size: 40, color: Colors.grey[400]),
+                          const SizedBox(height: 8),
+                          Text('Upload image', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                        ],
+                      ),
+          ),
+        ),
+      ],
     );
   }
 

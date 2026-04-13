@@ -86,16 +86,36 @@ class _AdminFranchiseListViewState extends State<AdminFranchiseListView> {
   Widget _buildFilters() {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.white,
-      child: TextField(
-        controller: _viewModel.searchController,
-        decoration: InputDecoration(
-          hintText: 'Search franchises...',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-        onChanged: _viewModel.onSearchChanged,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey[100]!)),
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: _viewModel.searchController,
+            decoration: InputDecoration(
+              hintText: 'Search franchises...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              filled: true,
+              fillColor: Colors.grey[50],
+            ),
+            onChanged: _viewModel.onSearchChanged,
+          ),
+          if (_viewModel.searchController.text.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _FilterChip(label: 'Search: ${_viewModel.searchController.text}', onClear: () {
+                   _viewModel.searchController.clear();
+                   _viewModel.fetchFranchises();
+                }),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -160,6 +180,18 @@ class _AdminFranchiseListViewState extends State<AdminFranchiseListView> {
                   franchise.status == 1 ? 'Active' : 'Inactive',
                   franchise.status == 1 ? Colors.green : Colors.red,
                 ),
+                if (franchise.outlet != null)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        'Outlet: ${franchise.outlet!.name}',
+                        style: TextStyle(fontSize: 11, color: primaryColor, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ),
                 Text(
                   'Created: ${franchise.createdAt.split('T')[0]}',
                   style: TextStyle(fontSize: 11, color: Colors.grey[500]),
@@ -231,5 +263,34 @@ class _AdminFranchiseListViewState extends State<AdminFranchiseListView> {
   void dispose() {
     _viewModel.dispose();
     super.dispose();
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onClear;
+  const _FilterChip({required this.label, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: primaryColor.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: TextStyle(color: primaryColor, fontSize: 11, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: onClear,
+            child: Icon(Icons.close, size: 14, color: primaryColor),
+          ),
+        ],
+      ),
+    );
   }
 }

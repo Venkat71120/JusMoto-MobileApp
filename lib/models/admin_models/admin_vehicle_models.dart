@@ -28,11 +28,13 @@ class AdminBrandItem {
   final int id;
   final String name;
   final String? image;
+  final int status;
 
   AdminBrandItem({
     required this.id,
     required this.name,
     this.image,
+    required this.status,
   });
 
   factory AdminBrandItem.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class AdminBrandItem {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       image: json['image'],
+      status: _toInt(json['status']),
     );
   }
 
@@ -47,11 +50,13 @@ class AdminBrandItem {
     int? id,
     String? name,
     String? image,
+    int? status,
   }) {
     return AdminBrandItem(
       id: id ?? this.id,
       name: name ?? this.name,
       image: image ?? this.image,
+      status: status ?? this.status,
     );
   }
 }
@@ -86,7 +91,7 @@ class AdminCarItem {
   final int id;
   final String name;
   final int brandId;
-  final String? Year;
+  final String? year;
   final String? image;
   final int status;
   final AdminBrandItem? brand;
@@ -95,7 +100,7 @@ class AdminCarItem {
     required this.id,
     required this.name,
     required this.brandId,
-    this.Year,
+    this.year,
     this.image,
     required this.status,
     this.brand,
@@ -106,7 +111,7 @@ class AdminCarItem {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       brandId: _toInt(json['brand_id']),
-      Year: json['Year'],
+      year: json['year'] ?? json['Year'],
       image: json['image'],
       status: _toInt(json['status']),
       brand: json['brand'] != null 
@@ -119,7 +124,7 @@ class AdminCarItem {
     int? id,
     String? name,
     int? brandId,
-    String? Year,
+    String? year,
     String? image,
     int? status,
     AdminBrandItem? brand,
@@ -128,7 +133,7 @@ class AdminCarItem {
       id: id ?? this.id,
       name: name ?? this.name,
       brandId: brandId ?? this.brandId,
-      Year: Year ?? this.Year,
+      year: year ?? this.year,
       image: image ?? this.image,
       status: status ?? this.status,
       brand: brand ?? this.brand,

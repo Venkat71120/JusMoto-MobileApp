@@ -105,13 +105,13 @@ class QuoteService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      String url = "${AppUrls.quotesUrl}?page=$page";
+      String url = "${AppUrls.adminQuotesUrl}?page=$page";
       if (status != null) url += "&status=$status";
 
       final response = await _apiService.getApi(
         url,
         LocalKeys.supportTicket,
-        headers: Map<String, String>.from(commonAuthHeader),
+        headers: acceptJsonAuthHeader,
       );
       if (response != null) {
         _quoteList = QuoteListModel.fromJson(

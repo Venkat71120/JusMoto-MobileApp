@@ -52,8 +52,6 @@ class AdminNotificationService extends ChangeNotifier {
         // Local update
         final index = _notificationList.data.indexWhere((n) => n.id == id);
         if (index != -1) {
-          // Since it's final in the model, we could just refresh or define copyWith
-          // Re-fetching current page is safer for data consistency
           fetchNotifications(page: _notificationList.pagination?.page ?? 1);
         }
         return true;
@@ -62,6 +60,31 @@ class AdminNotificationService extends ChangeNotifier {
     } catch (e) {
       debugPrint('❌ Error marking notification as read: $e');
       return false;
+    }
+  }
+
+  Future<bool> sendBroadcastNotification(Map<String, dynamic> data) async {
+    _loading = true;
+    notifyListeners();
+    try {
+      final response = await NetworkApiServices().postApi(
+        data,
+        AppUrls.adminNotificationsUrl,
+        "Send Broadcast Notification",
+        headers: acceptJsonAuthHeader,
+      );
+      if (response != null && response['success'] == true) {
+        "Notification sent successfully".showToast();
+        fetchNotifications();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('❌ Error sending notification: $e');
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
     }
   }
 }

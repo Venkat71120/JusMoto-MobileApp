@@ -89,6 +89,7 @@ class AppUrls {
   static String get adminNotificationsUrl =>
       '$baseEndPoint/admin/notifications';
   static String get adminRolesUrl => '$baseEndPoint/admin/roles';
+  static String get adminQuotesUrl => '$baseEndPoint/admin/quotes';
 
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';

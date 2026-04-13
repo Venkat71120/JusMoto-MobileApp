@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
@@ -36,11 +38,19 @@ class AdminVehicleService extends ChangeNotifier {
     }
   }
 
-  Future<bool> createBrand(Map<String, dynamic> data) async {
+  Future<bool> createBrand(Map<String, String> data, File? image) async {
     try {
-      final response = await NetworkApiServices().postApi(data, AppUrls.adminBrandsUrl, "Create Brand", headers: acceptJsonAuthHeader);
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminBrandsUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Create Brand");
       if (response != null && response['success'] == true) {
         "Brand created successfully".showToast();
+        fetchBrands();
         return true;
       }
       return false;
@@ -50,11 +60,20 @@ class AdminVehicleService extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateBrand(int id, Map<String, dynamic> data) async {
+  Future<bool> updateBrand(int id, Map<String, String> data, File? image) async {
     try {
-      final response = await NetworkApiServices().putApi(data, '${AppUrls.adminBrandsUrl}/$id', "Update Brand", headers: acceptJsonAuthHeader);
+      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminBrandsUrl}/$id'));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields['_method'] = 'PUT';
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Update Brand");
       if (response != null && response['success'] == true) {
         "Brand updated successfully".showToast();
+        fetchBrands();
         return true;
       }
       return false;
@@ -104,11 +123,19 @@ class AdminVehicleService extends ChangeNotifier {
     }
   }
 
-  Future<bool> createCar(Map<String, dynamic> data) async {
+  Future<bool> createCar(Map<String, String> data, File? image) async {
     try {
-      final response = await NetworkApiServices().postApi(data, AppUrls.adminCarsUrl, "Create Car", headers: acceptJsonAuthHeader);
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminCarsUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Create Car");
       if (response != null && response['success'] == true) {
         "Car created successfully".showToast();
+        fetchCars();
         return true;
       }
       return false;
@@ -118,19 +145,20 @@ class AdminVehicleService extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateCar(int id, Map<String, dynamic> data) async {
+  Future<bool> updateCar(int id, Map<String, String> data, File? image) async {
     try {
-      final response = await NetworkApiServices().putApi(data, '${AppUrls.adminCarsUrl}/$id', "Update Car", headers: acceptJsonAuthHeader);
+      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminCarsUrl}/$id'));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields['_method'] = 'PUT';
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Update Car");
       if (response != null && response['success'] == true) {
         "Car updated successfully".showToast();
-        // Local update for status
-        if (data.containsKey('status')) {
-          final index = _carList.cars.indexWhere((c) => c.id == id);
-          if (index != -1) {
-            _carList.cars[index] = _carList.cars[index].copyWith(status: data['status']);
-            notifyListeners();
-          }
-        }
+        fetchCars();
         return true;
       }
       return false;

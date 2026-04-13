@@ -61,6 +61,12 @@ class AdminBaseUserItem {
     if (json['outletLocation'] != null) {
       oId = json['outletLocation']['id'];
       oName = json['outletLocation']['name'];
+    } else if (json['outlet'] != null) {
+      oId = json['outlet']['id'];
+      oName = json['outlet']['name'];
+    } else if (json['branch'] != null) {
+      oId = json['branch']['id'];
+      oName = json['branch']['name'];
     } else if (json['outlet_location_id'] != null) {
       oId = _toInt(json['outlet_location_id']);
     }
@@ -135,7 +141,7 @@ int _toStatusInt(dynamic value) {
   if (value is bool) return value ? 1 : 0;
   if (value is int) return value;
   if (value is String) {
-    if (value.toLowerCase() == "active" || value == "1") return 1;
+    if (value.toLowerCase() == "active" || value == "1" || value.toLowerCase() == "true") return 1;
     return 0;
   }
   return 0;

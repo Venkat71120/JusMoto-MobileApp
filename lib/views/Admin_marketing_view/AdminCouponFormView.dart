@@ -45,11 +45,12 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
   }
 
   Future<void> _selectExpiry(BuildContext context) async {
+    final DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedExpiry ?? DateTime.now().add(const Duration(days: 30)),
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(const Duration(days: 3650)),
+      initialDate: _selectedExpiry ?? now.add(const Duration(days: 30)),
+      firstDate: now, // Block past dates
+      lastDate: now.add(const Duration(days: 3650)),
     );
     if (picked != null) {
       setState(() {
@@ -61,6 +62,12 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    
+    final discountVal = double.tryParse(_discountController.text) ?? 0.0;
+    if (_discountType == 'percentage' && discountVal > 100) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Percentage discount cannot exceed 100%')));
+      return;
+    }
 
     setState(() => _isLoading = true);
     final service = Provider.of<AdminMarketingService>(context, listen: false);
@@ -68,7 +75,7 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
     final data = {
       'code': _codeController.text.trim().toUpperCase(),
       'title': _titleController.text.trim(),
-      'discount': double.tryParse(_discountController.text) ?? 0.0,
+      'discount': discountVal,
       'discount_type': _discountType,
       'expire_date': _selectedExpiry != null ? DateFormat('yyyy-MM-dd').format(_selectedExpiry!) : null,
       'status': _status ? 1 : 0,
@@ -90,6 +97,7 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(isEdit ? 'Edit Coupon' : 'Add Coupon', style: const TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
@@ -107,7 +115,11 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
                 controller: _codeController,
                 label: 'Coupon Code',
                 hint: 'e.g. SUMMER2024',
+                textCapitalization: TextCapitalization.characters,
                 validator: (v) => v!.isEmpty ? 'Code is required' : null,
+                onChanged: (v) {
+                   // Ensure it stays uppercase as user types if they don't have it on
+                },
               ),
               20.toHeight,
               _buildTextField(
@@ -124,8 +136,13 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
                       controller: _discountController,
                       label: 'Discount Value',
                       hint: '0.00',
-                      keyboardType: TextInputType.number,
-                      validator: (v) => v!.isEmpty ? 'Value is required' : null,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (v) {
+                        if (v!.isEmpty) return 'Required';
+                        if (double.tryParse(v) == null) return 'Invalid';
+                        if (double.parse(v) <= 0) return 'Must be > 0';
+                        return null;
+                      },
                     ),
                   ),
                   16.toWidth,
@@ -149,15 +166,16 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
               40.toHeight,
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : Text(isEdit ? 'Update Coupon' : 'Create Coupon', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                 ),
               ),
@@ -215,8 +233,10 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
     required String label,
     required String hint,
     TextInputType? keyboardType,
+    TextCapitalization textCapitalization = TextCapitalization.none,
     String? Function(String?)? validator,
     Widget? suffixIcon,
+    void Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +246,9 @@ class _AdminCouponFormViewState extends State<AdminCouponFormView> {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          textCapitalization: textCapitalization,
           validator: validator,
+          onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hint,
             suffixIcon: suffixIcon,

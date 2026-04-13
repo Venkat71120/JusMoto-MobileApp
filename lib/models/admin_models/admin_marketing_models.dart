@@ -100,6 +100,9 @@ class AdminOfferItem {
   final String? image;
   final int status;
 
+  final int isPrimary;
+  final List<int> serviceIds;
+
   AdminOfferItem({
     required this.id,
     required this.title,
@@ -107,6 +110,8 @@ class AdminOfferItem {
     this.expiresAt,
     this.image,
     required this.status,
+    this.isPrimary = 0,
+    this.serviceIds = const [],
   });
 
   factory AdminOfferItem.fromJson(Map<String, dynamic> json) {
@@ -117,6 +122,8 @@ class AdminOfferItem {
       expiresAt: json['expires_at'],
       image: json['image'],
       status: _toInt(json['status']),
+      isPrimary: _toInt(json['is_primary'] ?? json['isPrimary']),
+      serviceIds: (json['services'] as List? ?? []).map((s) => _toInt(s is Map ? s['id'] : s)).toList(),
     );
   }
 
@@ -127,6 +134,8 @@ class AdminOfferItem {
     String? expiresAt,
     String? image,
     int? status,
+    int? isPrimary,
+    List<int>? serviceIds,
   }) {
     return AdminOfferItem(
       id: id ?? this.id,
@@ -135,6 +144,8 @@ class AdminOfferItem {
       expiresAt: expiresAt ?? this.expiresAt,
       image: image ?? this.image,
       status: status ?? this.status,
+      isPrimary: isPrimary ?? this.isPrimary,
+      serviceIds: serviceIds ?? this.serviceIds,
     );
   }
 

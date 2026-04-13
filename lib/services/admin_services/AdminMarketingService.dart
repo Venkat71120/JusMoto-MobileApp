@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
@@ -101,11 +103,25 @@ class AdminMarketingService extends ChangeNotifier {
     }
   }
 
-  Future<bool> createOffer(Map<String, dynamic> data) async {
+  Future<bool> createOffer(Map<String, String> data, File? image, List<int> serviceIds) async {
     try {
-      final response = await NetworkApiServices().postApi(data, AppUrls.adminOffersUrl, "Create Offer", headers: acceptJsonAuthHeader);
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminOffersUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+      
+      // Add service IDs as indexed fields if needed, or comma separated string
+      // Let's use service_ids[] or similar if required by backend
+      for (int i = 0; i < serviceIds.length; i++) {
+        request.fields['service_ids[$i]'] = serviceIds[i].toString();
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Create Offer");
       if (response != null && response['success'] == true) {
         "Offer created successfully".showToast();
+        fetchOffers();
         return true;
       }
       return false;
@@ -115,17 +131,24 @@ class AdminMarketingService extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateOffer(int id, Map<String, dynamic> data) async {
+  Future<bool> updateOffer(int id, Map<String, String> data, File? image, List<int> serviceIds) async {
     try {
-      final response = await NetworkApiServices().putApi(data, '${AppUrls.adminOffersUrl}/$id', "Update Offer", headers: acceptJsonAuthHeader);
+      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminOffersUrl}/$id'));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.fields['_method'] = 'PUT';
+      request.fields.addAll(data);
+      if (image != null) {
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      }
+
+      for (int i = 0; i < serviceIds.length; i++) {
+        request.fields['service_ids[$i]'] = serviceIds[i].toString();
+      }
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Update Offer");
       if (response != null && response['success'] == true) {
         "Offer updated successfully".showToast();
-        // Local update
-        final index = _offerList.offers.indexWhere((o) => o.id == id);
-        if (index != -1 && data.containsKey('status')) {
-          _offerList.offers[index] = _offerList.offers[index].copyWith(status: data['status']);
-          notifyListeners();
-        }
+        fetchOffers();
         return true;
       }
       return false;

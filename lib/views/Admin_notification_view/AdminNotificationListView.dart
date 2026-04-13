@@ -1,3 +1,4 @@
+import 'package:car_service/views/Admin_notification_view/AdminNotificationFormView.dart';
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/view_models/admin_view_models/AdminNotificationViewModel.dart';
@@ -79,6 +80,12 @@ class _AdminNotificationListViewState extends State<AdminNotificationListView> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminNotificationFormView())).then((_) => _viewModel.init()),
+        backgroundColor: primaryColor,
+        icon: const Icon(Icons.send, color: Colors.white),
+        label: const Text('Send Broadcast', style: TextStyle(color: Colors.white)),
       ),
     );
   }

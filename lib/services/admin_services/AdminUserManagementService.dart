@@ -201,6 +201,56 @@ class AdminUserManagementService extends ChangeNotifier {
     }
   }
 
+  Future<bool> createStaff(Map<String, dynamic> data) async {
+    _loading = true;
+    notifyListeners();
+    try {
+      final response = await NetworkApiServices().postApi(
+        data,
+        AppUrls.adminStaffUrl,
+        "Create Staff",
+        headers: acceptJsonAuthHeader,
+      );
+      if (response != null && response['success'] == true) {
+        "Staff account created successfully".showToast();
+        fetchStaff();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('❌ Error creating staff: $e');
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> createUser(Map<String, dynamic> data) async {
+    _loading = true;
+    notifyListeners();
+    try {
+      final response = await NetworkApiServices().postApi(
+        data,
+        AppUrls.adminUsersUrl,
+        "Create User",
+        headers: acceptJsonAuthHeader,
+      );
+      if (response != null && response['success'] == true) {
+        "User account created successfully".showToast();
+        fetchUsers();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('❌ Error creating user: $e');
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
   void _refreshType(String type) {
     if (type == 'franchise') fetchFranchises();
     if (type == 'staff') fetchStaff();

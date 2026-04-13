@@ -24,7 +24,13 @@ class AdminMarketingViewModel extends ChangeNotifier {
 
   Future<void> toggleOfferStatus(AdminOfferItem offer) async {
     final service = Provider.of<AdminMarketingService>(context, listen: false);
-    await service.updateOffer(offer.id, {'status': offer.status == 1 ? 0 : 1});
+    // updateOffer expects Map<String, String>, null image, and List<int> serviceIds
+    await service.updateOffer(
+      offer.id, 
+      {'status': offer.status == 1 ? '0' : '1'}, 
+      null, 
+      List<int>.from(offer.serviceIds)
+    );
   }
 
   Future<void> deleteCoupon(int id) async {
