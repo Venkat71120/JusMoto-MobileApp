@@ -90,6 +90,22 @@ class AdminMarketingService extends ChangeNotifier {
 
   // --- Offers ---
 
+  Future<int?> _uploadImage(File image) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminMediaUploadUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.files.add(await http.MultipartFile.fromPath('file', image.path));
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Upload Media");
+      if (response != null && response['success'] == true) {
+        return response['data']?['id'] as int?;
+      }
+    } catch (e) {
+      debugPrint('❌ Error uploading media: $e');
+    }
+    return null;
+  }
+
   Future<void> fetchOffers() async {
     _loading = true;
     notifyListeners();
@@ -108,20 +124,15 @@ class AdminMarketingService extends ChangeNotifier {
 
   Future<bool> createOffer(Map<String, String> data, File? image, List<int> serviceIds) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminOffersUrl));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
       
-      // Add service IDs as indexed fields if needed, or comma separated string
-      // Let's use service_ids[] or similar if required by backend
-      for (int i = 0; i < serviceIds.length; i++) {
-        request.fields['service_ids[$i]'] = serviceIds[i].toString();
-      }
+      payload['services'] = serviceIds; // Or 'service_ids' or 'services', web app uses 'services'
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Create Offer");
+      final response = await NetworkApiServices().postApi(payload, AppUrls.adminOffersUrl, "Create Offer", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Offer created successfully".showToast();
         fetchOffers();
@@ -136,19 +147,15 @@ class AdminMarketingService extends ChangeNotifier {
 
   Future<bool> updateOffer(int id, Map<String, String> data, File? image, List<int> serviceIds) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminOffersUrl}/$id'));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields['_method'] = 'PUT';
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      for (int i = 0; i < serviceIds.length; i++) {
-        request.fields['service_ids[$i]'] = serviceIds[i].toString();
-      }
+      payload['services'] = serviceIds;
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Update Offer");
+      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminOffersUrl}/$id', "Update Offer", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Offer updated successfully".showToast();
         fetchOffers();
@@ -197,14 +204,13 @@ class AdminMarketingService extends ChangeNotifier {
 
   Future<bool> createSlider(Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminSlidersUrl));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Create Slider");
+      final response = await NetworkApiServices().postApi(payload, AppUrls.adminSlidersUrl, "Create Slider", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Slider created successfully".showToast();
         fetchSliders();
@@ -219,15 +225,13 @@ class AdminMarketingService extends ChangeNotifier {
 
   Future<bool> updateSlider(int id, Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminSlidersUrl}/$id'));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields['_method'] = 'PUT';
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Update Slider");
+      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminSlidersUrl}/$id', "Update Slider", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Slider updated successfully".showToast();
         fetchSliders();

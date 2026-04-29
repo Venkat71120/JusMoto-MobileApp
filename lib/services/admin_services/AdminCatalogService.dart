@@ -19,6 +19,27 @@ class AdminCatalogService extends ChangeNotifier {
 
   // --- Categories ---
 
+  Future<int?> _uploadImage(File image) async {
+    try {
+      // Guard: skip upload if file doesn't exist on disk
+      if (!image.existsSync()) {
+        debugPrint('⚠️ Image file not found on disk, skipping upload.');
+        return null;
+      }
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminMediaUploadUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.files.add(await http.MultipartFile.fromPath('file', image.path));
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Upload Media");
+      if (response != null && response['success'] == true) {
+        return response['data']?['id'] as int?;
+      }
+    } catch (e) {
+      debugPrint('❌ Error uploading media: $e');
+    }
+    return null;
+  }
+
   Future<void> fetchCategories({int page = 1, String? search}) async {
     _loading = true;
     notifyListeners();
@@ -40,14 +61,13 @@ class AdminCatalogService extends ChangeNotifier {
 
   Future<bool> createCategory(Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminCategoriesUrl));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Create Category");
+      final response = await NetworkApiServices().postApi(payload, AppUrls.adminCategoriesUrl, "Create Category", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Category created successfully".showToast();
         fetchCategories();
@@ -62,15 +82,13 @@ class AdminCatalogService extends ChangeNotifier {
 
   Future<bool> updateCategory(int id, Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminCategoriesUrl}/$id'));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields['_method'] = 'PUT'; // Laravel/Node strategy for multipart PUT
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Update Category");
+      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminCategoriesUrl}/$id', "Update Category", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Category updated successfully".showToast();
         fetchCategories();
@@ -124,14 +142,19 @@ class AdminCatalogService extends ChangeNotifier {
 
   Future<bool> createService(Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminServicesUrl));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
+        // If upload fails we still proceed — image is optional
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Create Service");
+      final response = await NetworkApiServices().postApi(
+        payload,
+        AppUrls.adminServicesUrl,
+        "Create Service",
+        headers: {...acceptJsonAuthHeader, 'Content-Type': 'application/json'},
+      );
       if (response != null && response['success'] == true) {
         "Item created successfully".showToast();
         return true;
@@ -145,15 +168,13 @@ class AdminCatalogService extends ChangeNotifier {
 
   Future<bool> updateService(int id, Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminServicesUrl}/$id'));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields['_method'] = 'PUT';
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Update Service/Product");
+      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminServicesUrl}/$id', "Update Service/Product", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Item updated successfully".showToast();
         return true;

@@ -1,7 +1,6 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/services/admin_services/AdminFranchiseService.dart';
-import 'package:car_service/services/admin_services/AdminOutletService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +18,6 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
-  int? _selectedOutletId;
   bool _isLoading = false;
 
   bool get isEdit => widget.franchise != null;
@@ -31,13 +29,8 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
       _nameController.text = widget.franchise.name;
       _emailController.text = widget.franchise.email;
       _phoneController.text = widget.franchise.phone ?? '';
-      _selectedOutletId = widget.franchise.outlet?.id;
       // Password is not shown for editing
     }
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AdminOutletService>(context, listen: false).fetchOutlets();
-    });
   }
 
   Future<void> _save() async {
@@ -46,11 +39,10 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
     setState(() => _isLoading = true);
     final service = Provider.of<AdminFranchiseService>(context, listen: false);
 
-    final data = {
+    final Map<String, dynamic> data = {
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'phone': _phoneController.text.trim(),
-      'outlet_id': _selectedOutletId?.toString(),
     };
 
     if (!isEdit) {
@@ -74,7 +66,10 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit Franchise Partner' : 'Add Franchise Partner', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          isEdit ? 'Edit Franchise Partner' : 'Add Franchise Partner',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -93,15 +88,16 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                 validator: (v) => v!.isEmpty ? 'Name is required' : null,
               ),
               20.toHeight,
-              _buildOutletDropdown(),
-              20.toHeight,
-              20.toHeight,
               _buildTextField(
                 controller: _emailController,
                 label: 'Email Address',
                 hint: 'Enter email address',
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) => v!.isEmpty || !v.contains('@') ? 'Valid email is required' : null,
+                validator:
+                    (v) =>
+                        v!.isEmpty || !v.contains('@')
+                            ? 'Valid email is required'
+                            : null,
               ),
               20.toHeight,
               _buildTextField(
@@ -111,7 +107,8 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                 keyboardType: TextInputType.phone,
                 maxLength: 10,
                 validator: (v) {
-                  if (v != null && v.isNotEmpty && v.length != 10) return 'Phone must be 10 digits';
+                  if (v != null && v.isNotEmpty && v.length != 10)
+                    return 'Phone must be 10 digits';
                   return null;
                 },
               ),
@@ -122,7 +119,11 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                   label: 'Password',
                   hint: 'Set partner password',
                   obscureText: true,
-                  validator: (v) => v!.isEmpty || v.length < 6 ? 'Password (min 6 chars) is required' : null,
+                  validator:
+                      (v) =>
+                          v!.isEmpty || v.length < 6
+                              ? 'Password (min 6 chars) is required'
+                              : null,
                 ),
               ],
               40.toHeight,
@@ -133,52 +134,27 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                   onPressed: _isLoading ? null : _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(isEdit ? 'Update Partner' : 'Create Partner', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                  child:
+                      _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                            isEdit ? 'Update Partner' : 'Create Partner',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                 ),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildOutletDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Assigned Outlet', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        8.toHeight,
-        Consumer<AdminOutletService>(
-          builder: (context, service, _) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[400]!),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<int>(
-                  value: _selectedOutletId,
-                  hint: const Text('Select Outlet (Optional)'),
-                  isExpanded: true,
-                  items: service.outletList.outlets.map((o) {
-                    return DropdownMenuItem<int>(
-                      value: o.id,
-                      child: Text(o.name),
-                    );
-                  }).toList(),
-                  onChanged: (val) => setState(() => _selectedOutletId = val),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
     );
   }
 
@@ -194,7 +170,10 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
         8.toHeight,
         TextFormField(
           controller: controller,
@@ -206,7 +185,10 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
             hintText: hint,
             counterText: '',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
         ),
       ],

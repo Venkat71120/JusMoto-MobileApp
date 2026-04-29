@@ -51,7 +51,7 @@ class AdminFranchiseService extends ChangeNotifier {
         data,
         AppUrls.adminFranchisesUrl,
         "Create Franchise",
-        headers: acceptJsonAuthHeader,
+        headers: {...acceptJsonAuthHeader, 'Content-Type': 'application/json'},
       );
 
       if (response != null && response['success'] == true) {
@@ -78,7 +78,7 @@ class AdminFranchiseService extends ChangeNotifier {
         payload,
         '${AppUrls.adminFranchisesUrl}/$id',
         "Update Franchise",
-        headers: acceptJsonAuthHeader,
+        headers: {...acceptJsonAuthHeader, 'Content-Type': 'application/json'},
       );
 
       if (response != null && response['success'] == true) {

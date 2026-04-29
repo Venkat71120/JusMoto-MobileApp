@@ -185,11 +185,32 @@ class FranchiseOrdersService with ChangeNotifier {
       );
 
       if (response != null && response['success'] == true) {
-        "Order status updated".showToast();
-        // If we are viewing this order's details, refresh them
+        // 1. Update local list item if it exists
+        if (_orderList != null) {
+          final index = _orderList!.orders.indexWhere((o) => o.id == orderId);
+          if (index != -1) {
+            final oldItem = _orderList!.orders[index];
+            _orderList!.orders[index] = oldItem.copyWith(
+              statusCode: newStatus,
+              status: FranchiseOrderItem.statusLabel(newStatus),
+            );
+            notifyListeners();
+          }
+        }
+
+        // 2. Update detail model if it's the one we're viewing
         if (_orderDetail?.id == orderId) {
+          _orderDetail = _orderDetail!.copyWith(
+            statusCode: newStatus,
+            status: FranchiseOrderItem.statusLabel(newStatus),
+          );
+          notifyListeners();
+          
+          // Optionally still fetch fresh detail to ensure all related fields are sync'd
           await fetchOrderDetail(orderId);
         }
+
+        "Order status updated".showToast();
         return true;
       } else {
         "Failed to update status".showToast();
@@ -213,10 +234,31 @@ class FranchiseOrdersService with ChangeNotifier {
       );
 
       if (response != null && response['success'] == true) {
-        "Payment status updated".showToast();
+        // 1. Update local list item if it exists
+        if (_orderList != null) {
+          final index = _orderList!.orders.indexWhere((o) => o.id == orderId);
+          if (index != -1) {
+            final oldItem = _orderList!.orders[index];
+            _orderList!.orders[index] = oldItem.copyWith(
+              paymentStatusCode: newStatus,
+              paymentStatus: FranchiseOrderItem.paymentStatusLabel(newStatus),
+            );
+            notifyListeners();
+          }
+        }
+
+        // 2. Update detail model if it's the one we're viewing
         if (_orderDetail?.id == orderId) {
+          _orderDetail = _orderDetail!.copyWith(
+            paymentStatusCode: newStatus,
+            paymentStatus: FranchiseOrderItem.paymentStatusLabel(newStatus),
+          );
+          notifyListeners();
+          
           await fetchOrderDetail(orderId);
         }
+
+        "Payment status updated".showToast();
         return true;
       } else {
         "Failed to update payment status".showToast();
@@ -228,4 +270,4 @@ class FranchiseOrdersService with ChangeNotifier {
       return false;
     }
   }
-}
+}

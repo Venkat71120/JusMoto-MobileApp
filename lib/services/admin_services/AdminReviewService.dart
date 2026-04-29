@@ -35,7 +35,7 @@ class AdminReviewService extends ChangeNotifier {
     try {
       final response = await NetworkApiServices().putApi(
         {'status': status}, 
-        '${AppUrls.adminReviewsUrl}/$id', 
+        '${AppUrls.adminReviewsUrl}/$id/status', 
         "Update Review Status", 
         headers: acceptJsonAuthHeader
       );

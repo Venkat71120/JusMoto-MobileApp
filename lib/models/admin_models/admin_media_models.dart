@@ -1,3 +1,6 @@
+import '../../helper/app_urls.dart';
+import 'package:car_service/customization.dart';
+
 class AdminMediaListModel {
   final List<AdminMediaItem> media;
   final AdminMediaPagination pagination;
@@ -46,10 +49,19 @@ class AdminMediaItem {
 
   String get thumbUrl {
     if (path == null) return '';
-    if (path!.startsWith('http')) {
-      return path!.replaceFirst('/media/', '/media/thumb/');
+    String resolvedPath = path!;
+    if (!resolvedPath.startsWith('http')) {
+      final base = baseEndPoint.replaceAll('/api/v1', '');
+      resolvedPath = '$base/$resolvedPath';
     }
-    return path!; // Should be full URL from backend usually
+    return resolvedPath.replaceFirst('/media/', '/media/thumb/');
+  }
+
+  String get fullUrl {
+    if (path == null) return '';
+    if (path!.startsWith('http')) return path!;
+    final base = baseEndPoint.replaceAll('/api/v1', '');
+    return '$base/$path';
   }
 }
 

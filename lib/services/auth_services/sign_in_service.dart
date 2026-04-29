@@ -57,6 +57,9 @@ class SignInService with ChangeNotifier {
       emailVerified = (user['email_verified'] ?? 1).toString().parseToBool;
       emailToken = user['email_verify_token']?.toString() ?? "";
 
+      // Persist token immediately to avoid race conditions with subsequent profile fetches
+      await setToken(token);
+
       return emailVerified || !verifyEnabled;
     } else if (responseData != null && responseData.containsKey("message")) {
       responseData["message"]?.toString().showToast();
@@ -100,7 +103,7 @@ class SignInService with ChangeNotifier {
     if (responseData != null && responseData['data'] != null) {
       final dataObj = responseData['data'];
       token = dataObj['token'] ?? "";
-      setToken(token); // persist to SharedPreferences
+      await setToken(token); // persist to SharedPreferences
       return true;
     } else if (responseData != null && responseData.containsKey("message")) {
       responseData["message"]?.toString().showToast();

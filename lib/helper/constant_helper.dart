@@ -31,8 +31,8 @@ String get getToken {
   return sPref?.getString("token") ?? "";
 }
 
-setToken(token) {
-  sPref?.setString("token", token ?? "");
+Future<bool> setToken(String? token) async {
+  return await sPref?.setString("token", token ?? "") ?? false;
 }
 
 get commonAuthHeader => {'Authorization': 'Bearer $getToken'};

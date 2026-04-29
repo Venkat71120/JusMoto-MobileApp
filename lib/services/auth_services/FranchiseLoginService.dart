@@ -126,6 +126,7 @@ class FranchiseLoginService with ChangeNotifier {
         await sPref?.setString("franchise_code", franchiseCode);
         await sPref?.setString("franchise_location", franchiseLocation);
         await sPref?.setString("user_id", userId);
+        await sPref?.setBool("intro", true); // Ensure start flow doesn't reset session
 
         LocalKeys.signedInSuccessfully.showToast();
         notifyListeners();

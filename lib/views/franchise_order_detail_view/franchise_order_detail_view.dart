@@ -450,6 +450,7 @@ class _DetailBottomActions extends StatelessWidget {
                   context,
                   orderId: order.id,
                   invoiceNumber: order.invoiceNumber,
+                  isFranchise: true,
                 );
               },
               icon: const Icon(Icons.download_rounded, size: 20),
@@ -693,19 +694,20 @@ class _IconRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey[500]),
-        SizedBoxExtension(8).toWidth,
+        Icon(icon, size: 18, color: Colors.grey[500]),
+        SizedBoxExtension(10).toWidth,
         Text(
           '$label:',
           style: context.bodySmall?.copyWith(color: Colors.grey[500]),
         ),
-        SizedBoxExtension(8).toWidth,
+        SizedBoxExtension(12).toWidth,
         Expanded(
           child: Text(
             value,
             style: context.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.color.primaryContrastColor,
+              fontSize: 12,
             ),
             textAlign: TextAlign.end,
           ),

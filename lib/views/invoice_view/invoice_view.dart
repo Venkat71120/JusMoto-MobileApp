@@ -15,19 +15,26 @@ Future<void> downloadInvoicePdf(
   BuildContext context, {
   required dynamic orderId,
   String? invoiceNumber,
+  bool isFranchise = false,
 }) async {
   if (!context.mounted) return;
   context.toPage(_InvoicePage(
     orderId: orderId,
     invoiceNumber: invoiceNumber,
+    isFranchise: isFranchise,
   ));
 }
 
 class _InvoicePage extends StatefulWidget {
   final dynamic orderId;
   final String? invoiceNumber;
+  final bool isFranchise;
 
-  const _InvoicePage({required this.orderId, this.invoiceNumber});
+  const _InvoicePage({
+    required this.orderId,
+    this.invoiceNumber,
+    this.isFranchise = false,
+  });
 
   @override
   State<_InvoicePage> createState() => _InvoicePageState();
@@ -47,7 +54,11 @@ class _InvoicePageState extends State<_InvoicePage> {
 
   Future<void> _fetchHtml() async {
     try {
-      final url = '${AppUrls.orderInvoiceUrl}/${widget.orderId}/invoice';
+      final baseUrl = widget.isFranchise
+          ? AppUrls.franchiseOrdersUrl
+          : AppUrls.orderInvoiceUrl;
+      final url = '$baseUrl/${widget.orderId}/invoice';
+      
       if (kDebugMode) debugPrint('Fetching invoice: $url');
 
       final res = await http.get(Uri.parse(url), headers: {
@@ -61,7 +72,8 @@ class _InvoicePageState extends State<_InvoicePage> {
       }
 
       // Remove all <img> tags to avoid broken logo / alignment issues.
-      String html = res.body.replaceAll(RegExp(r'<img[^>]*/?>', caseSensitive: false), '');
+      String html =
+          res.body.replaceAll(RegExp(r'<img[^>]*/?>', caseSensitive: false), '');
 
       // Inject print-friendly CSS so the PDF comes out at correct A4 size.
       const printCss = '''
@@ -94,7 +106,11 @@ class _InvoicePageState extends State<_InvoicePage> {
   }
 
   void _setError() {
-    if (mounted) setState(() { _hasError = true; _isLoading = false; });
+    if (mounted)
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
   }
 
   @override
@@ -147,8 +163,8 @@ class _InvoicePageState extends State<_InvoicePage> {
                       });
                       _fetchHtml();
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: primaryColor),
                     child: const Text('Retry',
                         style: TextStyle(color: Colors.white)),
                   ),

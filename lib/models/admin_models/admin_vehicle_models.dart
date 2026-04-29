@@ -326,6 +326,7 @@ class AdminFuelTypeItem {
 int _toInt(dynamic value) {
   if (value == null) return 0;
   if (value is int) return value;
+  if (value is bool) return value ? 1 : 0;
   if (value is String) return int.tryParse(value) ?? 0;
   return 0;
 }

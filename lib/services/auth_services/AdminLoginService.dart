@@ -100,6 +100,7 @@ class AdminLoginService with ChangeNotifier {
         await sPref?.setBool("is_admin", true);
         await sPref?.setString("admin_username", this.username);
         await sPref?.setString("admin_user_id", userId);
+        await sPref?.setBool("intro", true); // Ensure start flow doesn't reset session
 
         "Admin signed in successfully".showToast();
         notifyListeners();

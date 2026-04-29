@@ -61,7 +61,7 @@ class FranchiseDashboardService with ChangeNotifier {
         ),
         _fetchEarningsPeriodic(),
         _fetchRecentActivity(),
-        _fetchOrderCounts(),
+        fetchOrderCounts(),
       ]);
 
       final dashboardResponse = results[0] as Map<String, dynamic>?;
@@ -139,7 +139,7 @@ class FranchiseDashboardService with ChangeNotifier {
     return false;
   }
 
-  Future<bool> _fetchOrderCounts() async {
+  Future<bool> fetchOrderCounts() async {
     try {
       final response = await NetworkApiServices().getApi(
         AppUrls.franchiseDashboardOrderCountsUrl,
@@ -151,10 +151,11 @@ class FranchiseDashboardService with ChangeNotifier {
         _orderCounts = FranchiseOrderCountsModel.fromJson(
           Map<String, dynamic>.from(response['data']),
         );
+        notifyListeners();
         return true;
       }
     } catch (e) {
-      debugPrint('❌ _fetchOrderCounts: $e');
+      debugPrint('❌ fetchOrderCounts: $e');
     }
     return false;
   }

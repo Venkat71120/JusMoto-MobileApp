@@ -1,5 +1,8 @@
+import 'package:car_service/services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
+import 'package:car_service/services/Franchise_dashboard_Services/franchise_tickets_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '/helper/extension/string_extension.dart';
 import '/helper/local_keys.g.dart';
@@ -26,6 +29,18 @@ class FranchiseLandingViewModel {
   void setNavIndex(int value) async {
     if (value == currentIndex.value) return;
     currentIndex.value = value;
+
+    // Trigger background refreshes to sync notification badges
+    if (context != null) {
+      if (value == 1) {
+        // Refresh Order Counts when entering Orders tab
+        Provider.of<FranchiseDashboardService>(context!, listen: false)
+            .fetchOrderCounts();
+      } else if (value == 2) {
+        // Refresh Ticket Statistics when entering Services tab
+        Provider.of<FranchiseTicketsService>(context!, listen: false).fetchAll();
+      }
+    }
   }
 
   void setNavIndexP(int value) {

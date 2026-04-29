@@ -28,6 +28,22 @@ class AdminVehicleService extends ChangeNotifier {
 
   // --- Brands ---
 
+  Future<int?> _uploadImage(File image) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminMediaUploadUrl));
+      request.headers.addAll(acceptJsonAuthHeader);
+      request.files.add(await http.MultipartFile.fromPath('file', image.path));
+
+      final response = await NetworkApiServices().postWithFileApi(request, "Upload Media");
+      if (response != null && response['success'] == true) {
+        return response['data']?['id'] as int?;
+      }
+    } catch (e) {
+      debugPrint('❌ Error uploading media: $e');
+    }
+    return null;
+  }
+
   Future<void> fetchBrands({int page = 1, String? search}) async {
     _loading = true;
     notifyListeners();
@@ -49,14 +65,13 @@ class AdminVehicleService extends ChangeNotifier {
 
   Future<bool> createBrand(Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminBrandsUrl));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Create Brand");
+      final response = await NetworkApiServices().postApi(payload, AppUrls.adminBrandsUrl, "Create Brand", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Brand created successfully".showToast();
         fetchBrands();
@@ -71,15 +86,13 @@ class AdminVehicleService extends ChangeNotifier {
 
   Future<bool> updateBrand(int id, Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminBrandsUrl}/$id'));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields['_method'] = 'PUT';
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Update Brand");
+      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminBrandsUrl}/$id', "Update Brand", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Brand updated successfully".showToast();
         fetchBrands();
@@ -134,14 +147,13 @@ class AdminVehicleService extends ChangeNotifier {
 
   Future<bool> createCar(Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse(AppUrls.adminCarsUrl));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Create Car");
+      final response = await NetworkApiServices().postApi(payload, AppUrls.adminCarsUrl, "Create Car", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Car created successfully".showToast();
         fetchCars();
@@ -156,15 +168,13 @@ class AdminVehicleService extends ChangeNotifier {
 
   Future<bool> updateCar(int id, Map<String, String> data, File? image) async {
     try {
-      final request = http.MultipartRequest('POST', Uri.parse('${AppUrls.adminCarsUrl}/$id'));
-      request.headers.addAll(acceptJsonAuthHeader);
-      request.fields['_method'] = 'PUT';
-      request.fields.addAll(data);
+      final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
       if (image != null) {
-        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        final mediaId = await _uploadImage(image);
+        if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().postWithFileApi(request, "Update Car");
+      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminCarsUrl}/$id', "Update Car", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
         "Car updated successfully".showToast();
         fetchCars();

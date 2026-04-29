@@ -105,6 +105,30 @@ class FranchiseOrderItem {
     this.firstItemImage,
   });
 
+  FranchiseOrderItem copyWith({
+    String? status,
+    int? statusCode,
+    String? paymentStatus,
+    int? paymentStatusCode,
+  }) {
+    return FranchiseOrderItem(
+      id: id,
+      invoiceNumber: invoiceNumber,
+      date: date,
+      schedule: schedule,
+      status: status ?? this.status,
+      statusCode: statusCode ?? this.statusCode,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentStatusCode: paymentStatusCode ?? this.paymentStatusCode,
+      total: total,
+      customer: customer,
+      staff: staff,
+      itemsCount: itemsCount,
+      createdAt: createdAt,
+      firstItemImage: firstItemImage,
+    );
+  }
+
   factory FranchiseOrderItem.fromJson(Map<String, dynamic> json) {
     try {
       final items = (json['items'] ?? json['order_details'] ?? []) as List;
@@ -257,6 +281,42 @@ class FranchiseOrderDetailModel {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  FranchiseOrderDetailModel copyWith({
+    String? status,
+    int? statusCode,
+    String? paymentStatus,
+    int? paymentStatusCode,
+  }) {
+    return FranchiseOrderDetailModel(
+      id: id,
+      invoiceNumber: invoiceNumber,
+      date: date,
+      schedule: schedule,
+      status: status ?? this.status,
+      statusCode: statusCode ?? this.statusCode,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentStatusCode: paymentStatusCode ?? this.paymentStatusCode,
+      paymentGateway: paymentGateway,
+      transactionId: transactionId,
+      subTotal: subTotal,
+      tax: tax,
+      deliveryCharge: deliveryCharge,
+      couponCode: couponCode,
+      couponAmount: couponAmount,
+      total: total,
+      orderNote: orderNote,
+      isRefunded: isRefunded,
+      refundAmount: refundAmount,
+      customer: customer,
+      location: location,
+      outlet: outlet,
+      staff: staff,
+      items: items,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
 
   factory FranchiseOrderDetailModel.fromJson(Map<String, dynamic> json) {
     try {

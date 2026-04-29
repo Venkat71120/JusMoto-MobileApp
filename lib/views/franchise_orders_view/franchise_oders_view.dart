@@ -123,8 +123,7 @@ class FranchiseOrdersView extends StatelessWidget {
         options: options,
         currentValue: order.statusCode,
         onSelect: (val) async {
-          final success = await os.updateOrderStatus(order.id, val);
-          if (success) os.refreshOrders();
+          await os.updateOrderStatus(order.id, val);
         },
       ),
     );
@@ -145,8 +144,7 @@ class FranchiseOrdersView extends StatelessWidget {
         options: options,
         currentValue: order.paymentStatusCode,
         onSelect: (val) async {
-          final success = await os.updatePaymentStatus(order.id, val);
-          if (success) os.refreshOrders();
+          await os.updatePaymentStatus(order.id, val);
         },
       ),
     );
@@ -222,7 +220,7 @@ class _OrderCard extends StatelessWidget {
                 // 3. Core Info Section
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 20, 20),
+                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -266,7 +264,7 @@ class _OrderCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        14.toHeight,
+                        16.toHeight,
 
                         // Customer Info with specialized icon
                         Row(
@@ -372,6 +370,7 @@ class _OrderCard extends StatelessWidget {
                                       context,
                                       orderId: order.id,
                                       invoiceNumber: order.invoiceNumber,
+                                      isFranchise: true,
                                     );
                                   },
                                   borderRadius: BorderRadius.circular(10),

@@ -15,6 +15,10 @@ import '../../helper/network_connectivity.dart';
 import '../../main.dart';
 import '../../view_models/landding_view_model/landding_view_model.dart';
 import '../../views/landing_view/landing_view.dart';
+import '../../services/auth_services/AdminLoginService.dart';
+import '../../services/auth_services/FranchiseLoginService.dart';
+import '../../views/Admin_sign_in_view/AdminLoginView.dart';
+import '../../views/Franchise_sign_in_view/FranchiseLoginView.dart';
 import '../app_exceptions.dart';
 
 class NetworkApiServices extends BaseApiServices {
@@ -95,7 +99,8 @@ class NetworkApiServices extends BaseApiServices {
       // bool, null…), send as JSON. Otherwise use the original form-encoded
       // path so all existing callers (Map<String,String>) are unaffected.
       final bool needsJson =
-          data is Map && data.values.any((v) => v is! String);
+          (data is Map && data.values.any((v) => v is! String)) ||
+          (h['Content-Type']?.contains('application/json') == true);
 
       if (needsJson) {
         h['Content-Type'] = 'application/json';
@@ -152,7 +157,8 @@ class NetworkApiServices extends BaseApiServices {
       http.Response response;
 
       final bool needsJson =
-          data is Map && data.values.any((v) => v is! String);
+          (data is Map && data.values.any((v) => v is! String)) ||
+          (h['Content-Type']?.contains('application/json') == true);
 
       if (needsJson) {
         h['Content-Type'] = 'application/json';
@@ -390,23 +396,53 @@ class NetworkApiServices extends BaseApiServices {
   }
 
   checkAuthentication(http.Response response) {
-    if (response.body.contains("Unauthenticated.")) {
-      final lvm = LandingViewModel.instance;
-      if (lvm.context != null && getToken.isNotEmpty) {
-        debugPrint("reset Everything".toString());
-        Provider.of<ProfileInfoService>(lvm.context!, listen: false).reset();
-        debugPrint(navigatorKey.currentContext?.widget.toString());
-        navigatorKey.currentContext?.widget;
-        navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LandingView()),
-          (route) => false,
+    // Only check for authentication failure on non-success status codes
+    if (response.statusCode == 200 || response.statusCode == 201) return;
+
+    if (response.body.contains("Unauthenticated.") ||
+        response.statusCode == 401) {
+      final context = navigatorKey.currentContext;
+
+      if (context != null && getToken.isNotEmpty) {
+        debugPrint(
+          "🔌 Session invalid (401/Unauthenticated). Resetting session...",
         );
-        lvm.setContext(null);
-        debugPrint(getToken.isEmpty.toString());
+
+        final isAdmin = sPref?.getBool("is_admin") ?? false;
+        final isFranchise = sPref?.getBool("is_franchise") ?? false;
+
+        if (isAdmin) {
+          Provider.of<AdminLoginService>(
+            context,
+            listen: false,
+          ).clearAdminData();
+          navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const AdminLoginView()),
+            (route) => false,
+          );
+        } else if (isFranchise) {
+          Provider.of<FranchiseLoginService>(
+            context,
+            listen: false,
+          ).clearFranchiseData();
+          navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const FranchiseLoginView()),
+            (route) => false,
+          );
+        } else {
+          Provider.of<ProfileInfoService>(context, listen: false).reset();
+          final lvm = LandingViewModel.instance;
+          lvm.setContext(null);
+          navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const LandingView()),
+            (route) => false,
+          );
+        }
+
         LocalKeys.sessionExpired.showToast();
         return null;
       } else {
-        debugPrint(lvm.context.toString());
+        debugPrint(navigatorKey.currentContext?.toString());
         debugPrint("failed to reset".toString());
       }
     }

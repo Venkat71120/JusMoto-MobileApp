@@ -26,8 +26,12 @@ class _AdminNotificationFormViewState extends State<AdminNotificationFormView> {
 
     final data = {
       'subject': _subjectController.text.trim(),
+      'title': _subjectController.text.trim(), // Fallback for title
       'message': _messageController.text.trim(),
+      'body': _messageController.text.trim(), // Fallback for body
       'audience': _targetAudience,
+      'type': _targetAudience, // Fallback for audience types
+      'target_user_type': _targetAudience,
     };
 
     final success = await service.sendBroadcastNotification(data);
