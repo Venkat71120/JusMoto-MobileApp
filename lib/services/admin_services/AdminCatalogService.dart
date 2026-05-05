@@ -174,7 +174,12 @@ class AdminCatalogService extends ChangeNotifier {
         if (mediaId != null) payload['image'] = mediaId;
       }
 
-      final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminServicesUrl}/$id', "Update Service/Product", headers: acceptJsonAuthHeader);
+      final response = await NetworkApiServices().putApi(
+        payload,
+        '${AppUrls.adminServicesUrl}/$id',
+        "Update Service/Product",
+        headers: {...acceptJsonAuthHeader, 'Content-Type': 'application/json'},
+      );
       if (response != null && response['success'] == true) {
         "Item updated successfully".showToast();
         return true;
