@@ -57,7 +57,11 @@ class _AdminCarListViewState extends State<AdminCarListView> {
                     itemCount: service.carList.cars.length + (service.carList.pagination.hasNextPage ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == service.carList.cars.length) {
-                        _viewModel.fetchCars(page: service.carList.pagination.currentPage + 1);
+                        if (!service.fetchingMore) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _viewModel.fetchCars(page: service.carList.pagination.currentPage + 1);
+                          });
+                        }
                         return const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()));
                       }
 
@@ -208,8 +212,8 @@ class _AdminCarListViewState extends State<AdminCarListView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildBadge(car.status == 1 ? 'Active' : 'Inactive', car.status == 1 ? Colors.green : Colors.red),
-                if (car.Year != null)
-                  Text('Year: ${car.Year}', style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                if (car.year != null)
+                  Text('Year: ${car.year}', style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500)),
               ],
             ),
           ],

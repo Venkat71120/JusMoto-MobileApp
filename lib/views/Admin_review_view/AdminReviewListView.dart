@@ -252,7 +252,7 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
       children: List.generate(5, (index) {
         return Icon(
           index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-          color: index < rating ? Colors.amber[700] : Colors.grey[400],
+          color: index < rating ? const Color(0xFFFFD700) : Colors.grey[300],
           size: 20,
         );
       }),

@@ -17,7 +17,7 @@ class AdminMediaService extends ChangeNotifier {
   bool _uploading = false;
   bool get uploading => _uploading;
 
-  Future<void> fetchMedia({int page = 1, String? search}) async {
+  Future<void> fetchMedia({int page = 1, String? search, bool isLoadMore = false}) async {
     _loading = true;
     notifyListeners();
     try {
@@ -26,7 +26,16 @@ class AdminMediaService extends ChangeNotifier {
 
       final response = await NetworkApiServices().getApi(url, "Admin Media List", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
-        _mediaList = AdminMediaListModel.fromJson(Map<String, dynamic>.from(response));
+        final newList = AdminMediaListModel.fromJson(Map<String, dynamic>.from(response));
+        if (isLoadMore) {
+          _mediaList.media.addAll(newList.media);
+          _mediaList = AdminMediaListModel(
+            media: _mediaList.media,
+            pagination: newList.pagination,
+          );
+        } else {
+          _mediaList = newList;
+        }
       }
     } catch (e) {
       debugPrint('❌ Error fetching media: $e');

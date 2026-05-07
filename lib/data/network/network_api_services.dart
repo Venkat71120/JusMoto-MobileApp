@@ -303,6 +303,7 @@ class NetworkApiServices extends BaseApiServices {
 
     Map? responseJson;
     try {
+      debugPrint("POST with File: ${request.url}");
       final responseStream = await request.send().timeout(
         Duration(seconds: timeoutSeconds ?? 60),
       ); // Default 60 for files
@@ -350,8 +351,10 @@ class NetworkApiServices extends BaseApiServices {
           dynamic responseJson = jsonDecode(response.body);
           if (responseJson["message"] != null) {
             responseJson["message"].toString().showToast();
-            return null;
+          } else if (responseJson["error"] != null) {
+            responseJson["error"].toString().showToast();
           }
+          return null;
         } catch (_) {
           debugPrint(response.body.toString());
           throw FetchDataException('${response.reasonPhrase}');
@@ -361,6 +364,7 @@ class NetworkApiServices extends BaseApiServices {
           checkAuthentication(response);
           dynamic responseJson = jsonDecode(response.body);
           showValidationErrors(responseJson);
+          return null;
         } catch (error) {
           if (error is String) {
             rethrow;
@@ -373,6 +377,7 @@ class NetworkApiServices extends BaseApiServices {
           checkAuthentication(response);
           dynamic responseJson = jsonDecode(response.body);
           showValidationErrors(responseJson);
+          return null;
         } catch (e) {
           if (e is String) {
             rethrow;
@@ -385,6 +390,7 @@ class NetworkApiServices extends BaseApiServices {
           checkAuthentication(response);
           dynamic responseJson = jsonDecode(response.body);
           showValidationErrors(responseJson);
+          return null;
         } catch (e) {
           if (e is String) {
             rethrow;

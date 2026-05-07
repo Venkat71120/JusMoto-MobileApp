@@ -95,7 +95,7 @@ class AppUrls {
   static String get adminFuelTypesUrl => '$baseEndPoint/admin/fuel-types';
   static String get adminSlidersUrl => '$baseEndPoint/admin/sliders';
   static String get adminMediaUrl => '$baseEndPoint/admin/media';
-  static String get adminMediaUploadUrl => '$baseEndPoint/admin/media/upload';
+  static String get adminMediaUploadUrl => '$baseEndPoint/admin/media-upload-v2';
 
   static String get myOrdersListUrl => '$baseEndPoint/client/orders/all';
   static String get orderDetailsUrl => '$baseEndPoint/client/orders/details';

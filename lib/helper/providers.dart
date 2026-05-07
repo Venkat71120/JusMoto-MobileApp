@@ -32,6 +32,7 @@ import 'package:car_service/services/admin_services/AdminReportService.dart';
 import 'package:car_service/services/admin_services/AdminNotificationService.dart';
 import 'package:car_service/services/admin_services/AdminRefundService.dart';
 import 'package:car_service/services/admin_services/AdminUserManagementService.dart';
+import 'package:car_service/services/admin_services/AdminMediaService.dart';
 import '../services/Franchise_dashboard_Services/franchise_dashboard_service.dart';
 
 import '../services/booking_services/booking_addons_service.dart';
@@ -108,6 +109,7 @@ class Providers {
     ChangeNotifierProvider(create: (context) => AdminNotificationService()),
     ChangeNotifierProvider(create: (context) => AdminRefundService()),
     ChangeNotifierProvider(create: (context) => AdminUserManagementService()),
+    ChangeNotifierProvider(create: (context) => AdminMediaService()),
     ChangeNotifierProvider(create: (context) => FranchiseDashboardService()),
     ChangeNotifierProvider(create: (context) => RatingAndReviewsService()),
     ChangeNotifierProvider(create: (context) => ProfileInfoService()),

@@ -57,7 +57,11 @@ class _AdminVariantListViewState extends State<AdminVariantListView> {
                     itemCount: service.variantList.variants.length + (service.variantList.pagination.hasNextPage ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == service.variantList.variants.length) {
-                        _viewModel.fetchVariants(page: service.variantList.pagination.currentPage + 1);
+                        if (!service.fetchingMore) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _viewModel.fetchVariants(page: service.variantList.pagination.currentPage + 1);
+                          });
+                        }
                         return const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()));
                       }
 

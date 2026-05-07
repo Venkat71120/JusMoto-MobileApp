@@ -95,7 +95,7 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
               ),
               const SizedBox(height: 16),
 
-              if (widget.type == 'franchise') ...[
+              if (widget.type == 'franchise' || widget.type == 'staff') ...[
                 _buildLabel('Phone Number'),
                 TextFormField(
                   controller: _phoneController,
@@ -193,6 +193,7 @@ class _AdminUserEditFormViewState extends State<AdminUserEditFormView> {
       if (widget.type == 'staff') {
         data['username'] = _usernameController.text;
         data['role'] = _selectedRole;
+        data['mobile_number'] = _phoneController.text;
         if (_selectedOutletId != null) data['outlet_location_id'] = _selectedOutletId;
       } else if (widget.type == 'franchise') {
         data['mobile_number'] = _phoneController.text;

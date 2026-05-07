@@ -47,13 +47,13 @@ class AdminBaseUserItem {
 
   factory AdminBaseUserItem.fromJson(Map<String, dynamic> json) {
     // Handle name field variations
-    String fullName = json['name'] ?? '';
+    String fullName = json['name'] ?? json['full_name'] ?? '';
     if (fullName.isEmpty) {
       final fName = json['first_name'] ?? '';
       final lName = json['last_name'] ?? '';
       fullName = '$fName $lName'.trim();
     }
-    if (fullName.isEmpty) fullName = 'Unnamed';
+    if (fullName.isEmpty) fullName = json['username'] ?? 'Unnamed';
 
     // Handle nested outlet location
     int? oId;
@@ -77,7 +77,7 @@ class AdminBaseUserItem {
       email: json['email'] ?? '',
       username: json['username'],
       phone: json['phone'] ?? json['mobile_number'],
-      role: json['role']?['name'] ?? json['role'],
+      role: json['role'] is Map ? json['role']['name'] : json['role'],
       // ROBUST STATUS PARSING: Some APIs return boolean, some string "1"/"0", some int
       status: _toStatusInt(json['status']),
       outletId: oId,

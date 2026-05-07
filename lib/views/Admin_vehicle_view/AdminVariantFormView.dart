@@ -17,6 +17,8 @@ class _AdminVariantFormViewState extends State<AdminVariantFormView> {
   final _nameController = TextEditingController();
   
   int? _selectedCarId;
+  int? _selectedEngineTypeId;
+  int? _selectedFuelTypeId;
   bool _isLoading = false;
 
   bool get isEdit => widget.variant != null;
@@ -25,12 +27,17 @@ class _AdminVariantFormViewState extends State<AdminVariantFormView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-       Provider.of<AdminVehicleService>(context, listen: false).fetchCars(page: 1);
+       final service = Provider.of<AdminVehicleService>(context, listen: false);
+       service.fetchCars(page: 1);
+       service.fetchEngineTypes();
+       service.fetchFuelTypes();
     });
 
     if (isEdit) {
       _nameController.text = widget.variant.name;
       _selectedCarId = widget.variant.carId;
+      _selectedEngineTypeId = widget.variant.engineTypeId;
+      _selectedFuelTypeId = widget.variant.fuelTypeId;
     }
   }
 
@@ -48,6 +55,8 @@ class _AdminVariantFormViewState extends State<AdminVariantFormView> {
     final Map<String, dynamic> data = {
       'name': _nameController.text.trim(),
       'car_id': _selectedCarId,
+      'engine_type_id': _selectedEngineTypeId,
+      'fuel_type_id': _selectedFuelTypeId,
       'status': '1',
     };
 
@@ -88,6 +97,14 @@ class _AdminVariantFormViewState extends State<AdminVariantFormView> {
                 hint: 'e.g. VXI, LXI, Top Model',
                 validator: (v) => v!.isEmpty ? 'Name is required' : null,
               ),
+              20.toHeight,
+              Row(
+                children: [
+                  Expanded(child: _buildEngineTypeDropdown()),
+                  16.toWidth,
+                  Expanded(child: _buildFuelTypeDropdown()),
+                ],
+              ),
               40.toHeight,
               SizedBox(
                 width: double.infinity,
@@ -107,6 +124,76 @@ class _AdminVariantFormViewState extends State<AdminVariantFormView> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEngineTypeDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Engine Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        8.toHeight,
+        Consumer<AdminVehicleService>(
+          builder: (context, service, _) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[400]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _selectedEngineTypeId,
+                  hint: const Text('Select'),
+                  isExpanded: true,
+                  items: service.engineTypeList.engineTypes.map((e) {
+                    return DropdownMenuItem<int>(
+                      value: e.id,
+                      child: Text(e.name),
+                    );
+                  }).toList(),
+                  onChanged: (val) => setState(() => _selectedEngineTypeId = val),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFuelTypeDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Fuel Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        8.toHeight,
+        Consumer<AdminVehicleService>(
+          builder: (context, service, _) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[400]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _selectedFuelTypeId,
+                  hint: const Text('Select'),
+                  isExpanded: true,
+                  items: service.fuelTypeList.fuelTypes.map((f) {
+                    return DropdownMenuItem<int>(
+                      value: f.id,
+                      child: Text(f.name),
+                    );
+                  }).toList(),
+                  onChanged: (val) => setState(() => _selectedFuelTypeId = val),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

@@ -20,6 +20,7 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _discountController = TextEditingController();
+  final _subtitleController = TextEditingController();
   final _expiryController = TextEditingController();
   
   bool _status = true;
@@ -40,6 +41,7 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
 
     if (isEdit) {
       _titleController.text = widget.offer.title;
+      _subtitleController.text = widget.offer.subTitle ?? '';
       _discountController.text = widget.offer.offerPercentage.toString();
       _status = widget.offer.status == 1;
       _isPrimary = widget.offer.isPrimary == 1;
@@ -83,6 +85,7 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
 
     final Map<String, String> data = {
       'title': _titleController.text.trim(),
+      'subTitle': _subtitleController.text.trim(),
       'offerPercentage': _discountController.text.trim(),
       'expires_at': _selectedExpiry != null ? DateFormat('yyyy-MM-dd').format(_selectedExpiry!) : '',
       'status': _status ? '1' : '0',
@@ -126,6 +129,14 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
                 label: 'Offer Headline / Title',
                 hint: 'e.g. Grand Opening Sale!',
                 validator: (v) => v!.isEmpty ? 'Title is required' : null,
+              ),
+              20.toHeight,
+              _buildTextField(
+                controller: _subtitleController,
+                label: 'Subtitle / Description',
+                hint: 'e.g. Get up to 50% off on all services',
+                maxLines: 3,
+                validator: (v) => v!.isEmpty ? 'Subtitle is required' : null,
               ),
               20.toHeight,
               _buildTextField(
@@ -284,6 +295,7 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
     required String label,
     required String hint,
     TextInputType? keyboardType,
+    int maxLines = 1,
     String? Function(String?)? validator,
     Widget? suffixIcon,
   }) {
@@ -295,6 +307,7 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          maxLines: maxLines,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
@@ -310,6 +323,7 @@ class _AdminOfferFormViewState extends State<AdminOfferFormView> {
   @override
   void dispose() {
     _titleController.dispose();
+    _subtitleController.dispose();
     _discountController.dispose();
     _expiryController.dispose();
     super.dispose();

@@ -31,6 +31,7 @@ class _AdminCarFormViewState extends State<AdminCarFormView> {
   @override
   void initState() {
     super.initState();
+    debugPrint('🛠️ Editing Car: ${widget.car.name}, EngineID: ${widget.car.engineTypeId}, FuelID: ${widget.car.fuelTypeId}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
        final service = Provider.of<AdminVehicleService>(context, listen: false);
        service.fetchBrands();

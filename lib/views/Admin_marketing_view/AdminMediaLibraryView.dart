@@ -16,13 +16,24 @@ class AdminMediaLibraryView extends StatefulWidget {
 
 class _AdminMediaLibraryViewState extends State<AdminMediaLibraryView> {
   final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AdminMediaService>(context, listen: false).fetchMedia();
     });
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      final service = Provider.of<AdminMediaService>(context, listen: false);
+      if (!service.loading && service.mediaList.pagination.hasNextPage) {
+        service.fetchMedia(page: service.mediaList.pagination.currentPage + 1, isLoadMore: true);
+      }
+    }
   }
 
   Future<void> _pickAndUpload() async {
@@ -70,6 +81,7 @@ class _AdminMediaLibraryViewState extends State<AdminMediaLibraryView> {
                 return RefreshIndicator(
                   onRefresh: () async => service.fetchMedia(),
                   child: GridView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.all(12),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -77,11 +89,15 @@ class _AdminMediaLibraryViewState extends State<AdminMediaLibraryView> {
                       mainAxisSpacing: 10,
                       childAspectRatio: 1,
                     ),
-                    itemCount: service.mediaList.media.length + (service.mediaList.pagination.hasNextPage ? 1 : 0),
+                    itemCount: service.mediaList.media.length + (service.loading ? 3 : 0),
                     itemBuilder: (context, index) {
-                      if (index == service.mediaList.media.length) {
-                        service.fetchMedia(page: service.mediaList.pagination.currentPage + 1);
-                        return const Center(child: CircularProgressIndicator());
+                      if (index >= service.mediaList.media.length) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        );
                       }
 
                       final item = service.mediaList.media[index];

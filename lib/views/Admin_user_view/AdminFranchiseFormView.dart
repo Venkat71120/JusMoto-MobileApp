@@ -1,9 +1,12 @@
 import 'package:car_service/customizations/colors.dart';
+import 'package:car_service/models/admin_models/AdminUserModels.dart';
+import 'package:car_service/models/admin_models/admin_franchise_model.dart';
 import 'package:car_service/view_models/admin_view_models/AdminUserManagementViewModel.dart';
 import 'package:flutter/material.dart';
 
 class AdminFranchiseFormView extends StatefulWidget {
-  const AdminFranchiseFormView({super.key});
+  final AdminFranchiseItem? franchise;
+  const AdminFranchiseFormView({super.key, this.franchise});
 
   @override
   State<AdminFranchiseFormView> createState() => _AdminFranchiseFormViewState();
@@ -11,17 +14,23 @@ class AdminFranchiseFormView extends StatefulWidget {
 
 class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+  late TextEditingController _passwordController;
 
   late AdminUserManagementViewModel _viewModel;
+
+  bool get isEdit => widget.franchise != null;
 
   @override
   void initState() {
     super.initState();
     _viewModel = AdminUserManagementViewModel(context);
+    _nameController = TextEditingController(text: widget.franchise?.name);
+    _emailController = TextEditingController(text: widget.franchise?.email);
+    _phoneController = TextEditingController(text: widget.franchise?.phone);
+    _passwordController = TextEditingController();
   }
 
   @override
@@ -29,7 +38,7 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Add Franchise Partner', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(isEdit ? 'Edit Franchise Partner' : 'Add Franchise Partner', style: const TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -41,9 +50,9 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Partner Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(isEdit ? 'Update Details' : 'Partner Details', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text('Enter the information below to create a new franchise account.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              Text(isEdit ? 'Modify franchise account information below.' : 'Enter the information below to create a new franchise account.', style: const TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 24),
               
               _buildLabel('Full Name'),
@@ -72,12 +81,12 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
               ),
               const SizedBox(height: 16),
 
-              _buildLabel('Account Password'),
+              _buildLabel(isEdit ? 'New Password (Optional)' : 'Account Password'),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: _inputDecoration('Set initial password', Icons.lock_outline),
-                validator: (v) => v!.length < 6 ? 'Password must be at least 6 characters' : null,
+                decoration: _inputDecoration(isEdit ? 'Leave blank to keep current' : 'Set initial password', Icons.lock_outline),
+                validator: (v) => !isEdit && v!.length < 6 ? 'Password must be at least 6 characters' : null,
               ),
               const SizedBox(height: 32),
 
@@ -91,7 +100,7 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
-                  child: const Text('Create Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(isEdit ? 'Update Account' : 'Create Account', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
             ],
@@ -127,10 +136,23 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
         'name': _nameController.text,
         'email': _emailController.text,
         'mobile_number': _phoneController.text,
-        'password': _passwordController.text,
       };
 
-      await _viewModel.createFranchise(data);
+      if (_passwordController.text.isNotEmpty) {
+        data['password'] = _passwordController.text;
+      }
+
+      if (isEdit) {
+        await _viewModel.updateAccount(AdminBaseUserItem(
+          id: widget.franchise!.id,
+          name: widget.franchise!.name,
+          email: widget.franchise!.email,
+          status: widget.franchise!.status,
+        ), 'franchise', data);
+      } else {
+        await _viewModel.createFranchise(data);
+      }
+      
       if (mounted) Navigator.pop(context);
     }
   }

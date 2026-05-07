@@ -87,7 +87,7 @@ class AdminFranchiseItem {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       email: json['email'] ?? '',
-      phone: json['phone'],
+      phone: json['phone'] ?? json['mobile_number'],
       status: _toInt(json['status']),
       createdAt: json['created_at'] ?? '',
       outlet: json['outlet'] != null ? AdminOutletItem.fromJson(json['outlet']) : null,

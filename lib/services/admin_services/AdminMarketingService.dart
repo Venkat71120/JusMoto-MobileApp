@@ -98,7 +98,11 @@ class AdminMarketingService extends ChangeNotifier {
 
       final response = await NetworkApiServices().postWithFileApi(request, "Upload Media");
       if (response != null && response['success'] == true) {
-        return response['data']?['id'] as int?;
+        final id = response['data']?['id'] as int?;
+        debugPrint('✅ Media uploaded successfully, ID: $id');
+        return id;
+      } else {
+        debugPrint('❌ Media upload failed: $response');
       }
     } catch (e) {
       debugPrint('❌ Error uploading media: $e');
@@ -130,7 +134,7 @@ class AdminMarketingService extends ChangeNotifier {
         if (mediaId != null) payload['image'] = mediaId;
       }
       
-      payload['services'] = serviceIds; // Or 'service_ids' or 'services', web app uses 'services'
+      payload['service_ids'] = serviceIds;
 
       final response = await NetworkApiServices().postApi(payload, AppUrls.adminOffersUrl, "Create Offer", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
@@ -153,7 +157,7 @@ class AdminMarketingService extends ChangeNotifier {
         if (mediaId != null) payload['image'] = mediaId;
       }
 
-      payload['services'] = serviceIds;
+      payload['service_ids'] = serviceIds;
 
       final response = await NetworkApiServices().putApi(payload, '${AppUrls.adminOffersUrl}/$id', "Update Offer", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {

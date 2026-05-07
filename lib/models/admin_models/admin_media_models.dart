@@ -54,7 +54,9 @@ class AdminMediaItem {
       final base = baseEndPoint.replaceAll('/api/v1', '');
       resolvedPath = '$base/$resolvedPath';
     }
-    return resolvedPath.replaceFirst('/media/', '/media/thumb/');
+    
+    // Default to the full path as the server/S3 may not have a /thumb/ folder
+    return resolvedPath;
   }
 
   String get fullUrl {

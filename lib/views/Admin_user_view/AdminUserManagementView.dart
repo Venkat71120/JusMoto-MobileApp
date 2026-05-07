@@ -188,7 +188,14 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
                 children: [
                   Icon(Icons.location_on, size: 10, color: primaryColor.withOpacity(0.7)),
                   4.toWidth,
-                  Text(user.outletName!, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue[700])),
+                  Expanded(
+                    child: Text(
+                      user.outletName!, 
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue[700]),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
                 ],
               ),
             ],

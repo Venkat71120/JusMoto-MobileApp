@@ -53,8 +53,8 @@ class _AdminSliderFormViewState extends State<AdminSliderFormView> {
     final service = Provider.of<AdminMarketingService>(context, listen: false);
 
     final Map<String, String> data = {
-      'title': _titleController.text.trim(),
-      'link': _linkController.text.trim(),
+      'identity': _titleController.text.trim(),
+      'type': _linkController.text.trim(),
       'status': _status ? '1' : '0',
     };
 

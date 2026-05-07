@@ -26,6 +26,9 @@ class AdminVehicleService extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
 
+  bool _fetchingMore = false;
+  bool get fetchingMore => _fetchingMore;
+
   // --- Brands ---
 
   Future<int?> _uploadImage(File image) async {
@@ -36,7 +39,11 @@ class AdminVehicleService extends ChangeNotifier {
 
       final response = await NetworkApiServices().postWithFileApi(request, "Upload Media");
       if (response != null && response['success'] == true) {
-        return response['data']?['id'] as int?;
+        final id = response['data']?['id'] as int?;
+        debugPrint('✅ Media uploaded successfully, ID: $id');
+        return id;
+      } else {
+        debugPrint('❌ Media upload failed: $response');
       }
     } catch (e) {
       debugPrint('❌ Error uploading media: $e');
@@ -124,7 +131,11 @@ class AdminVehicleService extends ChangeNotifier {
   // --- Cars ---
 
   Future<void> fetchCars({int page = 1, String? search, int? brandId, String? sort, String? order}) async {
-    _loading = true;
+    if (page > 1) {
+      _fetchingMore = true;
+    } else {
+      _loading = true;
+    }
     notifyListeners();
     try {
       String url = '${AppUrls.adminCarsUrl}?page=$page&limit=15';
@@ -135,12 +146,23 @@ class AdminVehicleService extends ChangeNotifier {
 
       final response = await NetworkApiServices().getApi(url, "Admin Cars List", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
-        _carList = AdminCarListModel.fromJson(Map<String, dynamic>.from(response));
+        debugPrint('🚗 Raw Car Data: ${response['data']?.take(1)}'); // Print first car for debug
+        final newModel = AdminCarListModel.fromJson(Map<String, dynamic>.from(response));
+        if (page > 1) {
+          _carList.cars.addAll(newModel.cars);
+          _carList = AdminCarListModel(
+            cars: _carList.cars,
+            pagination: newModel.pagination,
+          );
+        } else {
+          _carList = newModel;
+        }
       }
     } catch (e) {
       debugPrint('❌ Error fetching cars: $e');
     } finally {
       _loading = false;
+      _fetchingMore = false;
       notifyListeners();
     }
   }
@@ -206,7 +228,11 @@ class AdminVehicleService extends ChangeNotifier {
   // --- Variants ---
 
   Future<void> fetchVariants({int page = 1, int? carId}) async {
-    _loading = true;
+    if (page > 1) {
+      _fetchingMore = true;
+    } else {
+      _loading = true;
+    }
     notifyListeners();
     try {
       String url = '${AppUrls.adminVariantsUrl}?page=$page&limit=15';
@@ -214,12 +240,22 @@ class AdminVehicleService extends ChangeNotifier {
 
       final response = await NetworkApiServices().getApi(url, "Admin Variants List", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
-        _variantList = AdminVariantListModel.fromJson(Map<String, dynamic>.from(response));
+        final newModel = AdminVariantListModel.fromJson(Map<String, dynamic>.from(response));
+        if (page > 1) {
+          _variantList.variants.addAll(newModel.variants);
+          _variantList = AdminVariantListModel(
+            variants: _variantList.variants,
+            pagination: newModel.pagination,
+          );
+        } else {
+          _variantList = newModel;
+        }
       }
     } catch (e) {
       debugPrint('❌ Error fetching variants: $e');
     } finally {
       _loading = false;
+      _fetchingMore = false;
       notifyListeners();
     }
   }
@@ -273,18 +309,32 @@ class AdminVehicleService extends ChangeNotifier {
   // --- Engine Types ---
 
   Future<void> fetchEngineTypes({int page = 1}) async {
-    _loading = true;
+    if (page > 1) {
+      _fetchingMore = true;
+    } else {
+      _loading = true;
+    }
     notifyListeners();
     try {
       String url = '${AppUrls.adminEngineTypesUrl}?page=$page&limit=100';
       final response = await NetworkApiServices().getApi(url, "Admin Engine Types List", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
-        _engineTypeList = AdminEngineTypeListModel.fromJson(Map<String, dynamic>.from(response));
+        final newModel = AdminEngineTypeListModel.fromJson(Map<String, dynamic>.from(response));
+        if (page > 1) {
+          _engineTypeList.engineTypes.addAll(newModel.engineTypes);
+          _engineTypeList = AdminEngineTypeListModel(
+            engineTypes: _engineTypeList.engineTypes,
+            pagination: newModel.pagination,
+          );
+        } else {
+          _engineTypeList = newModel;
+        }
       }
     } catch (e) {
       debugPrint('❌ Error fetching engine types: $e');
     } finally {
       _loading = false;
+      _fetchingMore = false;
       notifyListeners();
     }
   }
@@ -338,18 +388,32 @@ class AdminVehicleService extends ChangeNotifier {
   // --- Fuel Types ---
 
   Future<void> fetchFuelTypes({int page = 1}) async {
-    _loading = true;
+    if (page > 1) {
+      _fetchingMore = true;
+    } else {
+      _loading = true;
+    }
     notifyListeners();
     try {
       String url = '${AppUrls.adminFuelTypesUrl}?page=$page&limit=100';
       final response = await NetworkApiServices().getApi(url, "Admin Fuel Types List", headers: acceptJsonAuthHeader);
       if (response != null && response['success'] == true) {
-        _fuelTypeList = AdminFuelTypeListModel.fromJson(Map<String, dynamic>.from(response));
+        final newModel = AdminFuelTypeListModel.fromJson(Map<String, dynamic>.from(response));
+        if (page > 1) {
+          _fuelTypeList.fuelTypes.addAll(newModel.fuelTypes);
+          _fuelTypeList = AdminFuelTypeListModel(
+            fuelTypes: _fuelTypeList.fuelTypes,
+            pagination: newModel.pagination,
+          );
+        } else {
+          _fuelTypeList = newModel;
+        }
       }
     } catch (e) {
       debugPrint('❌ Error fetching fuel types: $e');
     } finally {
       _loading = false;
+      _fetchingMore = false;
       notifyListeners();
     }
   }

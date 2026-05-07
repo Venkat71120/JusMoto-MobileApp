@@ -32,7 +32,11 @@ class AdminCatalogService extends ChangeNotifier {
 
       final response = await NetworkApiServices().postWithFileApi(request, "Upload Media");
       if (response != null && response['success'] == true) {
-        return response['data']?['id'] as int?;
+        final id = response['data']?['id'] as int?;
+        debugPrint('✅ Media uploaded successfully, ID: $id');
+        return id;
+      } else {
+        debugPrint('❌ Media upload failed: $response');
       }
     } catch (e) {
       debugPrint('❌ Error uploading media: $e');

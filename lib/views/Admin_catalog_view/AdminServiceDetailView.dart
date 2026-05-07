@@ -146,9 +146,9 @@ class AdminServiceDetailView extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.star, color: Colors.orange, size: 14),
+                  Icon(Icons.star, color: Color(0xFFFFD700), size: 14),
                   SizedBox(width: 4),
-                  Text('Featured', style: TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold)),
+                  Text('Featured', style: TextStyle(color: Color(0xFFFFD700), fontSize: 11, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

@@ -90,10 +90,12 @@ class AdminCarListModel {
 class AdminCarItem {
   final int id;
   final String name;
-  final int brandId;
+  final int? brandId;
   final String? year;
   final String? image;
   final int status;
+  final int? engineTypeId;
+  final int? fuelTypeId;
   final AdminBrandItem? brand;
 
   AdminCarItem({
@@ -103,6 +105,8 @@ class AdminCarItem {
     this.year,
     this.image,
     required this.status,
+    this.engineTypeId,
+    this.fuelTypeId,
     this.brand,
   });
 
@@ -110,10 +114,12 @@ class AdminCarItem {
     return AdminCarItem(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
-      brandId: _toInt(json['brand_id']),
-      year: json['year'] ?? json['Year'],
+      brandId: _toNullableInt(json['brand_id']),
+      year: _toString(json['year'] ?? json['Year']),
       image: json['image'],
       status: _toInt(json['status']),
+      engineTypeId: _toNullableInt(json['engine_type_id']),
+      fuelTypeId: _toNullableInt(json['fuel_type_id']),
       brand: json['brand'] != null 
           ? AdminBrandItem.fromJson(json['brand'] as Map<String, dynamic>) 
           : null,
@@ -127,6 +133,8 @@ class AdminCarItem {
     String? year,
     String? image,
     int? status,
+    int? engineTypeId,
+    int? fuelTypeId,
     AdminBrandItem? brand,
   }) {
     return AdminCarItem(
@@ -136,6 +144,8 @@ class AdminCarItem {
       year: year ?? this.year,
       image: image ?? this.image,
       status: status ?? this.status,
+      engineTypeId: engineTypeId ?? this.engineTypeId,
+      fuelTypeId: fuelTypeId ?? this.fuelTypeId,
       brand: brand ?? this.brand,
     );
   }
@@ -209,6 +219,8 @@ class AdminVariantItem {
   final String name;
   final int carId;
   final int status;
+  final int? engineTypeId;
+  final int? fuelTypeId;
   final AdminCarItem? car;
 
   AdminVariantItem({
@@ -216,6 +228,8 @@ class AdminVariantItem {
     required this.name,
     required this.carId,
     required this.status,
+    this.engineTypeId,
+    this.fuelTypeId,
     this.car,
   });
 
@@ -225,6 +239,8 @@ class AdminVariantItem {
       name: json['name'] ?? '',
       carId: _toInt(json['car_id']),
       status: _toInt(json['status']),
+      engineTypeId: _toNullableInt(json['engine_type_id']),
+      fuelTypeId: _toNullableInt(json['fuel_type_id']),
       car: json['car'] != null ? AdminCarItem.fromJson(json['car']) : null,
     );
   }
@@ -329,4 +345,15 @@ int _toInt(dynamic value) {
   if (value is bool) return value ? 1 : 0;
   if (value is String) return int.tryParse(value) ?? 0;
   return 0;
+}
+
+String? _toString(dynamic value) {
+  if (value == null) return null;
+  return value.toString();
+}
+
+int? _toNullableInt(dynamic value) {
+  if (value == null) return null;
+  int parsed = _toInt(value);
+  return parsed == 0 ? null : parsed;
 }

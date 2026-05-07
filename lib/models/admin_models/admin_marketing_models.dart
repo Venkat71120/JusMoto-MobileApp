@@ -95,6 +95,7 @@ class AdminOfferListModel {
 class AdminOfferItem {
   final int id;
   final String title;
+  final String? subTitle;
   final double offerPercentage;
   final String? expiresAt;
   final String? image;
@@ -106,6 +107,7 @@ class AdminOfferItem {
   AdminOfferItem({
     required this.id,
     required this.title,
+    this.subTitle,
     required this.offerPercentage,
     this.expiresAt,
     this.image,
@@ -118,6 +120,7 @@ class AdminOfferItem {
     return AdminOfferItem(
       id: json['id'] ?? 0,
       title: json['title'] ?? '',
+      subTitle: json['subTitle'] ?? json['subtitle'],
       offerPercentage: _toDouble(json['offerPercentage'] ?? json['offer_percentage']),
       expiresAt: json['expires_at'],
       image: json['image'],
@@ -130,6 +133,7 @@ class AdminOfferItem {
   AdminOfferItem copyWith({
     int? id,
     String? title,
+    String? subTitle,
     double? offerPercentage,
     String? expiresAt,
     String? image,
@@ -140,6 +144,7 @@ class AdminOfferItem {
     return AdminOfferItem(
       id: id ?? this.id,
       title: title ?? this.title,
+      subTitle: subTitle ?? this.subTitle,
       offerPercentage: offerPercentage ?? this.offerPercentage,
       expiresAt: expiresAt ?? this.expiresAt,
       image: image ?? this.image,
@@ -194,9 +199,9 @@ class AdminSliderItem {
   factory AdminSliderItem.fromJson(Map<String, dynamic> json) {
     return AdminSliderItem(
       id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      image: json['image'],
-      link: json['link'],
+      title: json['title'] ?? json['identity'] ?? '',
+      image: json['image_url'] ?? json['image'],
+      link: json['link'] ?? json['type'],
       status: _toInt(json['status']),
     );
   }

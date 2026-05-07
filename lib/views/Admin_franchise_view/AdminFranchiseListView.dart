@@ -142,7 +142,22 @@ class _AdminFranchiseListViewState extends State<AdminFranchiseListView> {
                 ),
               ),
               title: Text(franchise.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(franchise.email, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(franchise.email, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                  if (franchise.phone != null && franchise.phone!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(Icons.phone, size: 12, color: Colors.grey[400]),
+                        const SizedBox(width: 4),
+                        Text(franchise.phone!, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
               trailing: PopupMenuButton<String>(
                 itemBuilder: (context) => <PopupMenuEntry<String>>[
                   PopupMenuItem<String>(
