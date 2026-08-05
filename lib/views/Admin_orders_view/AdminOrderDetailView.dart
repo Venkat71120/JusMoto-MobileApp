@@ -135,7 +135,7 @@ class _DetailBody extends StatelessWidget {
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [primaryColor, primaryColor.withOpacity(0.8)],
+              colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -160,12 +160,12 @@ class _DetailBody extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.calendar_today_rounded,
-                          size: 13, color: Colors.white.withOpacity(0.7)),
+                          size: 13, color: Colors.white.withValues(alpha: 0.7)),
                       const SizedBox(width: 6),
                       Text(
                         order.createdAt.toOrderTime,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -247,7 +247,7 @@ class _DetailBody extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.12),
+                  color: primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
@@ -309,9 +309,9 @@ class _DetailBody extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.04),
+              color: primaryColor.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: primaryColor.withOpacity(0.1)),
+              border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +319,7 @@ class _DetailBody extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.pin_drop_rounded,
@@ -359,7 +359,7 @@ class _DetailBody extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: context.color.primaryPendingColor.withOpacity(0.1),
+                  color: context.color.primaryPendingColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(Icons.handyman_rounded,
@@ -399,7 +399,7 @@ class _DetailBody extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.08),
+                    color: primaryColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -420,7 +420,7 @@ class _DetailBody extends StatelessWidget {
             itemCount: order.items.length,
             separatorBuilder: (_, __) => Divider(
                 height: 1,
-                color: context.color.primaryBorderColor.withOpacity(0.5)),
+                color: context.color.primaryBorderColor.withValues(alpha: 0.5)),
             itemBuilder: (context, i) => _ItemTile(item: order.items[i]),
           ),
         ],
@@ -442,10 +442,10 @@ class _DetailBody extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: context.color.primaryPendingColor.withOpacity(0.05),
+              color: context.color.primaryPendingColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: context.color.primaryPendingColor.withOpacity(0.12)),
+                  color: context.color.primaryPendingColor.withValues(alpha: 0.12)),
             ),
             child: Text(
               order.orderNote!,
@@ -466,14 +466,14 @@ class _DetailBody extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryColor, primaryColor.withOpacity(0.85)],
+          colors: [primaryColor, primaryColor.withValues(alpha: 0.85)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.25),
+            color: primaryColor.withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -525,9 +525,9 @@ class _DetailBody extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.white.withOpacity(0.0),
-                    Colors.white.withOpacity(0.2),
-                    Colors.white.withOpacity(0.0),
+                    Colors.white.withValues(alpha: 0.0),
+                    Colors.white.withValues(alpha: 0.2),
+                    Colors.white.withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -563,7 +563,7 @@ class _DetailBody extends StatelessWidget {
   Widget _thinDivider(BuildContext context) => Divider(
       height: 1,
       thickness: 0.5,
-      color: context.color.primaryBorderColor.withOpacity(0.5));
+      color: context.color.primaryBorderColor.withValues(alpha: 0.5));
 
   static String _formatGateway(String raw) {
     if (raw.isEmpty) return 'N/A';
@@ -649,7 +649,7 @@ class _QuickActions extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: (s['color'] as Color).withOpacity(0.1),
+                    color: (s['color'] as Color).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(s['icon'] as IconData,
@@ -714,7 +714,7 @@ class _QuickActions extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: (o['color'] as Color).withOpacity(0.1),
+                    color: (o['color'] as Color).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(o['icon'] as IconData,
@@ -777,7 +777,7 @@ class _FranchiseAssignCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: context.color.primarySuccessColor.withOpacity(0.1),
+                    color: context.color.primarySuccessColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -797,9 +797,9 @@ class _FranchiseAssignCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.04),
+                color: primaryColor.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: primaryColor.withOpacity(0.12)),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.12)),
               ),
               child: Row(
                 children: [
@@ -807,7 +807,7 @@ class _FranchiseAssignCard extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(Icons.storefront_rounded,
@@ -855,16 +855,16 @@ class _FranchiseAssignCard extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.04),
+                  color: primaryColor.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: primaryColor.withOpacity(0.12)),
+                  border: Border.all(color: primaryColor.withValues(alpha: 0.12)),
                 ),
                 child: Column(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.08),
+                        color: primaryColor.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.add_business_rounded,
@@ -957,7 +957,7 @@ class _FranchiseAssignCard extends StatelessWidget {
                           height: 42,
                           decoration: BoxDecoration(
                             color: isAssigned
-                                ? primaryColor.withOpacity(0.12)
+                                ? primaryColor.withValues(alpha: 0.12)
                                 : context.color.mutedContrastColor,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1041,7 +1041,7 @@ class _Card extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1150,7 +1150,7 @@ class _InfoTile extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, size: 16, color: iconColor),
@@ -1256,8 +1256,8 @@ class _ItemTile extends StatelessWidget {
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: isProduct
-                            ? Colors.purple.withOpacity(0.08)
-                            : primaryColor.withOpacity(0.08),
+                            ? Colors.purple.withValues(alpha: 0.08)
+                            : primaryColor.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -1321,8 +1321,8 @@ class _ItemTile extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
         color: isProduct
-            ? Colors.purple.withOpacity(0.08)
-            : primaryColor.withOpacity(0.08),
+            ? Colors.purple.withValues(alpha: 0.08)
+            : primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(
@@ -1345,9 +1345,9 @@ class _WhiteBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1389,12 +1389,12 @@ class _SummaryRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
         ),
         Text(
           '${isNegative ? '- ' : ''}\u20B9$displayValue',
           style: TextStyle(
-            color: valueColor ?? Colors.white.withOpacity(0.85),
+            color: valueColor ?? Colors.white.withValues(alpha: 0.85),
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
@@ -1435,7 +1435,7 @@ class _DetailSkeleton extends StatelessWidget {
             background: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                  colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
                 ),
               ),
             ),
@@ -1517,7 +1517,7 @@ class _DetailError extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: context.color.primaryWarningColor.withOpacity(0.06),
+                color: context.color.primaryWarningColor.withValues(alpha: 0.06),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.error_outline_rounded,

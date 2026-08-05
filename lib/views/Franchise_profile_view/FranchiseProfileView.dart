@@ -39,7 +39,7 @@ class FranchiseProfileView extends StatelessWidget {
                 // Avatar
                 CircleAvatar(
                   radius: 48,
-                  backgroundColor: primaryColor.withOpacity(0.15),
+                  backgroundColor: primaryColor.withValues(alpha: 0.15),
                   child: Text(
                     franchise.name.isNotEmpty
                         ? franchise.name[0].toUpperCase()
@@ -63,7 +63,7 @@ class FranchiseProfileView extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -125,7 +125,7 @@ class FranchiseProfileView extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

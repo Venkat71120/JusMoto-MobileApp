@@ -53,7 +53,7 @@ class _AdminOrdersViewState extends State<AdminOrdersView>
               color: context.color.accentContrastColor,
               border: Border(
                 bottom: BorderSide(
-                    color: context.color.primaryBorderColor.withOpacity(0.5)),
+                    color: context.color.primaryBorderColor.withValues(alpha: 0.5)),
               ),
             ),
             child: TabBar(
@@ -274,7 +274,7 @@ class _OrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -291,7 +291,7 @@ class _OrderCard extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.08),
+                      color: primaryColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(Icons.receipt_outlined,
@@ -343,7 +343,7 @@ class _OrderCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: context.color.mutedContrastColor.withOpacity(0.4),
+                color: context.color.mutedContrastColor.withValues(alpha: 0.4),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(14),
                   bottomRight: Radius.circular(14),
@@ -422,7 +422,7 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

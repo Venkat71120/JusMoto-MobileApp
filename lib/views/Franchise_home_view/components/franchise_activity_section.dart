@@ -31,7 +31,7 @@ class FranchiseActivitySection extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -112,7 +112,7 @@ class _TabChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor : primaryColor.withOpacity(0.08),
+          color: isSelected ? primaryColor : primaryColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -183,12 +183,12 @@ class _OrdersList extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
               BoxShadow(
-                color: statusColor.withOpacity(0.03),
+                color: statusColor.withValues(alpha: 0.03),
                 blurRadius: 15,
                 offset: const Offset(0, 6),
               ),
@@ -209,7 +209,7 @@ class _OrdersList extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           statusColor,
-                          statusColor.withOpacity(0.3),
+                          statusColor.withValues(alpha: 0.3),
                         ],
                       ),
                     ),
@@ -228,7 +228,7 @@ class _OrdersList extends StatelessWidget {
                             color: Colors.grey[50],
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
+                                color: Colors.black.withValues(alpha: 0.04),
                                 blurRadius: 6,
                                 offset: const Offset(0, 2),
                               ),
@@ -262,7 +262,7 @@ class _OrdersList extends StatelessWidget {
                             border: Border.all(color: Colors.white, width: 2),
                             boxShadow: [
                               BoxShadow(
-                                color: statusColor.withOpacity(0.3),
+                                color: statusColor.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 spreadRadius: 1,
                               ),
@@ -295,7 +295,7 @@ class _OrdersList extends StatelessWidget {
                             style: context.bodyMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: context.color.primaryContrastColor
-                                  .withOpacity(0.85),
+                                  .withValues(alpha: 0.85),
                               fontSize: 12.5,
                             ),
                           ),
@@ -361,15 +361,15 @@ class _CompactV2Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
-        color: isSolid ? color : color.withOpacity(0.07),
+        color: isSolid ? color : color.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(100),
         border: isSolid
             ? null
-            : Border.all(color: color.withOpacity(0.15), width: 0.5),
+            : Border.all(color: color.withValues(alpha: 0.15), width: 0.5),
         boxShadow: isSolid
             ? [
                 BoxShadow(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 )
@@ -406,7 +406,7 @@ class _CompactV2Badge extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -427,7 +427,7 @@ class _CompactV2Badge extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           pColor,
-                          pColor.withOpacity(0.3),
+                          pColor.withValues(alpha: 0.3),
                         ],
                       ),
                     ),
@@ -439,7 +439,7 @@ class _CompactV2Badge extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: pColor.withOpacity(0.06),
+                        color: pColor.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(Icons.support_agent_rounded, size: 20, color: pColor),
@@ -497,7 +497,7 @@ class _CompactV2Badge extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: pColor.withOpacity(0.05),
+                            color: pColor.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -531,7 +531,7 @@ class _CompactV2Badge extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: pColor.withOpacity(0.1),
+                      color: pColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(

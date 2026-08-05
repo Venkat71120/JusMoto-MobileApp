@@ -1,5 +1,4 @@
 import 'package:car_service/customizations/colors.dart';
-import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:flutter/material.dart';
 
@@ -92,7 +91,7 @@ class AdminServiceDetailView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -141,7 +140,7 @@ class AdminServiceDetailView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Row(
@@ -196,9 +195,9 @@ class AdminServiceDetailView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
+        color: primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.1)),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

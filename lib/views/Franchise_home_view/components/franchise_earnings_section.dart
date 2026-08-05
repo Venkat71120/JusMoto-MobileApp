@@ -42,7 +42,7 @@ class FranchiseEarningsSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -78,7 +78,7 @@ class FranchiseEarningsSection extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? primaryColor
-                                  : primaryColor.withOpacity(0.08),
+                                  : primaryColor.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -123,7 +123,7 @@ class FranchiseEarningsSection extends StatelessWidget {
                           'net earnings',
                           style: context.bodySmall?.copyWith(
                             color: context.color.secondaryContrastColor
-                                .withOpacity(0.5),
+                                .withValues(alpha: 0.5),
                           ),
                         ),
                       ),
@@ -213,7 +213,7 @@ class _EarningDetailTile extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, size: 16, color: color),

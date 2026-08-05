@@ -180,7 +180,7 @@ class _AdminServiceListViewState extends State<AdminServiceListView> {
   Widget _buildChip(String label, VoidCallback onDeleted) {
     return Chip(
       label: Text(label, style: const TextStyle(fontSize: 12, color: primaryColor)),
-      backgroundColor: primaryColor.withOpacity(0.1),
+      backgroundColor: primaryColor.withValues(alpha: 0.1),
       deleteIcon: const Icon(Icons.close, size: 14, color: primaryColor),
       onDeleted: onDeleted,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide.none),
@@ -238,7 +238,7 @@ class _AdminServiceListViewState extends State<AdminServiceListView> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.category?.name ?? 'No Category', style: TextStyle(color: primaryColor.withOpacity(0.8), fontSize: 11, fontWeight: FontWeight.w600)),
+                  Text(item.category?.name ?? 'No Category', style: TextStyle(color: primaryColor.withValues(alpha: 0.8), fontSize: 11, fontWeight: FontWeight.w600)),
                   4.toHeight,
                   Row(
                     children: [
@@ -327,7 +327,7 @@ class _AdminServiceListViewState extends State<AdminServiceListView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(

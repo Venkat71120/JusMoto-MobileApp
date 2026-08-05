@@ -62,17 +62,11 @@ class PaytrApiPayment extends StatelessWidget {
           },
         ),
       ),
-      body: WillPopScope(
-        onWillPop: () async {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
           context.pop();
-          return false;
-          bool canGoBack = await _controller.canGoBack();
-          if (canGoBack) {
-            _controller.goBack();
-            return false;
-          }
-          Alerts().paymentFailWarning(context, onFailed: onFailed);
-          return false;
         },
         child: FutureBuilder(
           future: createPaymentRequest(),

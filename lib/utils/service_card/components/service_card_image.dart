@@ -53,7 +53,7 @@ class ServiceCardImage extends StatelessWidget {
                     padding: 6.paddingAll,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: context.color.accentContrastColor.withOpacity(.4),
+                      color: context.color.accentContrastColor.withValues(alpha: .4),
                     ),
                     child: (isFav ? SvgAssets.heartBold : SvgAssets.heart)
                         .toSVGSized(

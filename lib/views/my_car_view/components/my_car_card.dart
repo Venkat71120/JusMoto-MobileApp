@@ -131,7 +131,7 @@ class MyCarCard extends StatelessWidget {
                     radius: 6,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
-                    color: primaryColor.withOpacity(0.1),
+                    color: primaryColor.withValues(alpha: 0.1),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

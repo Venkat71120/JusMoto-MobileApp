@@ -48,7 +48,7 @@ class TicketTile extends StatelessWidget {
                     height: 48,
                     width: 48,
                     radius: 10,
-                    color: primaryColor.withOpacity(0.1),
+                    color: primaryColor.withValues(alpha: 0.1),
                     alignment: Alignment.center,
                     child: SvgAssets.ticket.toSVGSized(24, color: primaryColor),
                   ),

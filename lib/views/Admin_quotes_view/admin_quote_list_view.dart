@@ -103,7 +103,7 @@ class _AdminQuoteListViewState extends State<AdminQuoteListView> {
               });
               aqvm.fetchAllQuotes(context, status: selectedStatus);
             },
-            selectedColor: context.color.primaryPendingColor.withOpacity(0.2),
+            selectedColor: context.color.primaryPendingColor.withValues(alpha: 0.2),
             labelStyle: TextStyle(
               color:
                   isSelected ? context.color.primaryPendingColor : Colors.black,
@@ -149,7 +149,7 @@ class _AdminQuoteCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

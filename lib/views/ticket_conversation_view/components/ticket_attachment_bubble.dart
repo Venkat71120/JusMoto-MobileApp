@@ -79,8 +79,8 @@ class TicketAttachmentBubble extends StatelessWidget {
                 vertical: 10,
               ),
               color: senderFromWeb
-                  ? context.color.accentContrastColor.withOpacity(0.1)
-                  : Colors.white.withOpacity(0.1),
+                  ? context.color.accentContrastColor.withValues(alpha: 0.1)
+                  : Colors.white.withValues(alpha: 0.1),
               margin: const EdgeInsets.only(top: 4),
               radius: 12,
               child: Row(

@@ -25,7 +25,7 @@ class CarFuelCard extends StatelessWidget {
         borderColor:
             isSelected ? primaryColor : context.color.primaryBorderColor,
         color: isSelected
-            ? primaryColor.withOpacity(0.05)
+            ? primaryColor.withValues(alpha: 0.05)
             : context.color.accentContrastColor,
         padding: 8.paddingAll,
         height: (context.width - 64) / 3.6,

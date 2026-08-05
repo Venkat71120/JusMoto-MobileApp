@@ -21,7 +21,7 @@ class FranchiseTicketsService with ChangeNotifier {
   FranchiseTicketListModel? _ticketList;
   FranchiseTicketDetailModel? _ticketDetail;
 
-  bool _isLoadingStats = false;
+  final bool _isLoadingStats = false;
   bool _isLoadingList = false;
   bool _isLoadingDetail = false;
   bool _hasListError = false;
@@ -293,7 +293,7 @@ class FranchiseTicketsService with ChangeNotifier {
   // ── Private fetchers ───────────────────────────────────────────────────────
   Future<void> _fetchStatistics() async {
     try {
-      final url = '${AppUrls.franchiseTicketStatisticsUrl}';
+      final url = AppUrls.franchiseTicketStatisticsUrl;
       final response = await NetworkApiServices().getApi(url, null, headers: acceptJsonAuthHeader);
       
       if (response != null && response['success'] == true) {

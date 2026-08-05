@@ -24,7 +24,7 @@ class ChangeEmailOtpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (_) {},
+      onPopInvokedWithResult: (_, __) {},
       child: Scaffold(
         appBar: AppBar(
           leading: NavigationPopIcon(
@@ -182,7 +182,7 @@ class ChangeEmailOtpView extends StatelessWidget {
                       width: double.infinity,
                       height: double.infinity,
                       alignment: Alignment.center,
-                      color: context.color.accentContrastColor.withOpacity(.7),
+                      color: context.color.accentContrastColor.withValues(alpha: .7),
                       child: const CustomPreloader(),
                     )
                 ],

@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:car_service/customizations/colors.dart';
-import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/services/admin_services/AdminMediaService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -167,7 +165,7 @@ class _AdminMediaLibraryViewState extends State<AdminMediaLibraryView> {
                 onTap: () => _confirmDelete(item),
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.8), shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.8), shape: BoxShape.circle),
                   child: const Icon(Icons.close, size: 14, color: Colors.red),
                 ),
               ),

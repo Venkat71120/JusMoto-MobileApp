@@ -21,10 +21,10 @@ class ServiceDetailsOffers extends StatelessWidget {
             margin: const EdgeInsets.only(top: 20),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: context.color.primarySuccessColor.withOpacity(0.04),
+              color: context.color.primarySuccessColor.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: context.color.primarySuccessColor.withOpacity(0.15),
+                color: context.color.primarySuccessColor.withValues(alpha: 0.15),
               ),
             ),
             child: Column(

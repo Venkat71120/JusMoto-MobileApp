@@ -84,10 +84,10 @@ class AdminLoginService with ChangeNotifier {
         // ── Parse admin fields ──
         token = dataObj['token'] ?? "";
         this.username = admin['username'] ?? "";
-        this.email = admin['email'] ?? "";
-        this.name = admin['name'] ?? "";
-        this.image = admin['image']?.toString();
-        this.role = admin['role'] ?? "";
+        email = admin['email'] ?? "";
+        name = admin['name'] ?? "";
+        image = admin['image']?.toString();
+        role = admin['role'] ?? "";
         userId = admin['id']?.toString() ?? "";
         permissions = admin['permissions'] ?? [];
 
@@ -106,7 +106,7 @@ class AdminLoginService with ChangeNotifier {
         notifyListeners();
         return true;
       } else if (responseData != null) {
-        if (responseData is Map && responseData.containsKey("message")) {
+        if (responseData.containsKey("message")) {
           responseData["message"]?.toString().showToast();
         } else if (responseData.toString().contains("<!doctype html>") || 
                  responseData.toString().contains("<html>")) {

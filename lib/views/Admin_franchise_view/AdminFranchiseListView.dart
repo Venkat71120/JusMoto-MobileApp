@@ -135,7 +135,7 @@ class _AdminFranchiseListViewState extends State<AdminFranchiseListView> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
-                backgroundColor: primaryColor.withOpacity(0.1),
+                backgroundColor: primaryColor.withValues(alpha: 0.1),
                 child: Text(
                   franchise.name.isNotEmpty ? franchise.name[0] : '?',
                   style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
@@ -223,7 +223,7 @@ class _AdminFranchiseListViewState extends State<AdminFranchiseListView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -291,9 +291,9 @@ class _FilterChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.1),
+        color: primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: primaryColor.withOpacity(0.3)),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

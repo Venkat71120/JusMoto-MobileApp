@@ -25,7 +25,7 @@ class DotIndicator extends StatelessWidget {
           border: Border.all(color: color ?? primaryColor),
           color: isActive
               ? color ?? primaryColor
-              : mutedColor ?? context.color.accentContrastColor.withOpacity(.4),
+              : mutedColor ?? context.color.accentContrastColor.withValues(alpha: .4),
         ),
       ),
     );

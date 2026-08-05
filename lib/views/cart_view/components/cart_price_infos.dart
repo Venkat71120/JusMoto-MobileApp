@@ -1,7 +1,6 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/services/service/cart_service.dart';
 import 'package:car_service/view_models/service_booking_view_model/service_booking_view_model.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +27,7 @@ class CartPriceInfos extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, -6),
           ),
@@ -55,7 +54,7 @@ class CartPriceInfos extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: context.color.mutedContrastColor.withOpacity(0.5),
+                  color: context.color.mutedContrastColor.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
@@ -63,7 +62,7 @@ class CartPriceInfos extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.1),
+                        color: primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
@@ -100,7 +99,7 @@ class CartPriceInfos extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.08),
+                        color: primaryColor.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -152,7 +151,7 @@ class CartPriceInfos extends StatelessWidget {
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
                         elevation: 4,
-                        shadowColor: primaryColor.withOpacity(0.4),
+                        shadowColor: primaryColor.withValues(alpha: 0.4),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),

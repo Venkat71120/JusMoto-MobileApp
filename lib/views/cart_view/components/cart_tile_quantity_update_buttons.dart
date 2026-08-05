@@ -1,6 +1,5 @@
 import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
-import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:flutter/material.dart';
 
 class CartTileQuantityUpdateButtons extends StatelessWidget {
@@ -32,8 +31,8 @@ class CartTileQuantityUpdateButtons extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: quantity == 1
-                    ? context.color.primaryWarningColor.withOpacity(0.08)
-                    : context.color.primaryContrastColor.withOpacity(0.06),
+                    ? context.color.primaryWarningColor.withValues(alpha: 0.08)
+                    : context.color.primaryContrastColor.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(

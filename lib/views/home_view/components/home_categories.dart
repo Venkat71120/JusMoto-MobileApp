@@ -3,7 +3,6 @@ import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/extension/widget_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/utils/components/field_label.dart';
-import 'package:car_service/views/category_view/components/category_card.dart';
 import 'package:car_service/views/home_view/components/auto_scroll_category_list.dart'; // Add this import
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

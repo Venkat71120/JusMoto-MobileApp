@@ -10,7 +10,7 @@ void main() async {
     "password": "1234567890"
   };
 
-  print('Sending POST to ' + url.toString() + '...');
+  print('Sending POST to $url...');
   final response = await http.post(
     url,
     headers: {
@@ -21,6 +21,6 @@ void main() async {
     body: jsonEncode(body),
   );
 
-  print('Status: ' + response.statusCode.toString());
-  print('Body: ' + response.body);
+  print('Status: ${response.statusCode}');
+  print('Body: ${response.body}');
 }

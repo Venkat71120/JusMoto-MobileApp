@@ -83,7 +83,7 @@ class ServiceDetailsExcludes extends StatelessWidget {
                                               height: 1,
                                               color: context
                                                   .color.tertiaryContrastColo
-                                                  .withOpacity(.3),
+                                                  .withValues(alpha: .3),
                                             ),
                                             8.toHeight,
                                             Text(

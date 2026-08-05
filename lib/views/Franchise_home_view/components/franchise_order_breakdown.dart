@@ -26,7 +26,7 @@ class FranchiseOrderBreakdown extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -140,9 +140,9 @@ class _StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -200,7 +200,7 @@ class _PaymentRow extends StatelessWidget {
             Text(
               label,
               style: context.bodySmall?.copyWith(
-                color: context.color.secondaryContrastColor.withOpacity(0.7),
+                color: context.color.secondaryContrastColor.withValues(alpha: 0.7),
               ),
             ),
             const Spacer(),
@@ -218,7 +218,7 @@ class _PaymentRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: pct,
-            backgroundColor: color.withOpacity(0.12),
+            backgroundColor: color.withValues(alpha: 0.12),
             valueColor: AlwaysStoppedAnimation<Color>(color),
             minHeight: 6,
           ),

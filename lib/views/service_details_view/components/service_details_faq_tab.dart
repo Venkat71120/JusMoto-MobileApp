@@ -1,8 +1,6 @@
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
-import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/utils/components/empty_element.dart';
 import 'package:car_service/view_models/service_details_view_model/service_details_view_model.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +27,7 @@ class ServiceDetailsFaqTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -85,12 +83,12 @@ class ServiceDetailsFaqTab extends StatelessWidget {
                               curve: Curves.easeInOut,
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? primaryColor.withOpacity(0.05)
+                                    ? primaryColor.withValues(alpha: 0.05)
                                     : context.color.accentContrastColor,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isSelected
-                                      ? primaryColor.withOpacity(0.35)
+                                      ? primaryColor.withValues(alpha: 0.35)
                                       : context.color.primaryBorderColor,
                                   width: isSelected ? 1.5 : 1,
                                 ),
@@ -98,7 +96,7 @@ class ServiceDetailsFaqTab extends StatelessWidget {
                                     ? [
                                         BoxShadow(
                                           color:
-                                              primaryColor.withOpacity(0.08),
+                                              primaryColor.withValues(alpha: 0.08),
                                           blurRadius: 12,
                                           offset: const Offset(0, 4),
                                         ),
@@ -158,7 +156,7 @@ class ServiceDetailsFaqTab extends StatelessWidget {
                                           decoration: BoxDecoration(
                                             color: isSelected
                                                 ? primaryColor
-                                                    .withOpacity(0.1)
+                                                    .withValues(alpha: 0.1)
                                                 : context
                                                     .color.mutedContrastColor,
                                             shape: BoxShape.circle,

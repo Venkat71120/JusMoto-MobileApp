@@ -8,7 +8,6 @@ import 'package:car_service/view_models/service_booking_view_model/service_booki
 import 'package:car_service/views/landing_view/landing_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../models/order_models/order_response_model.dart';
 import '../../customizations/colors.dart';
@@ -30,7 +29,7 @@ class OrderSummeryView extends StatelessWidget {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (sbm.paymentLoading.value) return;
         context.toUntilPage(const LandingView());
       },
@@ -96,10 +95,10 @@ class OrderSummeryView extends StatelessWidget {
                                                 color: isPaid
                                                     ? context.color
                                                         .primarySuccessColor
-                                                        .withOpacity(0.08)
+                                                        .withValues(alpha: 0.08)
                                                     : context.color
                                                         .primaryPendingColor
-                                                        .withOpacity(0.08),
+                                                        .withValues(alpha: 0.08),
                                                 borderRadius:
                                                     const BorderRadius.only(
                                                   topLeft: Radius.circular(16),
@@ -212,7 +211,7 @@ class OrderSummeryView extends StatelessWidget {
                                                         vertical: 4),
                                                     decoration: BoxDecoration(
                                                       color: primaryColor
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha: 0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               20),
@@ -722,7 +721,7 @@ class OrderSummeryView extends StatelessWidget {
                           height: double.infinity,
                           width: double.infinity,
                           color: context.color.accentContrastColor
-                              .withOpacity(.7),
+                              .withValues(alpha: .7),
                           child: const Center(child: CustomPreloader()),
                         ),
                     ],

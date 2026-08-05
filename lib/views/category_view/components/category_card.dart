@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart' as badge;
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:figma_squircle_updated/figma_squircle.dart';
@@ -23,7 +22,7 @@ class CategoryCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: ShapeDecoration(
         color: isSelected 
-            ? primaryColor.withOpacity(0.1)
+            ? primaryColor.withValues(alpha: 0.1)
             : context.color.mutedContrastColor,
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
@@ -48,7 +47,7 @@ class CategoryCard extends StatelessWidget {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: isSelected 
-                  ? primaryColor.withOpacity(0.15)
+                  ? primaryColor.withValues(alpha: 0.15)
                   : Colors.white,
               shape: BoxShape.circle,
             ),

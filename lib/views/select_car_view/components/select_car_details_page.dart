@@ -1,6 +1,5 @@
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/models/car_models/car_model_list_model.dart';
 import 'package:car_service/utils/components/custom_network_image.dart';
 import 'package:car_service/utils/components/custom_refresh_indicator.dart';
@@ -12,7 +11,6 @@ import 'package:car_service/customizations/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../my_car_view/components/car_fuel_card.dart';
 import '../../../services/car_services/variant_list_service.dart';
 import '../../../utils/components/custom_future_widget.dart';
 
@@ -129,7 +127,7 @@ class SelectCarDetailsPage extends StatelessWidget {
                                               ),
                                             ),
                                           );
-                                        }).toList(),
+                                        }),
                                         // Custom Variant Option
                                         SizedBox(
                                           width: ((context.width - 100) / 2) < 100

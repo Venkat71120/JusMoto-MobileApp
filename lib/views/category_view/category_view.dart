@@ -12,7 +12,6 @@ import '../../services/category_service.dart';
 import '../../utils/components/custom_future_widget.dart';
 import '../../view_models/category_view_model/category_view_model.dart';
 import '../home_view/components/category_card_skeleton.dart';
-import 'components/category_card.dart';
 // import 'components/auto_scroll_category_list.dart'; // Add this import
 
 class CategoryView extends StatelessWidget {

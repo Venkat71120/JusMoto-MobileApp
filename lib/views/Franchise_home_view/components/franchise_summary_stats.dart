@@ -88,7 +88,7 @@ class _StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -103,7 +103,7 @@ class _StatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, size: 20, color: color),
@@ -111,7 +111,7 @@ class _StatCard extends StatelessWidget {
               Text(
                 subLabel,
                 style: context.bodySmall?.copyWith(
-                  color: context.color.secondaryContrastColor.withOpacity(0.5),
+                  color: context.color.secondaryContrastColor.withValues(alpha: 0.5),
                   fontSize: 10,
                 ),
               ),
@@ -129,7 +129,7 @@ class _StatCard extends StatelessWidget {
           Text(
             label,
             style: context.bodySmall?.copyWith(
-              color: context.color.secondaryContrastColor.withOpacity(0.6),
+              color: context.color.secondaryContrastColor.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -158,14 +158,14 @@ class _EarningHighlightCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryColor, primaryColor.withOpacity(0.75)],
+          colors: [primaryColor, primaryColor.withValues(alpha: 0.75)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.3),
+            color: primaryColor.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

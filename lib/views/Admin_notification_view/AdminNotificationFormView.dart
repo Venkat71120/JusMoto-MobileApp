@@ -130,7 +130,7 @@ class _AdminNotificationFormViewState extends State<AdminNotificationFormView> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? primaryColor.withOpacity(0.1) : Colors.grey[50],
+            color: isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: isSelected ? primaryColor : Colors.grey[200]!),
           ),

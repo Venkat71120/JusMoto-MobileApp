@@ -392,8 +392,9 @@ class RecentOrder {
     if (img == null) {
       final serviceGroup = itemMap['service'] as Map?;
       final productGroup = itemMap['product'] as Map?;
-      if (serviceGroup != null) img = serviceGroup['image'] ?? serviceGroup['img'];
-      else if (productGroup != null) img = productGroup['image'] ?? productGroup['img'];
+      if (serviceGroup != null) {
+        img = serviceGroup['image'] ?? serviceGroup['img'];
+      } else if (productGroup != null) img = productGroup['image'] ?? productGroup['img'];
     }
     return img?.toString();
   }

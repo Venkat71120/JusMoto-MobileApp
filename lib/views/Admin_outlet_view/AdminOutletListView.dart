@@ -86,7 +86,7 @@ class _AdminOutletListViewState extends State<AdminOutletListView> {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.location_on, color: primaryColor),
@@ -141,7 +141,7 @@ class _AdminOutletListViewState extends State<AdminOutletListView> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: outlet.status == 1 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+          color: outlet.status == 1 ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(

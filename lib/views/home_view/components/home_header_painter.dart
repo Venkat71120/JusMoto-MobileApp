@@ -183,7 +183,7 @@ class HomeHeaderPainter extends CustomPainter {
     path_0.close();
 
     Paint paint0Fill = Paint()..style = PaintingStyle.fill;
-    paint0Fill.color = color.withOpacity(1.0);
+    paint0Fill.color = color.withValues(alpha: 1.0);
     canvas.drawPath(path_0, paint0Fill);
   }
 

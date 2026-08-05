@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 
 // import '../../view_models/franchise_login_view_model/franchise_login_view_model.dart';
 // import '../franchise/franchise_login_view.dart';
-import '../sign_in_with_otp_view/sign_in_with_otp_view.dart';
 import 'components/create_account.dart';
 import 'components/social_sign_in.dart';
 

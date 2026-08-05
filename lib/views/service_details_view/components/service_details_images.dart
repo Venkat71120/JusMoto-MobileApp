@@ -6,7 +6,6 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../../../customizations/colors.dart';
 import '../../../models/service/service_details_model.dart';
 import '../../../utils/components/custom_network_image.dart';
-import '../../../utils/components/custom_squircle_widget.dart';
 import '../../../utils/components/image_view.dart';
 import '../../../view_models/service_details_view_model/service_details_view_model.dart';
 
@@ -116,7 +115,7 @@ class ServiceDetailsImages extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.45),
+                              Colors.black.withValues(alpha: 0.45),
                             ],
                           ),
                         ),
@@ -134,7 +133,7 @@ class ServiceDetailsImages extends StatelessWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.55),
+                          color: Colors.black.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -171,7 +170,7 @@ class ServiceDetailsImages extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: isActive
                                     ? primaryColor
-                                    : Colors.white.withOpacity(0.5),
+                                    : Colors.white.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),

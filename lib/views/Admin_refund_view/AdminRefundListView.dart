@@ -141,7 +141,7 @@ class _AdminRefundListViewState extends State<AdminRefundListView> with SingleTi
                 Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: primaryColor.withOpacity(0.1),
+                      backgroundColor: primaryColor.withValues(alpha: 0.1),
                       radius: 20,
                       child: const Icon(Icons.person_outline, color: primaryColor, size: 20),
                     ),
@@ -167,9 +167,9 @@ class _AdminRefundListViewState extends State<AdminRefundListView> with SingleTi
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.05),
+                      color: Colors.amber.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.amber.withOpacity(0.1)),
+                      border: Border.all(color: Colors.amber.withValues(alpha: 0.1)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +226,7 @@ class _AdminRefundListViewState extends State<AdminRefundListView> with SingleTi
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),

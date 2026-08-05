@@ -273,7 +273,7 @@ class Alerts {
       context: context,
       builder: (context) {
         return Material(
-          color: context.color.primaryContrastColor.withOpacity(.7),
+          color: context.color.primaryContrastColor.withValues(alpha: .7),
           child: const Center(child: CustomPreloader()),
         );
       },

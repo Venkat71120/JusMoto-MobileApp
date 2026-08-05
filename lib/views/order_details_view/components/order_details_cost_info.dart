@@ -102,8 +102,8 @@ class OrderDetailsCostInfo extends StatelessWidget {
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isPaid
-                          ? context.color.primarySuccessColor.withOpacity(0.1)
-                          : context.color.primaryPendingColor.withOpacity(0.1),
+                          ? context.color.primarySuccessColor.withValues(alpha: 0.1)
+                          : context.color.primaryPendingColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(

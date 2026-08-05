@@ -106,11 +106,12 @@ class _InvoicePageState extends State<_InvoicePage> {
   }
 
   void _setError() {
-    if (mounted)
+    if (mounted) {
       setState(() {
         _hasError = true;
         _isLoading = false;
       });
+    }
   }
 
   @override

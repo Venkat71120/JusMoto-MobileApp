@@ -29,7 +29,7 @@ class VerifyEmailOtpView extends StatelessWidget {
     return ChangeNotifierProvider<OtpService>(
       create: (context) => OtpService(),
       child: PopScope(
-        onPopInvoked: (_) {},
+        onPopInvokedWithResult: (_, __) {},
         child: Scaffold(
           backgroundColor: context.color.accentContrastColor,
           appBar: AppBar(

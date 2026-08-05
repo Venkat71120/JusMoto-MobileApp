@@ -1,13 +1,9 @@
-import 'dart:io';
 
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/models/support_models/ticket_messages_model.dart';
-import 'package:car_service/services/conversation_service.dart';
-import 'package:car_service/utils/components/custom_squircle_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../../../customizations/colors.dart';
 import 'ticket_attachment_bubble.dart';
@@ -48,7 +44,7 @@ class TicketChatBubble extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

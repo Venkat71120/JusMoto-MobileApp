@@ -109,7 +109,7 @@ class _DetailContent extends StatelessWidget {
             background: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                  colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -194,7 +194,7 @@ class _DetailContent extends StatelessWidget {
                           width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.12),
+                            color: primaryColor.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -259,7 +259,7 @@ class _DetailContent extends StatelessWidget {
                               order.location!.address!,
                               style: context.bodySmall?.copyWith(
                                 color: context.color.secondaryContrastColor
-                                    .withOpacity(0.7),
+                                    .withValues(alpha: 0.7),
                                 height: 1.5,
                               ),
                             ),
@@ -299,7 +299,7 @@ class _DetailContent extends StatelessWidget {
                       itemCount: order.items.length,
                       separatorBuilder: (_, __) => Divider(
                         height: 1,
-                        color: Colors.grey.withOpacity(0.12),
+                        color: Colors.grey.withValues(alpha: 0.12),
                       ),
                       itemBuilder: (context, i) =>
                           _LineItemRow(item: order.items[i]),
@@ -326,7 +326,7 @@ class _DetailContent extends StatelessWidget {
                               order.orderNote!,
                               style: context.bodySmall?.copyWith(
                                 color: context.color.secondaryContrastColor
-                                    .withOpacity(0.7),
+                                    .withValues(alpha: 0.7),
                                 height: 1.5,
                               ),
                             ),
@@ -363,7 +363,7 @@ class _DetailContent extends StatelessWidget {
                       ),
                     ],
                     12.toHeight,
-                    Divider(color: Colors.grey.withOpacity(0.15), height: 1),
+                    Divider(color: Colors.grey.withValues(alpha: 0.15), height: 1),
                     12.toHeight,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -411,7 +411,7 @@ class _DetailBottomActions extends StatelessWidget {
         color: context.color.accentContrastColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -527,7 +527,7 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -535,7 +535,7 @@ class _ActionButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -644,7 +644,7 @@ class _SectionHeader extends StatelessWidget {
       title,
       style: context.bodyMedium?.copyWith(
         fontWeight: FontWeight.bold,
-        color: context.color.secondaryContrastColor.withOpacity(0.5),
+        color: context.color.secondaryContrastColor.withValues(alpha: 0.5),
         fontSize: 12,
         letterSpacing: 0.5,
       ),
@@ -668,7 +668,7 @@ class _SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -788,8 +788,8 @@ class _LineItemRow extends StatelessWidget {
                           horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
                         color: isProduct
-                            ? Colors.purple.withOpacity(0.08)
-                            : primaryColor.withOpacity(0.08),
+                            ? Colors.purple.withValues(alpha: 0.08)
+                            : primaryColor.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -843,8 +843,8 @@ class _LineItemRow extends StatelessWidget {
       height: 42,
       decoration: BoxDecoration(
         color: isProduct
-            ? Colors.purple.withOpacity(0.1)
-            : primaryColor.withOpacity(0.1),
+            ? Colors.purple.withValues(alpha: 0.1)
+            : primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
@@ -868,7 +868,7 @@ class _PriceRow extends StatelessWidget {
     final isNegative = value < 0;
     final displayValue = isNegative ? -value : value;
     final displayColor = color ??
-        context.color.secondaryContrastColor.withOpacity(0.7);
+        context.color.secondaryContrastColor.withValues(alpha: 0.7);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -900,9 +900,9 @@ class _WhiteBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -945,7 +945,7 @@ class _DetailSkeleton extends StatelessWidget {
             background: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                  colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
                 ),
               ),
             ),

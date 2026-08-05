@@ -223,7 +223,7 @@ class SocialSignInViewModel {
     } catch (e, stackTrace) {
       debugPrint('❌ Facebook sign-in error: $e');
       debugPrint('StackTrace: $stackTrace');
-      throw e;
+      rethrow;
     }
   }
 

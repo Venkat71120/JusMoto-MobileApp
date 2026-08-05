@@ -154,7 +154,7 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -230,8 +230,8 @@ class _AdminReviewListViewState extends State<AdminReviewListView> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
-          border: Border.all(color: color.withOpacity(0.3)),
+          color: color.withValues(alpha: 0.05),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(

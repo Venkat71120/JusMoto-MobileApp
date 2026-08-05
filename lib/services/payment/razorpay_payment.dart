@@ -46,15 +46,17 @@ class RazorpayPayment extends StatelessWidget {
           Alerts().paymentFailWarning(context, onFailed: onFailed);
         }),
       ),
-      body: WillPopScope(
-        onWillPop: () async {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
           bool canGoBack = await _controller.canGoBack();
           if (canGoBack) {
             _controller.goBack();
-            return false;
+            return;
           }
           Alerts().paymentFailWarning(context, onFailed: onFailed);
-          return false;
+          return;
         },
         child: FutureBuilder(
             future: waitForIt(apiKey, apiSecret, orderId, userName, userEmail,

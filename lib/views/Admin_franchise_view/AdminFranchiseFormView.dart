@@ -107,8 +107,9 @@ class _AdminFranchiseFormViewState extends State<AdminFranchiseFormView> {
                 keyboardType: TextInputType.phone,
                 maxLength: 10,
                 validator: (v) {
-                  if (v != null && v.isNotEmpty && v.length != 10)
+                  if (v != null && v.isNotEmpty && v.length != 10) {
                     return 'Phone must be 10 digits';
+                  }
                   return null;
                 },
               ),

@@ -547,7 +547,7 @@ extension RefundStatusExtension on String {
       case "rejected":
         return "Rejected"; // Or use a LocalKeys if available
       default:
-        return this.capitalize;
+        return capitalize;
     }
   }
 

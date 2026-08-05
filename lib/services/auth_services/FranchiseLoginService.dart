@@ -1,7 +1,6 @@
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 
-import '../../customization.dart';
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
@@ -104,10 +103,10 @@ class FranchiseLoginService with ChangeNotifier {
         // ── Parse admin fields ──
         token = dataObj['token'] ?? "";
         this.username = admin['username'] ?? "";
-        this.email = admin['email'] ?? "";
-        this.name = admin['name'] ?? "";
-        this.image = admin['image']?.toString();
-        this.role = admin['role'] ?? "";
+        email = admin['email'] ?? "";
+        name = admin['name'] ?? "";
+        image = admin['image']?.toString();
+        role = admin['role'] ?? "";
         userId = admin['id']?.toString() ?? "";
         permissions = admin['permissions'] ?? [];
 

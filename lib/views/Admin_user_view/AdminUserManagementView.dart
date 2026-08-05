@@ -172,7 +172,7 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: _getTypeColor(type).withOpacity(0.1),
+          backgroundColor: _getTypeColor(type).withValues(alpha: 0.1),
           child: Icon(_getTypeIcon(type), color: _getTypeColor(type), size: 20),
         ),
         title: Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -186,7 +186,7 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 10, color: primaryColor.withOpacity(0.7)),
+                  Icon(Icons.location_on, size: 10, color: primaryColor.withValues(alpha: 0.7)),
                   4.toWidth,
                   Expanded(
                     child: Text(
@@ -267,7 +267,7 @@ class _AdminUserManagementViewState extends State<AdminUserManagementView> with 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+        color: isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

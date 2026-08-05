@@ -2,7 +2,6 @@ import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
-import 'package:car_service/helper/extension/widget_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/helper/svg_assets.dart';
 import 'package:car_service/models/home_models/services_list_model.dart';
@@ -98,7 +97,7 @@ class CartView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withValues(alpha: 0.04),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -176,7 +175,7 @@ class CartView extends StatelessWidget {
                                           endIndent: 16,
                                           color: context
                                               .color.primaryBorderColor
-                                              .withOpacity(0.5),
+                                              .withValues(alpha: 0.5),
                                         ),
                                     ],
                                   );
@@ -194,7 +193,7 @@ class CartView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withValues(alpha: 0.04),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -241,7 +240,7 @@ class CartView extends StatelessWidget {
                                     filled: true,
                                     fillColor:
                                         context.color.mutedContrastColor
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                     contentPadding:
                                         const EdgeInsets.all(12),
                                     border: OutlineInputBorder(
@@ -258,7 +257,7 @@ class CartView extends StatelessWidget {
                                       borderRadius:
                                           BorderRadius.circular(10),
                                       borderSide: BorderSide(
-                                        color: primaryColor.withOpacity(0.3),
+                                        color: primaryColor.withValues(alpha: 0.3),
                                       ),
                                     ),
                                   ),
@@ -275,7 +274,7 @@ class CartView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withValues(alpha: 0.04),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -379,7 +378,7 @@ class CartView extends StatelessWidget {
                         border: Border(
                           top: BorderSide(
                             color: context.color.primaryBorderColor
-                                .withOpacity(0.5),
+                                .withValues(alpha: 0.5),
                           ),
                         ),
                       ),

@@ -109,7 +109,7 @@ class _AdminOfferListViewState extends State<AdminOfferListView> {
                   decoration: BoxDecoration(
                     color: Colors.amber,
                     borderRadius: BorderRadius.circular(8),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)],
                   ),
                   child: Text(
                     '${offer.offerPercentage.toInt()}% OFF',
@@ -179,7 +179,7 @@ class _AdminOfferListViewState extends State<AdminOfferListView> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: offer.status == 1 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+          color: offer.status == 1 ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(

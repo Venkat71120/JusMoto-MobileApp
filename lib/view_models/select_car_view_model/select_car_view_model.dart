@@ -13,7 +13,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/car_services/user_cars_service.dart';
-import '../../views/splash_view/splash_view.dart';
 
 class SelectCarViewModel {
   final ValueNotifier<BrandModel?> selectedBrand = ValueNotifier(null);

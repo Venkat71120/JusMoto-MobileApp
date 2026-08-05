@@ -3,7 +3,6 @@ import 'package:car_service/view_models/landding_view_model/landding_view_model.
 import 'package:car_service/views/landing_view/components/landing_bottom_nav.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/payment/paytr_api_payment.dart';
 import '../home_view/home_view.dart';
 import '../menu_view/menu_view.dart';
 import '../my_car_view/my_car_view.dart';

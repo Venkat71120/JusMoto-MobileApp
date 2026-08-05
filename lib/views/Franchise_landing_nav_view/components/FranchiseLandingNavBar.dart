@@ -17,7 +17,6 @@ import '/helper/extension/context_extension.dart';
 import '/helper/extension/string_extension.dart';
 import '../../../helper/local_keys.g.dart';
 import '../../../helper/svg_assets.dart';
-import '../../../services/theme_service.dart';
 
 class FranchiseLandingNavBar extends StatelessWidget {
   const FranchiseLandingNavBar({super.key});

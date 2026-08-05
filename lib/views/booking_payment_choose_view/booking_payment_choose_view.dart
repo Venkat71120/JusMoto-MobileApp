@@ -92,7 +92,7 @@ class BookingPaymentChooseView extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 14),
                               decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.05),
+                                color: primaryColor.withValues(alpha: 0.05),
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(16),
                                   topRight: Radius.circular(16),

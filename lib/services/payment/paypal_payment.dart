@@ -147,15 +147,17 @@ class PaypalPaymentState extends State<PaypalPayment> {
         child: CustomFutureWidget(
           function: checkoutUrl == null ? initiatePayment() : null,
           shimmer: const CustomPreloader(),
-          child: WillPopScope(
-            onWillPop: () async {
+          child: PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) async {
+              if (didPop) return;
               bool canGoBack = await _controller.canGoBack();
               if (canGoBack) {
                 _controller.goBack();
-                return false;
+                return;
               }
               Alerts().paymentFailWarning(context, onFailed: widget.onFailed);
-              return false;
+              return;
             },
             child: WebViewWidget(
               controller: _controller,

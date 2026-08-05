@@ -32,7 +32,7 @@ class ServiceDetailsReviewTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -71,13 +71,13 @@ class ServiceDetailsReviewTab extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    primaryColor.withOpacity(0.06),
-                    primaryColor.withOpacity(0.02),
+                    primaryColor.withValues(alpha: 0.06),
+                    primaryColor.withValues(alpha: 0.02),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                 ),
               ),
               child: Row(
@@ -92,7 +92,7 @@ class ServiceDetailsReviewTab extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: primaryColor.withOpacity(0.15),
+                              color: primaryColor.withValues(alpha: 0.15),
                               blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
@@ -163,7 +163,7 @@ class ServiceDetailsReviewTab extends StatelessWidget {
                                     minHeight: 8,
                                     backgroundColor: context
                                         .color.primaryBorderColor
-                                        .withOpacity(0.4),
+                                        .withValues(alpha: 0.4),
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.orange.shade600,
                                     ),

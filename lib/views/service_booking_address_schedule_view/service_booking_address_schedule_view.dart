@@ -56,7 +56,7 @@ class ServiceBookingAddressScheduleView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -70,7 +70,7 @@ class ServiceBookingAddressScheduleView extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.1),
+                            color: primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -103,7 +103,7 @@ class ServiceBookingAddressScheduleView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -117,7 +117,7 @@ class ServiceBookingAddressScheduleView extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.1),
+                            color: primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -159,7 +159,7 @@ class ServiceBookingAddressScheduleView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -182,7 +182,7 @@ class ServiceBookingAddressScheduleView extends StatelessWidget {
           color: context.color.accentContrastColor,
           border: Border(
             top: BorderSide(
-              color: context.color.primaryBorderColor.withOpacity(0.5),
+              color: context.color.primaryBorderColor.withValues(alpha: 0.5),
             ),
           ),
         ),

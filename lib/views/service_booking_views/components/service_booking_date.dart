@@ -6,7 +6,6 @@ import 'package:car_service/view_models/service_booking_view_model/service_booki
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../models/schedule_list_model.dart';
 
 class ServiceBookingDate extends StatelessWidget {
   final dynamic providerId;
@@ -25,7 +24,7 @@ class ServiceBookingDate extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -81,7 +80,7 @@ class ServiceBookingDate extends StatelessWidget {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: primaryColor.withOpacity(0.3),
+                                  color: primaryColor.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),
@@ -97,7 +96,7 @@ class ServiceBookingDate extends StatelessWidget {
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: isSelected
-                                  ? Colors.white.withOpacity(0.8)
+                                  ? Colors.white.withValues(alpha: 0.8)
                                   : context.color.tertiaryContrastColo,
                             ),
                           ),
@@ -119,7 +118,7 @@ class ServiceBookingDate extends StatelessWidget {
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
                               color: isSelected
-                                  ? Colors.white.withOpacity(0.8)
+                                  ? Colors.white.withValues(alpha: 0.8)
                                   : context.color.tertiaryContrastColo,
                             ),
                           ),
@@ -246,10 +245,10 @@ class ServiceBookingDate extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.06),
+                    color: primaryColor.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: primaryColor.withOpacity(0.15),
+                      color: primaryColor.withValues(alpha: 0.15),
                     ),
                   ),
                   child: Row(

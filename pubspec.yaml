@@ -67,6 +67,9 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.13.2
 
+  firebase_core: any
+  http_parser: any
+  video_player: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

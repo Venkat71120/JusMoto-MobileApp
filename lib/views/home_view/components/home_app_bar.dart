@@ -85,7 +85,7 @@ class HomeAppBar extends StatelessWidget {
                               : Text(
                                   LocalKeys.welcomeBack,
                                   style: context.bodyMedium?.copyWith(
-                                    color: color.withOpacity(.7),
+                                    color: color.withValues(alpha: .7),
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),

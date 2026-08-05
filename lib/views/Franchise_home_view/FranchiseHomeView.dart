@@ -133,18 +133,18 @@ class FranchiseHomeView extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                color.withOpacity(0.12),
-                color.withOpacity(0.04),
+                color.withValues(alpha: 0.12),
+                color.withValues(alpha: 0.04),
                 context.color.backgroundColor,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: color.withOpacity(0.15), width: 1.5),
+            border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.06),
+                color: color.withValues(alpha: 0.06),
                 blurRadius: 24,
                 offset: const Offset(0, 12),
               ),
@@ -162,7 +162,7 @@ class FranchiseHomeView extends StatelessWidget {
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.05),
+                      color: color.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -179,7 +179,7 @@ class FranchiseHomeView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: color.withOpacity(0.1),
+                              color: color.withValues(alpha: 0.1),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -209,7 +209,7 @@ class FranchiseHomeView extends StatelessWidget {
                             Text(
                               'Review and respond to custom service requests',
                               style: context.bodySmall?.copyWith(
-                                color: context.color.secondaryContrastColor.withOpacity(0.6),
+                                color: context.color.secondaryContrastColor.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w500,
                                 height: 1.3,
                               ),
@@ -221,7 +221,7 @@ class FranchiseHomeView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -257,9 +257,9 @@ class FranchiseHomeView extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -267,7 +267,7 @@ class FranchiseHomeView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 24),

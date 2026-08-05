@@ -18,7 +18,6 @@ import 'package:car_service/view_models/landding_view_model/landding_view_model.
 import 'package:car_service/views/Franchise_landing_nav_view/FranchiseLandingView.dart';
 import 'package:car_service/views/Admin_landing_nav_view/AdminLandingView.dart';
 import 'package:car_service/views/landing_view/landing_view.dart';
-import 'package:car_service/views/select_car_view/select_car_view.dart';
 import 'package:car_service/views/sign_in_view/sign_in_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

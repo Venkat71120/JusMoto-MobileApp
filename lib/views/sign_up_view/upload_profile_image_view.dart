@@ -47,7 +47,7 @@ class UploadProfileImageView extends StatelessWidget {
                             height: 200,
                             width: 200,
                             decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(.15),
+                                color: primaryColor.withValues(alpha: .15),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: primaryColor,

@@ -129,7 +129,7 @@ class _OrdersList extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -147,7 +147,7 @@ class _OrdersList extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [statusColor, statusColor.withOpacity(0.3)],
+                        colors: [statusColor, statusColor.withValues(alpha: 0.3)],
                       ),
                     ),
                   ),
@@ -209,7 +209,7 @@ class _OrdersList extends StatelessWidget {
                             order.customerName,
                             style: context.bodyMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: context.color.primaryContrastColor.withOpacity(0.85),
+                              color: context.color.primaryContrastColor.withValues(alpha: 0.85),
                             ),
                           ),
                         ],
@@ -284,7 +284,7 @@ class _TicketsList extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -302,7 +302,7 @@ class _TicketsList extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [pColor, pColor.withOpacity(0.3)],
+                        colors: [pColor, pColor.withValues(alpha: 0.3)],
                       ),
                     ),
                   ),
@@ -311,7 +311,7 @@ class _TicketsList extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: pColor.withOpacity(0.06),
+                        color: pColor.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(Icons.support_agent_rounded, size: 20, color: pColor),
@@ -410,9 +410,9 @@ class _CompactV2Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
-        color: isSolid ? color : color.withOpacity(0.07),
+        color: isSolid ? color : color.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(100),
-        border: isSolid ? null : Border.all(color: color.withOpacity(0.15), width: 0.5),
+        border: isSolid ? null : Border.all(color: color.withValues(alpha: 0.15), width: 0.5),
       ),
       child: Text(
         label.toUpperCase(),

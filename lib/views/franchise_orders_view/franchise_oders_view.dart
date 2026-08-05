@@ -184,12 +184,12 @@ class _OrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
             BoxShadow(
-              color: statusColor.withOpacity(0.04),
+              color: statusColor.withValues(alpha: 0.04),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -210,8 +210,8 @@ class _OrderCard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         statusColor,
-                        statusColor.withOpacity(0.4),
-                        statusColor.withOpacity(0.1),
+                        statusColor.withValues(alpha: 0.4),
+                        statusColor.withValues(alpha: 0.1),
                       ],
                     ),
                   ),
@@ -234,7 +234,7 @@ class _OrderCard extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: primaryColor.withOpacity(0.06),
+                                  color: primaryColor.withValues(alpha: 0.06),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
@@ -285,7 +285,7 @@ class _OrderCard extends StatelessWidget {
                                 style: context.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: context.color.primaryContrastColor
-                                      .withOpacity(0.85),
+                                      .withValues(alpha: 0.85),
                                   fontSize: 13.5,
                                 ),
                                 maxLines: 2,
@@ -435,15 +435,15 @@ class _V2Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isSolid ? color : color.withOpacity(0.07),
+        color: isSolid ? color : color.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(100),
         border: isSolid
             ? null
-            : Border.all(color: color.withOpacity(0.15), width: 0.5),
+            : Border.all(color: color.withValues(alpha: 0.15), width: 0.5),
         boxShadow: isSolid
             ? [
                 BoxShadow(
-                  color: color.withOpacity(0.25),
+                  color: color.withValues(alpha: 0.25),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 )
@@ -479,7 +479,7 @@ class _QuickActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         onTap: onTap,
@@ -487,7 +487,7 @@ class _QuickActionButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: color.withOpacity(0.15)),
+            border: Border.all(color: color.withValues(alpha: 0.15)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -573,7 +573,7 @@ class _OptionSheet extends StatelessWidget {
                   ? Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text('Current', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
@@ -777,7 +777,7 @@ class _FilterSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.color.backgroundColor,
         border: Border(
-          bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
+          bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1), width: 1),
         ),
       ),
       child: Row(
@@ -808,7 +808,7 @@ class _FilterSection extends StatelessWidget {
               },
               icon: const Icon(Icons.close_rounded, size: 20),
               style: IconButton.styleFrom(
-                backgroundColor: Colors.red.withOpacity(0.1),
+                backgroundColor: Colors.red.withValues(alpha: 0.1),
                 foregroundColor: Colors.red,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -843,13 +843,13 @@ class _FilterItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: isActive
-              ? primaryColor.withOpacity(0.06)
-              : context.color.mutedContrastColor.withOpacity(0.3),
+              ? primaryColor.withValues(alpha: 0.06)
+              : context.color.mutedContrastColor.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isActive 
-                ? primaryColor.withOpacity(0.3) 
-                : Colors.grey.withOpacity(0.1),
+                ? primaryColor.withValues(alpha: 0.3) 
+                : Colors.grey.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -930,10 +930,10 @@ class _StatusFilterSection extends StatelessWidget {
               }
             },
             selectedColor: color,
-            backgroundColor: color.withOpacity(0.05),
+            backgroundColor: color.withValues(alpha: 0.05),
             checkmarkColor: Colors.white,
             side: BorderSide(
-              color: isSelected ? color : color.withOpacity(0.2),
+              color: isSelected ? color : color.withValues(alpha: 0.2),
               width: 1,
             ),
             shape: RoundedRectangleBorder(

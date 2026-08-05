@@ -83,8 +83,9 @@ class _CreateQuoteViewState extends State<CreateQuoteView> {
                   isRequired: true,
                   minLines: 5,
                   validator: (v) {
-                    if (v == null || v.isEmpty)
+                    if (v == null || v.isEmpty) {
                       return "Description is required";
+                    }
                     return null;
                   },
                 ),

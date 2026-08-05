@@ -17,7 +17,7 @@ extension CreateShimmerExtension on Widget {
       onPlay: (controller) => controller.repeat(),
     ).shimmer(
       duration: const Duration(seconds: 1),
-      color: color.accentContrastColor.withOpacity(.65),
+      color: color.accentContrastColor.withValues(alpha: .65),
     );
   }
 }

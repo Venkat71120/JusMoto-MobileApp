@@ -26,8 +26,8 @@ class CarBrandCard extends StatelessWidget {
       width: (context.width - 88) / 5,
       radius: 12,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-      borderColor: isSelected ? primaryColor : context.color.primaryBorderColor.withOpacity(0.5),
-      color: isSelected ? primaryColor.withOpacity(0.15) : context.color.accentContrastColor,
+      borderColor: isSelected ? primaryColor : context.color.primaryBorderColor.withValues(alpha: 0.5),
+      color: isSelected ? primaryColor.withValues(alpha: 0.15) : context.color.accentContrastColor,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -36,7 +36,7 @@ class CarBrandCard extends StatelessWidget {
                padding: const EdgeInsets.all(4),
                decoration: BoxDecoration(
                  // Add a subtle container for the logo to make it pop on dark backgrounds
-                 color: Colors.white.withOpacity(isSelected ? 0.9 : 0.85),
+                 color: Colors.white.withValues(alpha: isSelected ? 0.9 : 0.85),
                  borderRadius: BorderRadius.circular(6),
                ),
                child: CustomNetworkImage(

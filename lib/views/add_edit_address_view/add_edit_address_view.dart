@@ -1,6 +1,5 @@
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
 import 'package:car_service/utils/components/area_dropdown.dart';
 import 'package:car_service/utils/components/city_dropdown.dart';

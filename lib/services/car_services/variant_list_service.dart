@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import '../../data/network/network_api_services.dart';
 import '../../helper/app_urls.dart';
 import '../../helper/constant_helper.dart';
-import '../../helper/local_keys.g.dart';
 import '../../models/car_models/variant_list_model.dart';
-import '../../models/car_models/car_model_list_model.dart';
 
 class VariantListService with ChangeNotifier {
   VariantListModel? _variantListModel;

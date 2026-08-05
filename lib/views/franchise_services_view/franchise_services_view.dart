@@ -192,7 +192,7 @@ class _StatsHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryColor, primaryColor.withOpacity(0.82)],
+          colors: [primaryColor, primaryColor.withValues(alpha: 0.82)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -269,9 +269,9 @@ class _StatPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -309,7 +309,7 @@ class _StatsHeaderSkeleton extends StatelessWidget {
             width: 100,
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             )),
         12.toHeight,
@@ -319,7 +319,7 @@ class _StatsHeaderSkeleton extends StatelessWidget {
                 width: 80,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 )),
             SizedBoxExtension(10).toWidth,
@@ -327,7 +327,7 @@ class _StatsHeaderSkeleton extends StatelessWidget {
                 width: 80,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 )),
           ],
@@ -388,7 +388,7 @@ class _FilterSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.color.backgroundColor,
         border: Border(
-          bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
+          bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1), width: 1),
         ),
       ),
       child: Row(
@@ -419,7 +419,7 @@ class _FilterSection extends StatelessWidget {
               },
               icon: const Icon(Icons.close_rounded, size: 20),
               style: IconButton.styleFrom(
-                backgroundColor: Colors.red.withOpacity(0.1),
+                backgroundColor: Colors.red.withValues(alpha: 0.1),
                 foregroundColor: Colors.red,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -453,10 +453,10 @@ class _DateFilterItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isActive ? primaryColor.withOpacity(0.05) : context.color.accentContrastColor,
+          color: isActive ? primaryColor.withValues(alpha: 0.05) : context.color.accentContrastColor,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isActive ? primaryColor.withOpacity(0.3) : Colors.grey.withOpacity(0.15),
+            color: isActive ? primaryColor.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.15),
           ),
         ),
         child: Row(
@@ -561,7 +561,7 @@ class _FilterChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? primaryColor : primaryColor.withOpacity(0.08),
+          color: selected ? primaryColor : primaryColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -610,7 +610,7 @@ class _TicketCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -697,7 +697,7 @@ class _TicketCard extends StatelessWidget {
                             width: 22,
                             height: 22,
                             decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.12),
+                              color: primaryColor.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -798,7 +798,7 @@ class _SmallBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Text(

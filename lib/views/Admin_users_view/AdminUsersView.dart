@@ -1,4 +1,3 @@
-import 'package:car_service/customizations/colors.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/view_models/admin_view_models/AdminUsersViewModel.dart';
@@ -141,7 +140,7 @@ class _AdminUsersViewState extends State<AdminUsersView> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
-                backgroundColor: _getAvatarColor(user.id).withOpacity(0.1),
+                backgroundColor: _getAvatarColor(user.id).withValues(alpha: 0.1),
                 child: Text(
                   user.firstName.isNotEmpty ? user.firstName[0] : '?',
                   style: TextStyle(color: _getAvatarColor(user.id), fontWeight: FontWeight.bold),
@@ -203,7 +202,7 @@ class _AdminUsersViewState extends State<AdminUsersView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(

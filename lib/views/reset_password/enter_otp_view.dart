@@ -29,7 +29,7 @@ class EnterOtpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (_) {},
+      onPopInvokedWithResult: (_, __) {},
       child: Scaffold(
         appBar: AppBar(
           leading: NavigationPopIcon(

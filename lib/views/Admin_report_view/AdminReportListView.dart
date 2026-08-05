@@ -159,7 +159,7 @@ class _AdminReportListViewState extends State<AdminReportListView> with SingleTi
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.transparent,
           border: Border.all(color: isSelected ? primaryColor : Colors.grey[300]!),
           borderRadius: BorderRadius.circular(6),
         ),

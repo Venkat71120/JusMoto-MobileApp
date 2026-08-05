@@ -195,7 +195,7 @@ class _Content extends StatelessWidget {
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [primaryColor, primaryColor.withOpacity(0.8)],
+              colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -310,7 +310,7 @@ class _Content extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: context.color.mutedContrastColor.withOpacity(0.5),
+              color: context.color.mutedContrastColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
@@ -342,7 +342,7 @@ class _Content extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.12),
+                  color: primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
@@ -413,7 +413,7 @@ class _Content extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.05),
+              color: primaryColor.withValues(alpha: 0.05),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -445,7 +445,7 @@ class _Content extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.08),
+                    color: primaryColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.receipt_outlined,
@@ -491,7 +491,7 @@ class _Content extends StatelessWidget {
   Widget _divider(BuildContext context) => Divider(
       height: 1,
       thickness: 0.5,
-      color: context.color.primaryBorderColor.withOpacity(0.5));
+      color: context.color.primaryBorderColor.withValues(alpha: 0.5));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -573,7 +573,7 @@ class _QuickAction extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: (s['color'] as Color).withOpacity(0.1),
+                    color: (s['color'] as Color).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(s['icon'] as IconData,
@@ -633,7 +633,7 @@ class _ChatBubble extends StatelessWidget {
       labelColor = Colors.white70;
       senderLabel = 'You${message.senderName != null ? ' (${message.senderName})' : ''}';
     } else if (isFranchise) {
-      bgColor = Colors.teal.withOpacity(0.08);
+      bgColor = Colors.teal.withValues(alpha: 0.08);
       textColor = context.color.primaryContrastColor;
       timeColor = context.color.tertiaryContrastColo;
       labelColor = Colors.teal;
@@ -664,7 +664,7 @@ class _ChatBubble extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -672,8 +672,8 @@ class _ChatBubble extends StatelessWidget {
           border: (isFranchise || !isAdmin)
               ? Border.all(
                   color: isFranchise
-                      ? Colors.teal.withOpacity(0.15)
-                      : context.color.primaryBorderColor.withOpacity(0.5))
+                      ? Colors.teal.withValues(alpha: 0.15)
+                      : context.color.primaryBorderColor.withValues(alpha: 0.5))
               : null,
         ),
         child: Column(
@@ -796,7 +796,7 @@ class _ReplyBarState extends State<_ReplyBar> {
         color: context.color.accentContrastColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -905,7 +905,7 @@ class _FranchiseSection extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color:
-                        context.color.primarySuccessColor.withOpacity(0.1),
+                        context.color.primarySuccessColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text('ASSIGNED',
@@ -921,9 +921,9 @@ class _FranchiseSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.04),
+                color: primaryColor.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: primaryColor.withOpacity(0.12)),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.12)),
               ),
               child: Row(
                 children: [
@@ -931,7 +931,7 @@ class _FranchiseSection extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(Icons.storefront_rounded,
@@ -976,16 +976,16 @@ class _FranchiseSection extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.04),
+                  color: primaryColor.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: primaryColor.withOpacity(0.12)),
+                  border: Border.all(color: primaryColor.withValues(alpha: 0.12)),
                 ),
                 child: Column(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.08),
+                        color: primaryColor.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.add_business_rounded,
@@ -1060,7 +1060,7 @@ class _FranchiseSection extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             color: isAssigned
-                                ? primaryColor.withOpacity(0.12)
+                                ? primaryColor.withValues(alpha: 0.12)
                                 : context.color.mutedContrastColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -1134,7 +1134,7 @@ class _GlassCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1191,7 +1191,7 @@ class _InfoTile extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, size: 16, color: iconColor),
@@ -1242,9 +1242,9 @@ class _WhiteBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1276,7 +1276,7 @@ class _SmallBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(label,
@@ -1306,7 +1306,7 @@ class _Skeleton extends StatelessWidget {
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      colors: [primaryColor, primaryColor.withOpacity(0.8)]),
+                      colors: [primaryColor, primaryColor.withValues(alpha: 0.8)]),
                 ),
               ),
             ),
@@ -1364,7 +1364,7 @@ class _Error extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: context.color.primaryWarningColor.withOpacity(0.06),
+                color: context.color.primaryWarningColor.withValues(alpha: 0.06),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.error_outline_rounded,

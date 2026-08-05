@@ -108,7 +108,7 @@ class _DetailContent extends StatelessWidget {
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                    colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -213,7 +213,7 @@ class _DetailContent extends StatelessWidget {
                           ticket.description!.trim(),
                           style: context.bodySmall?.copyWith(
                             color: context.color.secondaryContrastColor
-                                .withOpacity(0.7),
+                                .withValues(alpha: 0.7),
                             height: 1.6,
                           ),
                         ),
@@ -234,7 +234,7 @@ class _DetailContent extends StatelessWidget {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.12),
+                              color: primaryColor.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -343,7 +343,7 @@ class _LinkedOrderCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.06),
+            color: primaryColor.withValues(alpha: 0.06),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(14),
               topRight: Radius.circular(14),
@@ -478,7 +478,7 @@ class _MessageBubble extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -604,7 +604,7 @@ class _ReplyInputState extends State<_ReplyInput> {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.05),
+                  color: Colors.grey.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Stack(
@@ -695,9 +695,9 @@ class _StatusPopup extends StatelessWidget {
       icon: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.4)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
         ),
         child: const Text(
           'Update Status',
@@ -739,7 +739,7 @@ class _SectionHeader extends StatelessWidget {
       title,
       style: context.bodyMedium?.copyWith(
         fontWeight: FontWeight.bold,
-        color: context.color.secondaryContrastColor.withOpacity(0.5),
+        color: context.color.secondaryContrastColor.withValues(alpha: 0.5),
         fontSize: 12,
         letterSpacing: 0.5,
       ),
@@ -763,7 +763,7 @@ class _SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -845,9 +845,9 @@ class _WhiteBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.18),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.35)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -884,7 +884,7 @@ class _SmallBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Text(
@@ -919,7 +919,7 @@ class _DetailSkeleton extends StatelessWidget {
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                    colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
                   ),
                 ),
               ),

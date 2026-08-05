@@ -1,6 +1,5 @@
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
-import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:flutter/material.dart';
 
 import '../../../customizations/colors.dart';
@@ -26,7 +25,7 @@ class ServiceDetailsBasics extends StatelessWidget {
     final hasDiscount =
         (displayDiscount ?? 0) > 0 && displayDiscount != displayPrice;
     final discountPercent = hasDiscount && (displayPrice ?? 0) > 0
-        ? (((displayPrice! - displayDiscount!) / displayPrice) * 100).round()
+        ? (((displayPrice - displayDiscount!) / displayPrice) * 100).round()
         : 0;
 
     return Container(
@@ -39,7 +38,7 @@ class ServiceDetailsBasics extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -65,7 +64,7 @@ class ServiceDetailsBasics extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange.withOpacity(0.15),
+                        color: Colors.orange.withValues(alpha: 0.15),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -162,7 +161,7 @@ class ServiceDetailsBasics extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF22C55E).withOpacity(0.12),
+                      color: const Color(0xFF22C55E).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(

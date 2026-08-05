@@ -77,15 +77,17 @@ class FlutterwavePayment extends StatelessWidget {
           Alerts().paymentFailWarning(context, onFailed: onFailed);
         }),
       ),
-      body: WillPopScope(
-        onWillPop: () async {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
           bool canGoBack = await _controller.canGoBack();
           if (canGoBack) {
             _controller.goBack();
-            return false;
+            return;
           }
           Alerts().paymentFailWarning(context, onFailed: onFailed);
-          return false;
+          return;
         },
         child: FutureBuilder(
             future: waitForIt(testing, secretKey, publicKey, amount),
@@ -126,7 +128,7 @@ class FlutterwavePayment extends StatelessWidget {
                         pageBuilder: (context, a, b) {
                           return Material(
                               color: context.color.primaryContrastColor
-                                  .withOpacity(.05),
+                                  .withValues(alpha: .05),
                               child: Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,

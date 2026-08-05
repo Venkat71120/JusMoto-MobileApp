@@ -109,7 +109,7 @@ class FranchiseInfoCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.12),
+                  color: primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -129,7 +129,7 @@ class FranchiseInfoCard extends StatelessWidget {
                     Text(
                       LocalKeys.welcomeBack,
                       style: context.bodySmall?.copyWith(
-                        color: context.color.secondaryContrastColor.withOpacity(0.6),
+                        color: context.color.secondaryContrastColor.withValues(alpha: 0.6),
                       ),
                     ),
                     4.toHeight,
@@ -152,7 +152,7 @@ class FranchiseInfoCard extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.1),
+                              color: primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -170,7 +170,7 @@ class FranchiseInfoCard extends StatelessWidget {
                               child: Text(
                                 franchiseLocation,
                                 style: context.bodySmall?.copyWith(
-                                  color: context.color.secondaryContrastColor.withOpacity(0.5),
+                                  color: context.color.secondaryContrastColor.withValues(alpha: 0.5),
                                   fontSize: 11,
                                 ),
                                 maxLines: 1,

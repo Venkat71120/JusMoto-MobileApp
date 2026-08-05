@@ -26,7 +26,7 @@ class ConversationSkeleton extends StatelessWidget {
                   CircleAvatar(
                     radius: 16,
                     backgroundColor: index.isEven
-                        ? primaryColor.withOpacity(.4)
+                        ? primaryColor.withValues(alpha: .4)
                         : context.color.tertiaryContrastColo,
                   ),
                   12.toWidth,
@@ -40,7 +40,7 @@ class ConversationSkeleton extends StatelessWidget {
                             BoxConstraints(maxWidth: context.width / 1.7),
                         color: index.isEven
                             ? context.color.mutedContrastColor
-                            : primaryColor.withOpacity(.5),
+                            : primaryColor.withValues(alpha: .5),
                         radius: 12,
                         child: const SizedBox(
                           height: 16,

@@ -4,7 +4,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:car_service/customizations/colors.dart';
-import 'package:car_service/helper/constant_helper.dart';
 import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/local_keys.g.dart';
@@ -13,7 +12,6 @@ import 'package:car_service/utils/components/custom_network_image.dart';
 import 'package:car_service/view_models/franchise_home_view_model/franchise_home_view_model.dart';
 import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class FranchiseHomeAppBar extends StatelessWidget {
@@ -87,7 +85,7 @@ class FranchiseHomeAppBar extends StatelessWidget {
                         Text(
                           LocalKeys.welcomeBack,
                           style: context.bodySmall?.copyWith(
-                            color: color.withOpacity(.7),
+                            color: color.withValues(alpha: .7),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -112,13 +110,13 @@ class FranchiseHomeAppBar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: value < 200 
-                          ? Colors.white.withOpacity(0.2)
-                          : primaryColor.withOpacity(0.12),
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : primaryColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: value < 200
-                            ? Colors.white.withOpacity(0.3)
-                            : primaryColor.withOpacity(0.3),
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : primaryColor.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(

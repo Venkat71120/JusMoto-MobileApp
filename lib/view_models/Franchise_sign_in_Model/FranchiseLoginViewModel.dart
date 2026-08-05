@@ -1,4 +1,3 @@
-import 'package:car_service/customization.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/services/auth_services/FranchiseLoginService.dart';
 import 'package:car_service/view_models/Franchise_landing_view_model/FranchiseLandingViewModel.dart';

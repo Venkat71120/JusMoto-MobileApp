@@ -32,11 +32,12 @@ class TicketConversationView extends StatelessWidget {
 
     return Consumer<TicketConversationService>(
       builder: (context, tcProvider, child) {
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: true,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) return;
             tcm.cancelAutoRefresh();
             tcProvider.clearAllMessages();
-            return true;
           },
           child: Scaffold(
             appBar: AppBar(
@@ -70,12 +71,12 @@ class TicketConversationView extends StatelessWidget {
                 },
               ),
             ),
-            body: WillPopScope(
-              onWillPop: () async {
+            body: PopScope(
+              canPop: true,
+              onPopInvokedWithResult: (didPop, result) {
+                if (!didPop) return;
                 tcm.cancelAutoRefresh();
                 tcProvider.clearAllMessages();
-                Navigator.of(context).pop();
-                return true;
               },
               child: Consumer<TicketConversationService>(
                 builder: (context, tcProvider, child) {
@@ -104,7 +105,7 @@ class TicketConversationView extends StatelessWidget {
                           color: context.color.accentContrastColor,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, -2),
                             ),
@@ -123,7 +124,7 @@ class TicketConversationView extends StatelessWidget {
                                     margin: const EdgeInsets.only(bottom: 12),
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.05),
+                                      color: Colors.grey.withValues(alpha: 0.05),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Stack(
@@ -174,10 +175,10 @@ class TicketConversationView extends StatelessWidget {
                                   Expanded(
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: context.color.backgroundColor.withOpacity(0.05),
+                                        color: context.color.backgroundColor.withValues(alpha: 0.05),
                                         borderRadius: BorderRadius.circular(24),
                                         border: Border.all(
-                                          color: context.color.primaryBorderColor.withOpacity(0.5),
+                                          color: context.color.primaryBorderColor.withValues(alpha: 0.5),
                                         ),
                                       ),
                                       child: TextField(
@@ -188,7 +189,7 @@ class TicketConversationView extends StatelessWidget {
                                         decoration: InputDecoration(
                                           hintText: LocalKeys.writeMessage,
                                           hintStyle: TextStyle(
-                                            color: context.color.tertiaryContrastColo.withOpacity(0.5),
+                                            color: context.color.tertiaryContrastColo.withValues(alpha: 0.5),
                                             fontSize: 14,
                                           ),
                                           contentPadding: const EdgeInsets.symmetric(

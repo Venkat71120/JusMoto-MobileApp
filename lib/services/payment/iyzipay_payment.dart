@@ -37,15 +37,17 @@ class IyzipayPayment extends StatelessWidget {
           Alerts().paymentFailWarning(context);
         }),
       ),
-      body: WillPopScope(
-        onWillPop: () async {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
           bool canGoBack = await _controller.canGoBack();
           if (canGoBack) {
             _controller.goBack();
-            return false;
+            return;
           }
           Alerts().paymentFailWarning(context);
-          return false;
+          return;
         },
         child: FutureBuilder(
             future: waitForIt(testing, apiKey, secretKey, amount),

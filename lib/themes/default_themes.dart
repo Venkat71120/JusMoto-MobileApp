@@ -172,7 +172,7 @@ class DefaultThemes {
         }),
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return color.primaryContrastColor.withOpacity(.05);
+            return color.primaryContrastColor.withValues(alpha: .05);
           }
           if (states.contains(WidgetState.pressed)) {
             return color.primaryContrastColor;
@@ -208,7 +208,7 @@ class DefaultThemes {
               overlayColor:
                   WidgetStateColor.resolveWith((states) => Colors.transparent),
               backgroundColor: WidgetStateProperty.resolveWith((states) {
-                return color.primaryContrastColor.withOpacity(0.0);
+                return color.primaryContrastColor.withValues(alpha: 0.0);
               }),
               foregroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
@@ -287,7 +287,7 @@ SwitchThemeData switchThemeData(ColorModel color) => SwitchThemeData(
       thumbColor:
           WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return primaryColor.withOpacity(.1);
+          return primaryColor.withValues(alpha: .1);
         }
         return color.accentContrastColor;
       }),

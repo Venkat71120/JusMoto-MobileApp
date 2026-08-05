@@ -1,4 +1,3 @@
-import '../../helper/app_urls.dart';
 import 'package:car_service/customization.dart';
 
 class AdminMediaListModel {

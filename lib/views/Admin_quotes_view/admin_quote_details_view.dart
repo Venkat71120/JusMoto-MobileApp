@@ -90,10 +90,12 @@ class _AdminQuoteDetailsViewState extends State<AdminQuoteDetailsView> {
                               controller: aqvm.priceController,
                               keyboardType: TextInputType.number,
                               validator: (v) {
-                                if (v == null || v.isEmpty)
+                                if (v == null || v.isEmpty) {
                                   return "Price is required to review";
-                                if (double.tryParse(v) == null)
+                                }
+                                if (double.tryParse(v) == null) {
                                   return "Invalid price";
+                                }
                                 return null;
                               },
                             ),

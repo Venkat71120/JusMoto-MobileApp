@@ -5,7 +5,6 @@ import 'package:car_service/helper/extension/context_extension.dart';
 import 'package:car_service/helper/extension/int_extension.dart';
 import 'package:car_service/helper/extension/string_extension.dart';
 import 'package:car_service/helper/extension/widget_extension.dart';
-import 'package:car_service/services/booking_services/booking_addons_service.dart';
 import 'package:car_service/services/service/cart_service.dart';
 import 'package:car_service/utils/components/empty_widget.dart';
 import 'package:car_service/utils/components/navigation_pop_icon.dart';
@@ -22,10 +21,8 @@ import 'package:provider/provider.dart';
 import '../../customizations/colors.dart';
 import '../../helper/local_keys.g.dart';
 import '../../services/home_services/service_details_service.dart';
-import '../../utils/components/custom_button.dart';
 import '../../utils/components/custom_future_widget.dart';
 import '../../utils/components/custom_refresh_indicator.dart';
-import '../../view_models/service_booking_view_model/service_booking_view_model.dart';
 import 'components/service_details_brand_selection.dart';
 import 'components/service_details_basics.dart';
 import '../quote_view/create_quote_view.dart';
@@ -135,7 +132,7 @@ class ServiceDetailsView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: 0.04),
                             blurRadius: 12,
                             offset: const Offset(0, 2),
                           ),
@@ -158,7 +155,7 @@ class ServiceDetailsView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: 0.04),
                             blurRadius: 12,
                             offset: const Offset(0, 2),
                           ),
@@ -189,7 +186,7 @@ class ServiceDetailsView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: 0.04),
                             blurRadius: 12,
                             offset: const Offset(0, 2),
                           ),
@@ -213,7 +210,7 @@ class ServiceDetailsView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: Colors.black.withValues(alpha: 0.04),
                               blurRadius: 12,
                               offset: const Offset(0, 2),
                             ),

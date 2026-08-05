@@ -10,9 +10,9 @@ class ColorModel {
   final Color primarySuccessColor;
   final Color primaryWarningColor;
   final Color primaryPendingColor;
-  Color get mutedPendingColor => primaryPendingColor.withOpacity(.1);
-  Color get mutedWarningColor => primaryWarningColor.withOpacity(.1);
-  Color get mutedSuccessColor => primarySuccessColor.withOpacity(.1);
+  Color get mutedPendingColor => primaryPendingColor.withValues(alpha: .1);
+  Color get mutedWarningColor => primaryWarningColor.withValues(alpha: .1);
+  Color get mutedSuccessColor => primarySuccessColor.withValues(alpha: .1);
   final Color primaryBorderColor;
   final Color cardFillColor;
   final Color inputFillColor;

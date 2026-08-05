@@ -137,7 +137,7 @@ class TicketListService with ChangeNotifier {
       headers: commonAuthHeader,
     );
 
-    if (responseData != null && responseData is Map && responseData.containsKey('data')) {
+    if (responseData != null && responseData.containsKey('data')) {
       departments = TicketDepartmentsModel.fromJson(responseData).departments;
     } else {
       departments = [];
